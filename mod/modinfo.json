@@ -1,0 +1,10 @@
+﻿{
+	"id": "syhnne.caterators",
+	"name": "_Caterators (alpha ver.)",
+	"version": "0.1.0",
+	"authors": "syhnne",
+	"description": "在这个时候更新，，",
+	"requirements": [ "slime-cubed.slugbase", "moreslugcats", "fisobs", "crs" ],
+	"requirements_names": [ "SlugBase", "More Slugcats Expansion", "Fisobs", "Custom Regions Support" ],
+	"tags": [ "Custom Slugcat" ]
+}
