@@ -31,7 +31,7 @@ public class CustomLore
     // 打开外层空间的门。这是你唯一出去的路了，毕竟不能走根源设施（但说实话被困外层空间挺难顶的，给他们一个3-4级的初始业力罢
     private static bool RegionGate_customOEGateRequirements(On.RegionGate.orig_customOEGateRequirements orig, RegionGate self)
     {
-        if (self.room.game.IsStorySession && self.room.game.GetStorySession.saveStateNumber == Enums.SRSname)
+        if (self.room.game.IsStorySession && self.room.game.StoryCharacter == Enums.SRSname)
         {
             return true;
         }

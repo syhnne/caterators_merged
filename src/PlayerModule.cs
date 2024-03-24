@@ -11,6 +11,8 @@ public class PlayerModule
     public readonly bool IsMyStory;
     public readonly bool isCaterator;
     public GravityController gravityController;
+    public nsh.Scarf nshScarf;
+    public srs.LightSourceModule srsLightSource;
 
 
     public PlayerModule(Player player)
@@ -23,7 +25,7 @@ public class PlayerModule
         }
         if (player.room.game.session is StoryGameSession)
         {
-            storyName = player.room.game.GetStorySession.saveStateNumber;
+            storyName = player.room.game.StoryCharacter;
         }
         else { storyName = null; }
 

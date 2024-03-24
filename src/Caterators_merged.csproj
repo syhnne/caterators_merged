@@ -48,6 +48,9 @@
         <Reference Include="Fisobs">
           <HintPath>..\..\srs\lib\Fisobs.dll</HintPath>
         </Reference>
+        <Reference Include="Unity.Mathematics">
+          <HintPath>..\lib\Unity.Mathematics.dll</HintPath>
+        </Reference>
     </ItemGroup>
     
     <Target Name="GenerateMod" AfterTargets="PostBuildEvent">

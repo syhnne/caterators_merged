@@ -1,0 +1,16 @@
+Press G and up&down arrow keys to adjust the gravity in room.|按住G键和上下键来调整房间的重力
+Explosion capacity|爆炸次数上限
+Explosion capacity |死亡前可以执行的爆炸动作最大次数
+Add food by electric means|电击恢复饱食度
+Add food when electrocuted by centipedes and zapcoils or crafting with electric spears|被蜈蚣或线圈电击时，以及使用有电的电矛进行制作时，是否恢复饱食度
+Crafting key|制作按键
+The key to be pressed when crafting electric spears (if unspecified, hold [pickup] to craft)|制作电矛时，除了拾取键以外还需要按住的键。如果没有绑定，只需要按拾取键即可。
+oracle console|控制台
+(WIP)The key to toggle SS_AI console. For some reason this doesn't work right now, but you can use Tab to toggle the console.|(WIP)用于在演算室内打开控制台的按键
+Gravity control key|重力控制按键
+The key to be pressed when controlling gravity|调整房间重力时需要按住的键
+Gravity control toggle|启用重力控制
+(WIP)The key to toggle gravity control|(WIP)在游戏中启用和关闭重力控制的键
+Options|其他选项
+Gravity Control|重力控制选项
+Fallen Bridge|断桥

@@ -44,6 +44,12 @@ public class PlayerHooks
         On.Player.NewRoom += Player_NewRoom;
 
 
+        // 重力控制
+        On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
+        On.Player.Die += Player_Die;
+        On.Player.Destroy += Player_Destroy;
+        On.Player.MovementUpdate += Player_MovementUpdate;
+
 
         // 不能吃神经元
         IL.Player.GrabUpdate += IL_Player_GrabUpdate;
@@ -60,12 +66,9 @@ public class PlayerHooks
             );
 
         fp.PlayerHooks.Apply();
-        
-
+        srs.PlayerHooks.Apply();
+        nsh.PlayerHooks.Apply();
     }
-
-
-
 
 
 
@@ -81,6 +84,10 @@ public class PlayerHooks
         if (getModule)
         {
             module.Update(self, eu);
+            if (self.room == null && module.srsLightSource != null)
+            {
+                module.srsLightSource.lightSources = null;
+            }
         }
         orig(self, eu);
 
@@ -103,7 +110,7 @@ public class PlayerHooks
         bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && Enums.IsCaterator(module.playerName);
         if (self.dead || !getModule || Enums.IsCaterator(self.SlugCatClass)) return;
         module.gravityController?.NewRoom(module.IsMyStory);
-
+        // 这咋也不好使？
 
         if (newRoom.abstractRoom.name == "SS_AI" && CustomLore.DPSaveData != null && CustomLore.DPSaveData.saveStateNumber == Enums.FPname)
         {
@@ -112,6 +119,11 @@ public class PlayerHooks
         }
 
         if (self.room == null) { return; }
+
+        if (module.srsLightSource != null && module.srsLightSource.lightSources == null && self.SlugCatClass == Enums.SRSname) 
+        {
+            module.srsLightSource.AddLightSource();
+        }
 
         // 我感觉用不着这么写了 写的时候再说吧
         // TODO:
@@ -137,6 +149,14 @@ public class PlayerHooks
         Plugin.Log("CustomLore.DPSaveData.CyclesFromLastEnterSSAI:", CustomLore.DPSaveData.CyclesFromLastEnterSSAI, CustomLore.DPSaveData.saveStateNumber.value);
 
         Plugin.Log("self.slugcatStats.foodToHibernate:", self.slugcatStats.foodToHibernate);
+
+        foreach (var obj in newRoom.physicalObjects)
+        {
+            foreach (var obj2 in obj)
+            {
+                Plugin.Log("physicalObj:", obj2.GetType().Name);
+            }
+        }
     }
 
 
@@ -149,7 +169,7 @@ public class PlayerHooks
 
 
 
-
+    // 不要动这个数，尤其是srs的，动了会导致新地图的难度发生明显变化（
     private static void Player_Jump(On.Player.orig_Jump orig, Player self)
     {
         orig(self);
@@ -167,6 +187,75 @@ public class PlayerHooks
         }
 
     }
+
+
+
+    #region 重力控制
+
+    // 启用重力控制时阻止y轴输入
+    private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
+    {
+        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
+        if (getModule)
+        {
+            if (module.gravityController != null && module.gravityController.isAbleToUse)
+            {
+                module.gravityController.inputY = self.input[0].y;
+                self.input[0].y = 0;
+            }
+        }
+        orig(self, eu);
+    }
+
+
+
+    // 垃圾回收
+    private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
+    {
+        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
+        if (getModule)
+        {
+            module.gravityController?.Destroy();
+            module.gravityController = null;
+        }
+        orig(self);
+    }
+
+
+
+
+    // 防止你那倒霉的联机队友在你死了之后顶着3倍重力艰难行走。我知道队友有可能也会控制重力，但是我懒得加判断
+    private static void Player_Die(On.Player.orig_Die orig, Player self)
+    {
+        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
+        if (getModule)
+        {
+            module.gravityController.Die();
+        }
+        orig(self);
+
+    }
+
+
+
+
+    // 重力显示
+    private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
+    {
+        orig(self, cam);
+        bool getModule = Plugin.playerModules.TryGetValue((self.owner as Player), out var module) && module.isCaterator;
+        if (getModule)
+        {
+            Plugin.LogStat("HUD gravityMeter");
+            self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
+        }
+
+    }
+
+
+
+    #endregion
+
 
 
 

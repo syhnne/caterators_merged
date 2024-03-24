@@ -1,0 +1,6 @@
+RainIntensity: 0
+RumbleIntensity: 0.2065217
+Palette: 18
+Effects: ZeroG-0.2861299-287.5083-227.7459, 
+PlacedObjects: SuperStructureFuses><552.9138><56.31956><231~14, SuperStructureFuses><391.0566><55.94933><24~23, SuperStructureFuses><231.8644><44.35301><29~21, SuperStructureFuses><93.11798><45.66154><18~19, 
+FadePalette: 17, 0.9130435

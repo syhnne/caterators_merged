@@ -1,0 +1,11 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0
+BkgDroneVolume: 0.326087
+Palette: 23
+EffectColorB: 12
+Effects: ZeroG-0.8573257-20-20, BrokenZeroG-0.2-278-20, CorruptionSpores-0.3695652-19-90, ZeroGSpecks-0.3695652-282-88, 
+PlacedObjects: LightFixture><1771.676><1412.906><RedLight~-396.6795~-27~0, LightFixture><1209.422><1222.601><RedLight~17.32051~-10~30, LightSource><1920.692><1540.445><0.5543478~Environment~0~100~-413~-350.3975~1~0~None~0~0, Corruption><1957.05><1014.246><-63~-125, Corruption><1677.676><1476.406><-5~107, SuperStructureFuses><-171.4138><1211.865><112~80, SuperStructureFuses><-174.4986><1099.45><128~21, SuperStructureFuses><1803.573><1401.064><88~161, Corruption><1949.37><608.16><66~121, CorruptionDarkness><1932.061><597.4406><-56~128, Corruption><1286.705><585.0551><70~39, CorruptionTube><1284.065><561.1741><455~302, Corruption><1757.145><882.4395><-5.69165~81.50214, StuckDaddy><245.1274><538.6827><48.37915~98.57706, Corruption><169.3448><1015.351><9.248932~75.81039, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><649.1858><647.926><0.3913043><1, SPOT><SO_SFX-Doomsday.ogg><7.054199><376.2908><0.5543478><0.9804348><997.0542><503.2908><-160.3553><-125.3553><0><0.1652175, SPOT><SO_SFX-Corrosion.ogg><184.8535><498.8289><0.4565217><1><1961.854><641.8289><-145.3553><-128.3553><0><0.2304349, SPOT><SO_SFX-Corrosion.ogg><7.312744><264.8203><0.2934783><1><1946.313><989.8203><-159.3553><-54.35535><0><0.1869567, 
+FadePalette: 17, 0.1195652, 0.1086956, 0.1086956, 0.1195652

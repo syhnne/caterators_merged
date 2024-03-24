@@ -1,0 +1,12 @@
+Template: NONE
+WaveSpeed: 0.5967958
+WaveAmplitude: 0.2717391
+SecondWaveAmplitude: 0
+Clouds: 0.4253285
+Grime: 0.3530685
+Palette: 27
+EffectColorA: 12
+EffectColorB: 6
+Effects: Fog-0.4794612-20-20, BorderPushBack-1-17.19376-150.9479, Coldness-1-47-62, FairyParticles-0-301-160, 
+PlacedObjects: DayNightSettings><1604.52><912.0322><-7.094727~137.4342~5~49, DangleFruit><1932.402><5226.603><-276.0458~51.9364~2~6, DangleFruit><1956.606><5177.366><-382.7645~-35.57291~2~6, DangleFruit><2069.877><5149.919><-735.6479~-102.45~2~6, DangleFruit><2098.73><5096.519><-827.4261~-162.924~2~6, DangleFruit><2206.706><5062.329><-931.299~-231.9354~2~6, DangleFruit><2181.046><5151.75><0~0~2~6, DangleFruit><1781.222><3337.38><-426.1635~-26.32397~2~6, DangleFruit><1746.872><3306.04><0~0~2~3, JellyFish><1183.701><186.719><0~0~2~3, DeadTokenStalk><1136.13><786.5728><-12.09503~-89.24792, WhiteToken><1074.413><762.2116><16.36353~-63.63538~40.55298~-226.2437~0~Chatlog_Broadcast16~White|Yellow|Red|Rivulet|Artificer|Saint|Gourmand|NSHslugcat~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0, 
+FadePalette: 13, 0.4485275, 0, 0, 0.6805254, 0, 0.8351898, 1, 0, 0.3325295, 0.1546651, 0, 0, 1

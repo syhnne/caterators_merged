@@ -1,0 +1,11 @@
+Template: NONE
+WaveSpeed: 0.6086956
+WaveAmplitude: 0.25
+SecondWaveAmplitude: 0
+Clouds: 0.5108696
+Grime: 0.5234604
+Palette: 13
+EffectColorA: 6
+EffectColorB: 6
+Effects: Fog-0.5-58-9, Darkness-0.06521739-28-67, BorderPushBack-0.1029444-197-132, LightRain-0.5-267-218, 
+FadePalette: 35, 0.4021739, 0.4021739, 0.4021739

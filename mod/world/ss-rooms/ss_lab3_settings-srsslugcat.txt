@@ -1,0 +1,7 @@
+Template: SS_SettingsTemplate_Corrupt
+Clouds: 1
+Grime: 0
+BkgDroneVolume: 0
+Effects: BrokenZeroG-0-315.2947-207.1531, 
+PlacedObjects: Corruption><855.1761><558.8447><-92~-137, Corruption><671.6396><49.85677><1~71, CorruptionTube><837.3835><558.8374><-153~-495, Filter><842.5546><552.2073><-24~-39~21~71~White|Red|SRSslugcat, Filter><683.9128><37.11615><-27~-30~141~-59~White|Red|SRSslugcat, 
+FadePalette: 17, 0.7042007

@@ -1,0 +1,4 @@
+WaveAmplitude: 0.1542796
+SecondWaveAmplitude: 0.3478261
+Effects: BorderPushBack-0-274.7021-200.7104, Darkness-0.04639966-2.924988-69.09062, 
+FadePalette: 5, 0.1314651, 0.1314651

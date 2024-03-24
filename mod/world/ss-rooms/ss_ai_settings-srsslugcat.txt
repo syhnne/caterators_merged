@@ -1,0 +1,11 @@
+Template: NONE
+DangerType: None
+CeilingDrips: 0
+Clouds: 0
+Grime: 0
+BkgDroneVolume: 0
+RandomItemDensity: 0
+Palette: 26
+Effects: SunBlock-1-14-118, ZeroG-0.9-18-57, DarkenLights-0.193331-0-0, Darkness-0-377.7844-151.5406, Contrast-0.1005319-288.1407-33.43855, 
+PlacedObjects: LightSource><204.5629><635.6332><1~Environment~591.2218~-558.099~50~86.60254~0~0~None~0~0, LightSource><781.581><58.65844><1~Environment~-586.9531~564.5823~50~86.60254~1~0~None~0~0, LightSource><191.803><50.49693><1~Environment~593.3562~574.5427~50~86.60254~1~0~None~0~0, LightSource><775.9514><635.511><1~Environment~-597.6251~-568.0594~50~86.60254~1~0~None~0~0, 
+AmbientSounds: OMNI><AM_WIN-StrongWnd2.ogg><649.244><654.55><0.3695652><1, 

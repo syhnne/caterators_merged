@@ -19,6 +19,8 @@ using Menu;
 
 namespace Caterators_merged.fp;
 
+
+// TODO: 你先别急，让我先急，我想改点东西，玩家时间结束了也可以玩，只不过画面很阴间，约等于没法玩
 internal class CustomLore
 {
 
@@ -243,7 +245,7 @@ internal class CustomLore
             c.Emit(OpCodes.Ldarg_2);
             c.EmitDelegate<Func<int, RainWorldGame, int>>((redsCycles, game) =>
             {
-                return (game != null && game.IsStorySession && game.GetStorySession.saveStateNumber == Enums.FPname) ? Plugin.Cycles : redsCycles;
+                return (game != null && game.IsStorySession && game.StoryCharacter == Enums.FPname) ? Plugin.Cycles : redsCycles;
             });
         }
     }
@@ -259,7 +261,7 @@ internal class CustomLore
         if (self.manager.upcomingProcess != null || !self.IsStorySession) return;
 
         SaveState save = self.GetStorySession.saveState;
-        if (self.GetStorySession.saveStateNumber == Enums.FPname)
+        if (self.StoryCharacter == Enums.FPname)
         {
             Plugin.LogStat("RainWorldGame_Win: cycle: " + save.cycleNumber);
             if (Caterators_merged.CustomLore.DPSaveData != null && Caterators_merged.CustomLore.DPSaveData.saveStateNumber == Enums.FPname)
@@ -419,7 +421,7 @@ internal class SS_PebblesAltEnding : UpdatableAndDeletable
 
         // 测试的时候用这个粗略判断一下，防止刚一开始就结束了
         if (!room.game.IsStorySession
-            || room.game.GetStorySession.saveStateNumber != Enums.FPname
+            || room.game.StoryCharacter != Enums.FPname
             || !room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon) return;
 
         if (!ModManager.CoopAvailable)
@@ -460,7 +462,7 @@ internal class SS_PebblesAltEnding : UpdatableAndDeletable
             {
                 endingTriggered = true;
                 // 这是不是过场动画？
-                room.game.manager.sceneSlot = room.game.GetStorySession.saveStateNumber;
+                room.game.manager.sceneSlot = room.game.StoryCharacter;
 
                 if (fadeOut == null)
                 {

@@ -32,7 +32,7 @@ public class GravityController : UpdatableAndDeletable
     public GravityController(Player player)
     {
         this.player = player;
-        unlocked = (player.room.game.IsStorySession && Enums.IsCaterator(player.room.game.GetStorySession.saveStateNumber) && player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended) || Plugin.DevMode;
+        unlocked = (player.room.game.IsStorySession && Enums.IsCaterator(player.room.game.StoryCharacter) && player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended) || Plugin.DevMode;
         /*if (player.room != null && player.room.abstractRoom.name == "SS_AI" && player.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding)
         {
             gravityBonus = 0;
@@ -47,7 +47,6 @@ public class GravityController : UpdatableAndDeletable
     public void Update(bool eu, bool isMyStory)
     {
         if (!enabled || player.room.abstractRoom.name == "SS_E08" || !unlocked) return;
-        if (!isMyStory && (player.room.abstractRoom.name.StartsWith("SS") || player.room.abstractRoom.name.StartsWith("DM") || player.room.abstractRoom.name.StartsWith("RM"))) return;
 
         if (player.room.abstractRoom.name == "SS_AI" || player.room.abstractRoom.name == "SS_A03")
         {
@@ -162,9 +161,9 @@ public class GravityController : UpdatableAndDeletable
             return;
         }*/
         // 防止玩家一开局就看见fp倒着漂浮在空中（好崩溃
-        if (player.SlugCatClass == Enums.FPname && player.room.abstractRoom.name == "SS_AI" && !player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended)
+        if (player.room.game.StoryCharacter == Enums.FPname && player.room.abstractRoom.name == "SS_AI" && !player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended && player.stillInStartShelter)
         {
-            // 这里不能直接修改重力，只能修改bonus，让SSOracleBehavior_SubBehavior_lowGravity来读这个
+            // 这里不能直接修改重力，只能修改bonus，让SSOracleBehavior_SubBehavior_lowGravity或者unconsciousUpdate来读这个
             RoomHasEffect = true;
             gravityBonus = 10;
         }

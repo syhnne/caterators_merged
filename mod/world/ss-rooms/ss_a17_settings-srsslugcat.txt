@@ -1,0 +1,10 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0
+BkgDroneVolume: 0
+Palette: 23
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.3369565-19-78, 
+PlacedObjects: LightSource><578.1786><296.0529><1~Environment~-2~169~50~86.60254~1~0~None~0~0, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><827.2978><654.3058><0.4673913><1, 
+FadePalette: 17, 0.3369565

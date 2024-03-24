@@ -1,0 +1,10 @@
+Template: NONE
+DangerType: None
+Clouds: 0
+Grime: 0
+BkgDroneVolume: 0.326087
+Palette: 25
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.423913-22-83, BrokenZeroG-0-282-21, SunBlock-1-17-152, 
+PlacedObjects: SuperStructureFuses><290.3789><2000.653><82~92, SuperStructureFuses><559.4067><-15.07309><36~86, SuperStructureFuses><677.4041><-13.57452><32~89, SuperStructureFuses><796.0911><-12.57193><35~80, WallMycelia><4.092773><2042.376><-40~-259, WallMycelia><977.334><1830.182><-72~-228, CoralStem><257.6511><2045.869><-183~-1, CoralStem><399.0567><2042.051><138~-121, WallMycelia><400.4415><2242.192><-148~-10, WallMycelia><24.57886><1514.066><-8~-186, WallMycelia><977.8048><911.2063><-11~157, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><645.6973><653.2172><0.4565217><1, SPOT><SO_IND-FlourLight.ogg><58.69543><260.7925><0.2608696><1><172.6954><1928.792><-35.35534><-35.35534><0><0.2739132, SPOT><SO_SFX-Celia.ogg><54.33118><373.3172><0.07608695><1.371739><669.3312><826.3173><-333.3553><-21.35534><0><0.4369566, 
+FadePalette: 10, 0.4021739, 0.4021739, 0.4021739

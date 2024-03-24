@@ -1,0 +1,9 @@
+Template: SS_SettingsTemplate_Corrupt
+DangerType: None
+Clouds: 1
+Grime: 0.1847826
+Palette: 23
+EffectColorB: 12
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.4021739-18-81, 
+PlacedObjects: Corruption><945.4434><275.6991><-74~190, Corruption><621.9167><76.3896><-33~180, CorruptionTube><-246.9469><230.5572><0~100, CorruptionTube><910.8258><210.6851><-180~-157, CorruptionTube><845.7781><352.5519><-261~-257, 
+AmbientSounds: SPOT><AM_IND-DeepHum.ogg><753.7><309.2496><0.2391304><1><489.7><363.2496><-110.3553><-130.3553><0><0.1, 

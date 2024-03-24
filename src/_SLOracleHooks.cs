@@ -21,7 +21,7 @@ public class SLOracleHooks
 
     private static void MoonConversation_AddEvents(On.SLOracleBehaviorHasMark.MoonConversation.orig_AddEvents orig, SLOracleBehaviorHasMark.MoonConversation self)
     {
-        SlugcatStats.Name ssn = self.myBehavior.oracle.room.game.GetStorySession.saveStateNumber;
+        SlugcatStats.Name ssn = self.myBehavior.oracle.room.game.StoryCharacter;
         if (self.myBehavior.oracle.room.game.IsStorySession && Enums.IsCaterator(ssn))
         {
             Plugin.Log("moon conversation:", self.id.ToString(), self.State.neuronsLeft.ToString(), "savestatenumber:",  ssn);
@@ -43,7 +43,7 @@ public class SLOracleHooks
 
     private static void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
     {
-        if (self.oracle.room.game.IsStorySession && Enums.IsCaterator(self.oracle.room.game.GetStorySession.saveStateNumber))
+        if (self.oracle.room.game.IsStorySession && Enums.IsCaterator(self.oracle.room.game.StoryCharacter))
         {
             if (!self.State.SpeakingTerms)
             {

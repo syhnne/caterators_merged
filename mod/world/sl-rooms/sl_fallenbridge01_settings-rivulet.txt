@@ -1,0 +1,10 @@
+WaveSpeed: 0.5922384
+WaveLength: 0.9997195
+WaveAmplitude: 0.2252652
+SecondWaveLength: 0.5144925
+SecondWaveAmplitude: 0.3478261
+Palette: 13
+EffectColorA: 21
+EffectColorB: 6
+Effects: GreenSparks-0.1314651-281.3636-202.7556, Darkness-0.25-276-258, WaterDepth-0.08506573-307.1052-329.1302, LightRain-0.5-4-132, Fog-0.25-20-20, 
+FadePalette: 6, 1, 0.7501248, 0.502661, 0.2551973, 0

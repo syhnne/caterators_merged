@@ -1,0 +1,8 @@
+DangerType: None
+Grime: 0.2173913
+BkgDroneVolume: 0.2782609
+Palette: 25
+Effects: BrokenZeroG-0-20-20, ZeroGSpecks-0.4021739-22-75, CorruptionSpores-0.5543478-24-135, 
+PlacedObjects: SuperStructureFuses><362.5695><552.2148><144~128, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><687.7602><628.0842><0.5><1, 
+FadePalette: 17, 0.5396966

@@ -1,0 +1,6 @@
+DangerType: None
+Palette: 25
+Effects: ZeroG-1-20-20, ZeroGSpecks-0.1956522-18-74, 
+PlacedObjects: SuperStructureFuses><629.5643><228.9258><121~114, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><827.9499><651.2572><0.4565217><1, 
+FadePalette: 10, 0.4673913

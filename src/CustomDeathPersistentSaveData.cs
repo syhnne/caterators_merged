@@ -16,11 +16,11 @@ public class CustomDeathPersistentSaveData
 
     // 这样调用起来会方便点吗（
     public int CyclesFromLastEnterSSAI = 0;
-    public bool TestData = false;
+    public bool OxygenMaskTaken = false;
     public List<string> saveStrings = new List<string>()
     {
         nameof(CyclesFromLastEnterSSAI),
-
+        nameof(OxygenMaskTaken),
     };
 
 
@@ -34,7 +34,7 @@ public class CustomDeathPersistentSaveData
     {
         saveStateNumber = newName;
         CyclesFromLastEnterSSAI = 0;
-        TestData = false;
+        OxygenMaskTaken = false;
     }
 
 
@@ -42,9 +42,9 @@ public class CustomDeathPersistentSaveData
 
     public string SaveToString(string res)
     {
-        Plugin.LogStat("DPSaveData - SaveToString", CyclesFromLastEnterSSAI);
+        Plugin.LogStat("DPSaveData - SaveToString", CyclesFromLastEnterSSAI, OxygenMaskTaken);
         res += TotalHeader + nameof(CyclesFromLastEnterSSAI) + "<dpB>" + CyclesFromLastEnterSSAI.ToString() + "<dpA>";
-        // res += TotalHeader + saveStrings[1] + "<dpB>" + TestData.ToString() + "<dpA>";
+        res += TotalHeader + saveStrings[1] + "<dpB>" + OxygenMaskTaken.ToString() + "<dpA>";
 
 
 
@@ -68,6 +68,10 @@ public class CustomDeathPersistentSaveData
             {
                 CyclesFromLastEnterSSAI = int.Parse(data[1]);
                 // Plugin.Log("data:", nameof(CyclesFromLastEnterSSAI), CyclesFromLastEnterSSAI);
+            }
+            if (data[0].Contains(nameof(OxygenMaskTaken)))
+            {
+                OxygenMaskTaken = bool.Parse(data[1]);
             }
 
         }

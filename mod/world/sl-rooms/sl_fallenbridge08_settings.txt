@@ -1,0 +1,9 @@
+DangerType: FloodAndRain
+WaveAmplitude: 0.2276608
+SecondWaveAmplitude: 0.3478261
+Clouds: 0
+WaterReflectionAlpha: 0
+EffectColorA: 6
+Effects: WaterDepth-0.06959899-303.8719-255.3778, Darkness-0.3866617-294.623-313.8323, 
+PlacedObjects: LightBeam><158.7399><347.8388><-41.97604~417.7845~40~416.3615~207.9041~2.13443~197.074~-214.8604~0.4~0~0~1~None~0~0, 
+FadePalette: 27, 0.7423913, 0.7423912, 0.7423915

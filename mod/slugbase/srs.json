@@ -1,7 +1,7 @@
 {
     "id": "SRSslugcat",
 	"name": "srs",
-	"description": "orz",
+	"description": "water is toxic",
 	"features": {
 
 
@@ -30,7 +30,7 @@
 
 		"guide_overseer": 3,
 		"start_room": "OE_S04",
-		"world_state": [ "SRSslugcat", "White" ],
+		"world_state": [ "SRSslugcat", "White", "Saint" ],
 		"timeline_after": "White",
 		"cycle_length_min": 15,
 

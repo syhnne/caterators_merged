@@ -132,6 +132,10 @@ public class OxygenMaskModules
                     {
                         room.game.GetStorySession.lastEverMetPebbles = true;
                     }
+                    if (Caterators_merged.CustomLore.DPSaveData != null && !Caterators_merged.CustomLore.DPSaveData.OxygenMaskTaken)
+                    {
+                        Caterators_merged.CustomLore.DPSaveData.OxygenMaskTaken = true;
+                    }
                 }
 
                 if (count == Abstr.lungCapacityBonus)
@@ -217,9 +221,9 @@ public class OxygenMaskModules
     {
         public int lungCapacityBonus;
 
-        public OxygenMaskAbstract(World world, WorldCoordinate pos, EntityID ID) : base(world, OxygenMaskFisob.OxygenMask, null, pos, ID)
+        public OxygenMaskAbstract(World world, WorldCoordinate pos, EntityID ID, int lungCapBonus) : base(world, OxygenMaskFisob.OxygenMask, null, pos, ID)
         {
-            lungCapacityBonus = 3;
+            lungCapacityBonus = lungCapBonus;
         }
         public override void Realize()
         {
@@ -262,7 +266,7 @@ public class OxygenMaskModules
                 p = new string[1];
             }
 
-            var result = new OxygenMaskAbstract(world, saveData.Pos, saveData.ID)
+            var result = new OxygenMaskAbstract(world, saveData.Pos, saveData.ID, 3)
             {
                 lungCapacityBonus = int.TryParse(p[0], out var b) ? b : 0,
             };

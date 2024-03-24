@@ -62,7 +62,7 @@ public static class ShelterSS_AI
     private static float KarmaMeter_Radius(orig_Radius orig, KarmaMeter self)
     {
         var result = orig(self);
-        if (self.hud.owner is Player && (self.hud.owner as Player).room != null && (self.hud.owner as Player).room.game.IsStorySession && (self.hud.owner as Player).room.game.GetStorySession.saveStateNumber == Enums.FPname)
+        if (self.hud.owner is Player && (self.hud.owner as Player).room != null && (self.hud.owner as Player).room.game.IsStorySession && (self.hud.owner as Player).room.game.StoryCharacter == Enums.FPname)
         {
             float forceSleep = (self.hud.owner as Player).FoodInStomach >= self.hud.foodMeter.survivalLimit ? 0f : self.hud.foodMeter.forceSleep;
             result = self.rad + (self.showAsReinforced ? (8f * (1f - Mathf.InverseLerp(0.2f, 0.4f, forceSleep))) : 0f);
@@ -121,7 +121,7 @@ public static class ShelterSS_AI
             c.Emit(OpCodes.Ldarg_0);
             c.EmitDelegate<Func<float, KarmaMeter, float>>((fl, self) =>
             {
-                if (self.hud.owner is Player && (self.hud.owner as Player).room != null && (self.hud.owner as Player).room.game.IsStorySession && (self.hud.owner as Player).room.game.GetStorySession.saveStateNumber == Enums.FPname)
+                if (self.hud.owner is Player && (self.hud.owner as Player).room != null && (self.hud.owner as Player).room.game.IsStorySession && (self.hud.owner as Player).room.game.StoryCharacter == Enums.FPname)
                 {
                     return (self.hud.owner as Player).FoodInStomach >= self.hud.foodMeter.survivalLimit ? 0f : fl;
                 }
@@ -153,7 +153,7 @@ public static class ShelterSS_AI
             c.Emit(OpCodes.Ldarg_0);
             c.EmitDelegate<Func<int, FoodMeter, int>>((currentFood, self) =>
             {
-                if (self.hud.owner is Player && (self.hud.owner as Player).room != null && (self.hud.owner as Player).room.game.IsStorySession && (self.hud.owner as Player).room.game.GetStorySession.saveStateNumber == Enums.FPname)
+                if (self.hud.owner is Player && (self.hud.owner as Player).room != null && (self.hud.owner as Player).room.game.IsStorySession && (self.hud.owner as Player).room.game.StoryCharacter == Enums.FPname)
                 {
                     // 这个malnourished有问题，他很。。智障，我吃饱了之后，他就变成false了，这个时候就会给我返回5，
                     return Math.Min(currentFood, self.survivalLimit);
@@ -340,9 +340,9 @@ public static class ShelterSS_AI
         {
             self.room.game.rainWorld.progression.miscProgressionData.regionsVisited.Add(self.room.world.name, new List<string>());
         }
-        if (!self.room.game.rainWorld.progression.miscProgressionData.regionsVisited[self.room.world.name].Contains(self.room.game.GetStorySession.saveStateNumber.value))
+        if (!self.room.game.rainWorld.progression.miscProgressionData.regionsVisited[self.room.world.name].Contains(self.room.game.StoryCharacter.value))
         {
-            self.room.game.rainWorld.progression.miscProgressionData.regionsVisited[self.room.world.name].Add(self.room.game.GetStorySession.saveStateNumber.value);
+            self.room.game.rainWorld.progression.miscProgressionData.regionsVisited[self.room.world.name].Add(self.room.game.StoryCharacter.value);
         }
 
 

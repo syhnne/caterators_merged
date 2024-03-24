@@ -1,0 +1,12 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0.08695652
+BkgDroneVolume: 0.326087
+Palette: 25
+EffectColorA: 5
+EffectColorB: 11
+Effects: CorruptionSpores-0.7717391-19-86, ZeroGSpecks-0.2676179-278-86, BrokenZeroG-1-20-20, ZeroG-1-277-25, 
+PlacedObjects: Corruption><458.1265><36.84267><-128~112, Corruption><77.6217><601.4034><134~-88, Corruption><470.569><474.5623><173~74, CorruptionTube><57.32977><491.145><200~-42, CorruptionTube><485.8015><435.7256><228~28, CorruptionTube><482.4968><142.7><-44~175, CorruptionDarkness><496.5857><79.11403><-29~154, CorruptionDarkness><101.994><612.4499><121~-60, SuperStructureFuses><791.1597><380.2145><195~87, SuperStructureFuses><311.4505><369.6646><112~89, SSLightRod><725.1074><581.4237><-307.5848~12.16162~0.6521739~270~607.1704~0.5, SSLightRod><127.3976><591.6718><282.3205~-117~0.6195652~180~410.4348~0.5, SSLightRod><576.9648><197.6969><74.3205~-45~0.5760869~45~179.1304~0.5, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><651.5601><653.0629><0.4347826><1, 
+FadePalette: 26, 0.3658741

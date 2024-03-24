@@ -1,0 +1,10 @@
+Template: NONE
+DangerType: None
+Clouds: 0
+Grime: 0
+BkgDroneVolume: 0
+Palette: 25
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.2934783-21-81, SunBlock-1-17-146, Bloom-0.1016534-429.6458-319.7188, 
+PlacedObjects: WallMycelia><664.5735><59.65601><-9~129, WallMycelia><166.1683><232.9326><0~100, CoralNeuron><193.8217><236.0633><153~57, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><832.6114><653.1442><0.2989363><1, 
+RoomSpecificScriptActive: ON

@@ -1,0 +1,9 @@
+DangerType: FloodAndRain
+CeilingDrips: 0.5850658
+WaveAmplitude: 0.1039289
+SecondWaveAmplitude: 0.3478261
+Clouds: 0
+Grime: 0.1984034
+WaterReflectionAlpha: 0
+Effects: Darkness-0.4407947-3.636475-136.6792, WaterDepth-0.1778651-293.9114-206.4021, 
+FadePalette: 27, 0.4098619

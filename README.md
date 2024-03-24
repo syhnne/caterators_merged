@@ -1,6 +1,25 @@
-Use this template on GitHub or [download the code](https://github.com/SlimeCubed/ExampleSlugBaseMod/archive/refs/heads/master.zip), whichever is easiest.
+看了一篇七选五，他说我们会过于乐观地预估自己完成项目的用时。想了想我的估测，我估计的是今年9月份，大学开学之前。汗流浃背了家人们
 
-Links:
-- [Template Walkthrough](https://slimecubed.github.io/slugbase/articles/template.html) for a guide to this template.
-- [SlugBase Docs](https://slimecubed.github.io/slugbase/) for information regarding custom slugcats.
-- [Modding Wiki](https://rainworldmodding.miraheze.org/wiki/Downpour_Reference/Mod_Directories) for `modinfo.json` documentation.
+
+
+目前进度如下
+
+  fp: 70%
+
+ srs: 40%
+
+ nsh: 5%
+
+moon: 0%
+
+这个进度条是会缩水的，因为我动不动就想加新东西，一旦我看了一些《我感觉能加进来的》东西，他就会排上任务列表，这个进度条就会缩短。
+
+而且由于我几乎一点也没画美术，这个进度条本身可能就是一种过于乐观的估测，实际上未完成的内容恐怕比你看到的要多得多。
+
+那七选五说的一点不假，我不会要做一坤年吧，在那之前我肯定早退坑了（
+
+
+
+已知问题：
+
+可能和Precipice Leap不兼容。目前没心情测，因为这mod现在不知道为啥死活不输出日志（恼

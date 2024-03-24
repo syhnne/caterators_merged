@@ -1,0 +1,11 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0
+BkgDroneVolume: 0.326087
+Palette: 25
+EffectColorB: 11
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.6086956-18-84, CorruptionSpores-0.8260869-283-21, BrokenZeroG-0-285-83, 
+PlacedObjects: LightFixture><572.7747><514.0925><RedLight~17.32051~-10~49, SuperStructureFuses><782.6406><1289.167><80~74, SuperStructureFuses><177.1528><1370.47><28~82, Corruption><563.8455><366.8578><-50~131, Corruption><595.9441><700.855><-4~137, Corruption><566.6834><907.4986><-2~110, Corruption><330.0203><530.759><0~100, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><831.3088><652.4413><0.5><1, 
+FadePalette: 17, 0.3695652, 0.2608696

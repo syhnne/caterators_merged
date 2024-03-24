@@ -1,0 +1,10 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0
+BkgDroneVolume: 0
+Palette: 23
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.2065217-21-78, Bloom-0.1651495-24-141, BrokenZeroG-0-274-20, 
+PlacedObjects: SuperStructureFuses><760.1992><134.5565><118~39, ZapCoil><402.6335><333.8374><41~170, SuperStructureFuses><1428.751><251.95><51~57, SuperStructureFuses><1250.878><1023.096><451~426, ZapCoil><405.0791><2072.354><37~192, SuperStructureFuses><623.0556><2346.942><41~54, SuperStructureFuses><-142.3301><1043.855><207~62, ZapCoil><2515.959><261.9937><28~211, SuperStructureFuses><2212.697><133.2825><55~99, SuperStructureFuses><3005.81><1791.561><159~142, ZapCoil><2519.069><2098.085><38~189, LightSource><-137.5096><1287.95><1~Environment~69~-114~50~86.60254~1~0~None~0~0, LightFixture><1456.165><1247.569><ZapCoilLight~17.32051~-10~74, ZapCoil><514.4384><329.6828><38~177, ZapCoil><507.0692><2075.415><50~199, ZapCoil><2618.514><2097.051><30~207, ZapCoil><2608.95><266.7429><49~206, 
+AmbientSounds: OMNI><SO_SFX-Drowning.ogg><827.8358><650.8859><0.3392778><1, 
+FadePalette: 17, 0.4021739, 0.4021739, 0.4130435, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739

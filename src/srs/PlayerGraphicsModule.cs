@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using RWCustom;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
 namespace Caterators_merged.srs;
 
@@ -16,6 +18,33 @@ public class PlayerGraphicsModule
     internal static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, };
 
 
+    
+
+
+
+
+    // 整一个超亮的自发光
+    public static void PlayerGraphics_Update(PlayerGraphics self, PlayerModule module)
+    {
+        /*if (self.lightSource == null)
+        {
+            self.lightSource = new LightSource(self.player.mainBodyChunk.pos, false, Color.Lerp(spearColor, bodyColor, 0.8f), self.player);
+            self.lightSource.requireUpKeep = true;
+            self.lightSource.setRad = new float?(700f);
+            self.lightSource.setAlpha = new float?(3f);
+            self.player.room.AddObject(self.lightSource);
+        }*/
+
+        
+        if (self.player.room != null && module.srsLightSource == null)
+        {
+            module.srsLightSource = new LightSourceModule(self.player);
+        }
+        else
+        {
+            module.srsLightSource.Update();
+        }
+    }
 
 
 
@@ -39,7 +68,9 @@ public class PlayerGraphicsModule
             self.tail[3] = new TailSegment(self, 3.5f, 7f, self.tail[2], 0.85f, 1f, 0.5f, true);
             self.tail.Append(new TailSegment(self, 2f, 5f, self.tail[3], 0.85f, 1f, 0.5f, true));
         }
-
+        if (self.player.room == null) { return; }
+        Plugin.playerModules.TryGetValue(self.player, out var module);
+        module.srsLightSource = new LightSourceModule(self.player);
     }
 
 
@@ -184,7 +215,8 @@ public class PlayerGraphicsModule
     }
 
 
-
+    // 呃 问题不是我不会写这个函数，而是贴图的混合模式，是正片叠底
+    // 如果能让贴图不按正片叠底混合，而是覆盖在原本的颜色之上，那我简直用不着动这个函数
     public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
     {
         for (int i = 0; i < 12; i++)
@@ -232,8 +264,51 @@ public class PlayerGraphicsModule
     public static void Apply()
     {
         On.PlayerGraphics.TailSpeckles.DrawSprites += TailSpecks_DrawSprites;
-
+        // IL.PlayerGraphics.Update += IL_PlayerGraphics_Update;
+        On.Player.SpitOutOfShortCut += Player_SpitOutOfShortCut;
     }
+
+
+    // 防止玩家离开房间之后没有把自发光带过去
+    private static void Player_SpitOutOfShortCut(On.Player.orig_SpitOutOfShortCut orig, Player self, IntVector2 pos, Room newRoom, bool spitOutAllSticks)
+    {
+        orig(self, pos, newRoom, spitOutAllSticks);
+        if (self.SlugCatClass == Enums.SRSname && Plugin.playerModules.TryGetValue(self, out var module) && module.srsLightSource != null)
+        {
+            module.srsLightSource.AddLightSource();
+        }
+    }
+
+
+
+
+
+
+    // 我谢谢你嗷，以后再也不写ilhook了
+    // 非黑暗条件下仍然显示光照
+    // 不知道效果如何……按理说应该就是这样吧（
+    private static void IL_PlayerGraphics_Update(ILContext il)
+    {
+        ILCursor c = new(il);
+        if (c.TryGotoNext(MoveType.After,
+            i => i.Match(OpCodes.Ldfld),
+            i => i.Match(OpCodes.Ldfld),
+            i => i.Match(OpCodes.Ldarg_0),
+            i => i.Match(OpCodes.Ldfld),
+            i => i.Match(OpCodes.Callvirt),
+            i => i.Match(OpCodes.Ldfld),
+            i => i.Match(OpCodes.Callvirt),
+            i => i.Match(OpCodes.Ldc_R4)
+            ))
+        {
+            c.Emit(OpCodes.Ldarg_0);
+            c.EmitDelegate<Func<bool, Player, bool>>((orig, player) =>
+            {
+                return player.SlugCatClass == Enums.SRSname ? false : orig;
+            });
+        }
+    }
+
 
 
     private static void TailSpecks_DrawSprites(On.PlayerGraphics.TailSpeckles.orig_DrawSprites orig, PlayerGraphics.TailSpeckles self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)

@@ -1,0 +1,53 @@
+{
+    "id": "NSHslugcat",
+    "name": "nsh",
+    "description": "graphics only",
+    "features": {
+        "color": "9cf0a4",
+        "custom_colors": [
+            {
+                "name": "Body",
+                "story": "ffffff"
+            },
+            {
+                "name": "Eyes",
+                "story": "010101"
+            }
+        ],
+        "select_menu_scene": "Slugcat_nsh",
+        "select_menu_scene_ascended": "Ghost_nsh",
+
+        "back_spear": true,
+        "walk_speed": 1.5,
+        "climb_speed": 1.5,
+        "tunnel_speed": 1.5,
+        "lung_capacity": 1.5,
+        "auto_grab_batflies": false,
+        "karma": 9,
+        "karma_cap": 9,
+        "the_mark": true,
+        "the_glow": true,
+        "throw_skill": [ 1.2, 0.9 ],
+        "crouch_stealth": [ 1.2, 0.9 ],
+        "food_min": 6,
+        "food_max": 9,
+
+        "guide_overseer": 2,
+        "start_room": "CC_A02",
+        "world_state": [ "NSHslugcat", "Rivulet" ],
+        "timeline_after": "Yellow",
+        "cycle_length_min": 5,
+
+        "diet": {
+            "base": "Red",
+            "overrides": {
+
+            }
+        },
+
+        "alignments": {
+            "Scavengers": { "like": -0.3 },
+            "lizards": { "like": -0.3 }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+Template: NONE
+DangerType: None
+Clouds: 0
+Grime: 0
+BkgDroneVolume: 0
+Palette: 25
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.3043478-19-72, SunBlock-1-16-130, Bloom-0.1020382-333.8875-193.8656, 
+PlacedObjects: LightSource><958.0713><402.3131><0.5978261~Environment~-154~117~50~86.60254~1~0~None~0~0, WallMycelia><140.8445><228.8743><0~100, WallMycelia><500.3695><596.5896><-6~72, WallMycelia><552.3798><115.8478><-10~70, 
+AmbientSounds: SPOT><AM_IND-DeepHum.ogg><698.7678><308.3008><0.4021739><1><533.7678><358.3008><-167.3553><-93.35535><0><0.1, OMNI><SO_SFX-Drowning.ogg><834.6663><651.3184><0.5><1, 
+FadePalette: 17, 0
+RoomSpecificScriptActive: ON

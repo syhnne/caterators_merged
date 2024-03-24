@@ -1,0 +1,6 @@
+WaveAmplitude: 0
+SecondWaveAmplitude: 0.3478261
+Effects: SilenceWater-0.9047894-271.1447-197.8646, Fog-0.8221353-285.374-264.0302, Bloom-0.203476-20-20, LightRain-0.5-301-327, 
+PlacedObjects: DataPearl><275.1195><184.4598><58.33957~146.5604~0~0~Misc~0, 
+AmbientSounds: OMNI><AM_WAT-Sea01.ogg><654.1245><638.5935><0.09013831><1, 
+FadePalette: 35, 0.402774, 0.4083222, 0.4046651, 0.4046651

@@ -1,0 +1,5 @@
+WaveSpeed: 0.501405
+WaveLength: 0.7492975
+WaveAmplitude: 0.05000002
+SecondWaveLength: 0.5144925
+SecondWaveAmplitude: 0.3478261

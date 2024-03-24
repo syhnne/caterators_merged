@@ -10,7 +10,9 @@ namespace Caterators_merged.fp;
 
 public class PlayerGraphicsModule
 {
-
+    private static readonly Color32 bodyColor_hard = new Color32(254, 104, 202, 255);
+    private static readonly Color eyesColor_hard = new Color(1f, 1f, 1f);
+    private static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, 5, 6, 7, 8, 9, };
 
     public static void InitiateSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {

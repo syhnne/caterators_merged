@@ -1,0 +1,5 @@
+DangerType: None
+Grime: 0.09782609
+Palette: 18
+Effects: ZeroG-0.2087976-269.0104-279.6823, 
+FadePalette: 17, 0.8043478

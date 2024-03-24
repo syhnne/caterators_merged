@@ -1,0 +1,4 @@
+Effects: Fog-1-0-0, 
+PlacedObjects: UniqueDataPearl><354.5697><627.5043><-20.63226~-219.8406~0~0~SL_FallenBridge_Pearl~0, WhiteToken><678.7488><525.6127><-15.65204~-66.48126~86.08649~-78.26044~0~SRSslugSequence~White|Yellow|Red|Rivulet|Artificer|Saint|Spear|Gourmand|PebblesSlug|NSHslugcat~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0, DeadTokenStalk><623.6367><546.1707><17.78644~-86.40198, 
+AmbientSounds: OMNI><AM_WAT-Sea01.ogg><654.1245><638.5935><0><1, 
+FadePalette: 5, 0.3093298

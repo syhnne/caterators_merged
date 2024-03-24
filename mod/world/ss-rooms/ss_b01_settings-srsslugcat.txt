@@ -1,0 +1,9 @@
+Template: NONE
+DangerType: None
+Clouds: 1
+Grime: 0.09782609
+Palette: 18
+Effects: ZeroG-0.9-20-20, ZeroGSpecks-0.2717391-23-77, 
+AmbientSounds: SPOT><SO_IND-FlourLight.ogg><70.34198><157.1273><0.2934783><1.058696><747.5159><1148.068><-66.35535><-60.35535><0><0.2195653, SPOT><SO_SFX-Drowning.ogg><656.5643><614.4257><0.4347826><1><484.5643><1151.426><-288.3553><-48.35535><0><0.1978262, 
+Triggers: Spot<tA>event<tB>MusicEvent<eA>songName<eB>BM_DS_GATE<eA>vol<eB>0.3217395<eA>prio<eB>0.5<eA>mxThrt<eB>1<eA>loop<eB>0<eA>droneTol<eB>0<eA>rooms<eB>-1<eA>rest<eB>5<eA>fadeIn<eB>0<eA>oneSongPerCycle<eB>0<eA>stopAtDeath<eB>0<eA>stopAtGate<eB>0<tA>multiUse<tB>0<tA>toCycle<tB>-1<tA>fromCycle<tB>0<tA>delay<tB>0<tA>panPos<tB>525.2484<tB>318.45<tA>fireChance<tB>1<tA>entrance<tB>-1<tA>karma<tB>0<tA>slugcats<tB><tA>pos<tB>591.2484<tB>1242.45<tA>handlePos<tB>-323.3553<tB>-32.35535, 
+FadePalette: 17, 0.8260869, 0.9021739

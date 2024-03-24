@@ -62,7 +62,7 @@ public class CustomLore
     private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
     {
         orig(self, manager);
-        if (self.IsStorySession && Enums.IsCaterator(self.GetStorySession.saveStateNumber) && self.GetStorySession.saveStateNumber != Enums.FPname)
+        if (self.IsStorySession && Enums.IsCaterator(self.StoryCharacter) && self.StoryCharacter != Enums.FPname)
         {
             // self.GetStorySession.saveState.miscWorldSaveData.moonRevived = true;
             self.GetStorySession.saveState.miscWorldSaveData.moonHeartRestored = true;
@@ -82,7 +82,7 @@ public class CustomLore
     // 防止玩家用特殊手段归乡（别想在酒吧点炒饭
     private static void MSCRoomSpecificScript_GourmandEnding_Update(On.MoreSlugcats.MSCRoomSpecificScript.OE_GourmandEnding.orig_Update orig, MSCRoomSpecificScript.OE_GourmandEnding self, bool eu)
     {
-        if (self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.GetStorySession.saveStateNumber)) return;
+        if (self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter)) return;
         orig(self, eu);
     }
 
@@ -135,23 +135,24 @@ public class CustomLore
 
     private static void Room_Loaded(On.Room.orig_Loaded orig, Room self)
     {
-        if (!self.game.IsStorySession) { return; }
-        if (self.game.GetStorySession.saveStateNumber == Enums.FPname)
+        if (self.game != null && self.game.IsStorySession && Enums.IsCaterator(self.game.StoryCharacter)) 
         {
-            fp.CustomLore.AddRoomSpecificScripts(self);
-        }
-        else if (self.game.GetStorySession.saveStateNumber == Enums.SRSname && self.abstractRoom.name == "SS_AI")
-        {
-            // TODO: 我猜测这东西会在我每次回到这儿的时候都生成一个面具，所以得使用deathpersistent
-            Plugin.Log("Add OxygenMask");
+            if (self.game.StoryCharacter == Enums.FPname)
+            {
+                fp.CustomLore.AddRoomSpecificScripts(self);
+            }
+            else if (self.game.StoryCharacter == Enums.SRSname && self.abstractRoom.name == "SS_AI" && DPSaveData != null && !DPSaveData.OxygenMaskTaken)
+            {
+                Plugin.Log("Add OxygenMask");
 
-            AbstractPhysicalObject abstr = new OxygenMaskAbstract(self.game.world, new WorldCoordinate(self.abstractRoom.index, -1, -1, 0), self.game.GetNewID());
-            abstr.destroyOnAbstraction = true;
-            self.abstractRoom.AddEntity(abstr);
-            abstr.RealizeInRoom();
-            (abstr.realizedObject as OxygenMask).firstChunk.pos = new Vector2(300f, 300f);
-            // room.AddObject(new PlaceOxygenMask(room));
+                AbstractPhysicalObject abstr = new OxygenMaskAbstract(self.game.world, new WorldCoordinate(self.abstractRoom.index, -1, -1, 0), self.game.GetNewID(), 3);
+                abstr.destroyOnAbstraction = true;
+                self.abstractRoom.AddEntity(abstr);
+                abstr.RealizeInRoom();
+                (abstr.realizedObject as OxygenMask).firstChunk.pos = new Vector2(300f, 300f);
+            }
         }
+        
 
         orig(self);
 

@@ -25,6 +25,7 @@ public class PlayerGraphicsModule
     public static void Apply()
     {
         On.PlayerGraphics.ctor += PlayerGraphics_ctor;
+        On.PlayerGraphics.Update += PlayerGraphics_Update;
 
         On.PlayerGraphics.InitiateSprites += InitiateSprites;
         On.PlayerGraphics.AddToContainer += AddToContainer;
@@ -40,9 +41,29 @@ public class PlayerGraphicsModule
     private static void PlayerGraphics_ctor(On.PlayerGraphics.orig_ctor orig, PlayerGraphics self, PhysicalObject ow)
     {
         orig(self, ow);
-        if (self.player != null && self.player.SlugCatClass == Enums.SRSname)
+        if(self.player == null) { return; }
+        if (self.player.SlugCatClass == Enums.SRSname)
         {
             srs.PlayerGraphicsModule.PlayerGraphics_ctor(self, ow);
+        }
+        else if (self.player.SlugCatClass == Enums.NSHname)
+        {
+            nsh.PlayerGraphicsModule.PlayerGraphics_ctor(self, ow);
+        }
+    }
+
+
+
+    private static void PlayerGraphics_Update(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
+    {
+        if (self.player.SlugCatClass == Enums.SRSname && Plugin.playerModules.TryGetValue(self.player, out var module))
+        {
+            srs.PlayerGraphicsModule.PlayerGraphics_Update(self, module);
+        }
+        orig(self);
+        if (self.player.SlugCatClass == Enums.NSHname && Plugin.playerModules.TryGetValue(self.player, out var module2))
+        {
+            module2.nshScarf?.Update();
         }
     }
 
@@ -58,6 +79,10 @@ public class PlayerGraphicsModule
         {
             fp.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
         }
+        else if (self.player.SlugCatClass == Enums.NSHname)
+        {
+            nsh.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
+        }
     }
 
 
@@ -68,6 +93,10 @@ public class PlayerGraphicsModule
         if (self.player.SlugCatClass == Enums.SRSname && self.tailSpecks != null)
         {
             srs.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
+        }
+        else if (self.player.SlugCatClass == Enums.NSHname)
+        {
+            nsh.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
         }
     }
 
@@ -83,6 +112,10 @@ public class PlayerGraphicsModule
         {
             fp.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
         }
+        else if (self.player.SlugCatClass == Enums.NSHname)
+        {
+            nsh.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
+        }
     }
 
 
@@ -96,6 +129,10 @@ public class PlayerGraphicsModule
         else if (self.player.SlugCatClass == Enums.FPname)
         {
             fp.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
+        }
+        else if (self.player.SlugCatClass == Enums.NSHname)
+        {
+            nsh.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
         }
     }
 }
