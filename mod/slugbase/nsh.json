@@ -3,16 +3,10 @@
     "name": "nsh",
     "description": "graphics only",
     "features": {
-        "color": "9cf0a4",
+        "color": "7fe66f",
         "custom_colors": [
-            {
-                "name": "Body",
-                "story": "ffffff"
-            },
-            {
-                "name": "Eyes",
-                "story": "010101"
-            }
+            { "name": "Body", "story": "7fe66f" },
+            { "name": "Eyes", "story": "010101" }
         ],
         "select_menu_scene": "Slugcat_nsh",
         "select_menu_scene_ascended": "Ghost_nsh",
@@ -34,7 +28,7 @@
 
         "guide_overseer": 2,
         "start_room": "CC_A02",
-        "world_state": [ "NSHslugcat", "Rivulet" ],
+        "world_state": [ "NSHslugcat", "Rivulet", "Yellow" ],
         "timeline_after": "Yellow",
         "cycle_length_min": 5,
 

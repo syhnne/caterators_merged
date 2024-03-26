@@ -8,7 +8,7 @@ using UnityEngine;
 using RWCustom;
 using System.Xml.Schema;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 public class SSOracleHooks
 {
@@ -28,6 +28,7 @@ public class SSOracleHooks
             Oracle_Consious
             );
         On.Oracle.SetUpMarbles += Oracle_SetUpMarbles;
+        fp.SSOracleHooks.Apply();
     }
 
 
@@ -39,7 +40,7 @@ public class SSOracleHooks
     private static bool Oracle_Consious(orig_Consious orig, Oracle self)
     {
         var result = orig(self);
-        if (self.room.game.IsStorySession && self.ID == Oracle.OracleID.SS && Enums.IsCaterator(self.room.game.GetStorySession.saveState.saveStateNumber) && (self.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding != true || self.room.game.StoryCharacter != Enums.FPname))
+        if (self.room.game.IsStorySession && self.ID == Oracle.OracleID.SS && self.room.game.GetStorySession.saveState.IsCaterator() && (self.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding != true || self.room.game.StoryCharacter != Enums.FPname))
         {
             result = false;
         }
@@ -51,7 +52,7 @@ public class SSOracleHooks
 
     private static void Oracle_SetUpMarbles(On.Oracle.orig_SetUpMarbles orig, Oracle self)
     {
-        if (self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter) && self.room.game.StoryCharacter != Enums.FPname)
+        if (self.room.game.IsStorySession && self.room.game.IsCaterator() && self.room.game.StoryCharacter != Enums.FPname)
         {
             return;
         }
@@ -63,7 +64,7 @@ public class SSOracleHooks
     private static void SSOracleBehavior_ctor(On.SSOracleBehavior.orig_ctor orig, SSOracleBehavior self, Oracle oracle)
     {
         orig(self, oracle);
-        if (oracle.room.game.session is not StoryGameSession || !Enums.IsCaterator(oracle.room.game.GetStorySession.saveState.saveStateNumber)) return;
+        if (oracle.room.game.session is not StoryGameSession || !oracle.room.game.GetStorySession.saveState.IsCaterator()) return;
         self.movementBehavior = SSOracleBehavior.MovementBehavior.Meditate;
 
     }
@@ -73,7 +74,7 @@ public class SSOracleHooks
     private static void SSOracleBehavior_UnconciousUpdate(On.SSOracleBehavior.orig_UnconciousUpdate orig, SSOracleBehavior self)
     {
         if (self.oracle.room.game != null && self.oracle.room.game.IsStorySession && self.oracle.ID == Oracle.OracleID.SS 
-            && Enums.IsCaterator(self.oracle.room.game.StoryCharacter))
+            && self.oracle.room.game.IsCaterator())
         {
             self.FindPlayer();
             self.unconciousTick += 1f;
@@ -116,7 +117,7 @@ public class SSOracleHooks
     // 让fp无视你的大部分行为
     private static void SSOracleBehavior_SeePlayer(On.SSOracleBehavior.orig_SeePlayer orig, SSOracleBehavior self)
     {
-        if (self.oracle.ID == Oracle.OracleID.SS && self.oracle.room.game.IsStorySession && Enums.IsCaterator(self.oracle.room.game.StoryCharacter))
+        if (self.oracle.ID == Oracle.OracleID.SS && self.oracle.room.game.IsStorySession && self.oracle.room.game.IsCaterator())
         {
             self.NewAction(ActionID);
             self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad = 0;
@@ -152,17 +153,17 @@ public class SSOracleHooks
             }
             subBehavior.Activate(self.action, nextAction);
             self.currSubBehavior.Deactivate();
-            Plugin.LogStat("Switching subbehavior to: " + subBehavior.ID.ToString() + " from: " + self.currSubBehavior.ID.ToString());
+            Plugin.Log("Switching subbehavior to: " + subBehavior.ID.ToString() + " from: " + self.currSubBehavior.ID.ToString());
             self.currSubBehavior = subBehavior;
             self.inActionCounter = 0;
             self.action = nextAction;
             return;
         }
-        else if (self.oracle.room.game.IsStorySession && Enums.IsCaterator(self.oracle.room.game.StoryCharacter))
+        else if (self.oracle.room.game.IsStorySession && self.oracle.room.game.IsCaterator())
         {
 
             if (nextAction == self.action) return;
-            Plugin.LogStat("old action:", self.action.ToString(), "new action:", nextAction.ToString());
+            Plugin.Log("old action:", self.action.ToString(), "new action:", nextAction.ToString());
 
             // 防止一切洗脑失败的情况（。）直接给你堵死。乐
             nextAction = ActionID;
@@ -241,18 +242,18 @@ public class SSOracleSubBehavior : SSOracleBehavior.ConversationBehavior
 
 
     // 这个本来和console有关的 我懒得搬运，把console删了 所以只能瞎改一气（
-    public override Vector2? LookPoint
+    /*public override Vector2? LookPoint
     {
         get
         {
             if (base.player == null) return null;
-            if (Enums.IsCaterator(player.SlugCatClass) && (player.grasps[0].grabbed != null || player.grasps[1].grabbed != null))
+            if (Enums.IsCaterator(player.SlugCatClass) && player.grasps.Count() > 0 && (player.grasps[0].grabbed != null || player.grasps[1].grabbed != null))
             {
                 return player.mainBodyChunk.pos;
             }
-            return null;
+            return this.oracle.firstChunk.pos;
         }
-    }
+    }*/
 
 
 

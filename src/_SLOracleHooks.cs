@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 public class SLOracleHooks
 {
@@ -43,7 +43,7 @@ public class SLOracleHooks
 
     private static void SLOracleBehaviorHasMark_InitateConversation(On.SLOracleBehaviorHasMark.orig_InitateConversation orig, SLOracleBehaviorHasMark self)
     {
-        if (self.oracle.room.game.IsStorySession && Enums.IsCaterator(self.oracle.room.game.StoryCharacter))
+        if (self.oracle.room.game.IsStorySession && self.oracle.room.game.IsCaterator())
         {
             if (!self.State.SpeakingTerms)
             {

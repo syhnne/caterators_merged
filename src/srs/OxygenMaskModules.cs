@@ -9,8 +9,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Caterators_merged.srs;
+namespace Caterators_by_syhnne.srs;
 
+
+
+// 合着我捯饬半天没有用 是没挂上啊（擦汗）
 public class OxygenMaskModules
 {
 
@@ -18,78 +21,19 @@ public class OxygenMaskModules
 
 
 
-    // 卧槽？官方改这个函数了是吗
-    /*private static void SaveState_SpawnSavedObjectsAndCreatures(On.SaveState.orig_SpawnSavedObjectsAndCreatures orig, SaveState self, World world, WorldCoordinate atPos)
-    {
-        foreach (string obj in self.pendingObjects)
-        {
-            Plugin.Log("pending object:", obj);
-        }
-        foreach (string obj in self.unrecognizedSaveStrings)
-        {
-            Plugin.Log("unrecognized SaveStrings:", obj);
-        }
-        orig(self, world, atPos);
-
-    }*/
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public class OxygenMask : Weapon
     {
 
-        public float lastAirInLungs;
-        public float AirInLungs;
+
+
         public int count;
         public OxygenMaskAbstract Abstr;
 
         public OxygenMask(OxygenMaskAbstract abstr) : base(abstr, abstr.world)
         {
             Abstr = abstr;
-            lastAirInLungs = 1f;
-            AirInLungs = 1f;
+
+
             base.bodyChunks = new BodyChunk[1];
             base.bodyChunks[0] = new BodyChunk(this, 0, new Vector2(0f, 0f), 5f, 0.14f);
             this.bodyChunkConnections = new PhysicalObject.BodyChunkConnection[0];
@@ -124,18 +68,8 @@ public class OxygenMaskModules
                     /*Plugin.Log("1", room.game.GetStorySession.saveState.miscWorldSaveData.pebblesEnergyTaken);
                     Plugin.Log("2", room.game.GetStorySession.lastEverMetPebbles);
                     Plugin.Log("3", room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad);*/
-                    if (room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad <= 0)
-                    {
-                        room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad += 1;
-                    }
-                    if (!room.game.GetStorySession.lastEverMetPebbles)
-                    {
-                        room.game.GetStorySession.lastEverMetPebbles = true;
-                    }
-                    if (Caterators_merged.CustomLore.DPSaveData != null && !Caterators_merged.CustomLore.DPSaveData.OxygenMaskTaken)
-                    {
-                        Caterators_merged.CustomLore.DPSaveData.OxygenMaskTaken = true;
-                    }
+                    room.game.GetDeathPersistent().OxygenMaskTaken = true;
+
                 }
 
                 if (count == Abstr.lungCapacityBonus)
@@ -250,10 +184,11 @@ public class OxygenMaskModules
 
     public class OxygenMaskFisob : Fisob
     {
+        private static readonly OxygenMaskProperties properties = new();
         public static readonly AbstractPhysicalObject.AbstractObjectType OxygenMask = new("OxygenMask", true);
         public OxygenMaskFisob() : base(OxygenMask)
         {
-
+            Icon = new OxygenMaskIcon();
         }
 
         public override AbstractPhysicalObject Parse(World world, EntitySaveData saveData, SandboxUnlock? unlock)
@@ -280,6 +215,13 @@ public class OxygenMaskModules
 
             return result;
         }
+
+        public override ItemProperties Properties(PhysicalObject forObject)
+        {
+            // If you need to use the forObject parameter, pass it to your ItemProperties class's constructor.
+            // The Mosquitoes example demonstrates this.
+            return properties;
+        }
     }
 
     #endregion
@@ -299,7 +241,7 @@ public class OxygenMaskModules
 
         public override Color SpriteColor(int data)
         {
-            return RWCustom.Custom.HSL2RGB(data / 1000f, 0.65f, 0.4f);
+            return Color.white;
         }
 
         public override string SpriteName(int data)

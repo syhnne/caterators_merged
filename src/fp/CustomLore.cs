@@ -17,7 +17,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Menu;
 
-namespace Caterators_merged.fp;
+namespace Caterators_by_syhnne.fp;
 
 
 // TODO: 你先别急，让我先急，我想改点东西，玩家时间结束了也可以玩，只不过画面很阴间，约等于没法玩
@@ -263,17 +263,12 @@ internal class CustomLore
         SaveState save = self.GetStorySession.saveState;
         if (self.StoryCharacter == Enums.FPname)
         {
-            Plugin.LogStat("RainWorldGame_Win: cycle: " + save.cycleNumber);
-            if (Caterators_merged.CustomLore.DPSaveData != null && Caterators_merged.CustomLore.DPSaveData.saveStateNumber == Enums.FPname)
-            {
-                Plugin.Log("CustomLore.DPSaveData.CyclesFromLastEnterSSAI++ :");
-                Plugin.Log(Caterators_merged.CustomLore.DPSaveData.CyclesFromLastEnterSSAI);
-                Caterators_merged.CustomLore.DPSaveData.CyclesFromLastEnterSSAI++;
-                Plugin.Log(Caterators_merged.CustomLore.DPSaveData.CyclesFromLastEnterSSAI);
-            }
+            self.GetDeathPersistent().CyclesFromLastEnterSSAI++;
+            Plugin.Log("RainWorldGame_Win: cycle: " + save.cycleNumber, "CyclesFromLastEnterSSAI:", self.GetDeathPersistent().CyclesFromLastEnterSSAI);
+
             if (!save.deathPersistentSaveData.altEnding && save.cycleNumber >= Plugin.Cycles)
             {
-                Plugin.Log("PebblesSlug Game Over !!! cycle:" + save.cycleNumber);
+                Plugin.Log("FPslug Game Over !!! cycle:" + save.cycleNumber);
                 save.deathPersistentSaveData.redsDeath = true;
                 save.deathPersistentSaveData.ascended = false;
                 self.GoToRedsGameOver();
@@ -649,7 +644,7 @@ public class SS_PebblesStartCutscene : UpdatableAndDeletable
             Destroy();
             return;
         }
-        // Plugin.LogStat("start cutscene timer: ", timer);
+        // Plugin.Log("start cutscene timer: ", timer);
         timer++;
     }
 
@@ -720,7 +715,7 @@ public class TestSprite : CosmeticSprite
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             int randint = r.Next(0, glyphs.Length);
-            Plugin.Log("sprites: ", i, " sp: ", randint);
+            // Plugin.Log("sprites: ", i, " sp: ", randint);
             sLeaser.sprites[i] = glyphs[randint];
             sLeaser.sprites[i].color = new Color(0f, 0f, 0f);
             sLeaser.sprites[i].isVisible = true;

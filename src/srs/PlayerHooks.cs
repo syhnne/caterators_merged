@@ -27,17 +27,22 @@ using SlugBase;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing.Imaging;
 
-namespace Caterators_merged.srs;
+namespace Caterators_by_syhnne.srs;
 
 internal class PlayerHooks
 {
 
-    public static void Player_ctor(Player self, AbstractCreature abstr, World world)
+    public static void Player_Die(Player self, PlayerModule module)
     {
-        // 经测试，完全免疫风雪有点超模，于是砍掉（
-        // 准备加一个给你的联机队友保温的功能（？）但现在懒得写
-        // abstr.HypothermiaImmune = true;
+        if (module.srsLightSource != null)
+        {
+            module.srsLightSource.Clear();
+            module.srsLightSource = null;
+        }
+        
     }
+
+
 
 
 

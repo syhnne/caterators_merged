@@ -3,13 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using static Caterators_by_syhnne.srs.OxygenMaskModules;
 
-namespace Caterators_merged.srs;
+namespace Caterators_by_syhnne.srs;
 
 public class CustomLore
 {
 
-
+    public static void Room_Loaded(Room self)
+    {
+        if (self.abstractRoom.name == "SS_AI" && self.game.GetDeathPersistent() != null)
+        {
+            Plugin.Log("Add OxygenMask");
+            AbstractPhysicalObject abstr = new OxygenMaskAbstract(self.game.world, new WorldCoordinate(self.abstractRoom.index, -1, -1, 0), self.game.GetNewID(), 3);
+            abstr.destroyOnAbstraction = true;
+            self.abstractRoom.AddEntity(abstr);
+            abstr.RealizeInRoom();
+            (abstr.realizedObject as OxygenMask).firstChunk.pos = new Vector2(300f, 300f);
+        }
+    }
 
 
 

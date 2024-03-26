@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 
 // 这其实没什么用罢，到最后我还是得手搓一切roomSettings
@@ -47,7 +47,7 @@ public class SSRoomEffects
 
     private static void Room_Loaded(On.Room.orig_Loaded orig, Room self)
     {
-        if (self.game != null && self.game.IsStorySession && Enums.IsCaterator(self.game.StoryCharacter) && !self.game.GetStorySession.saveState.deathPersistentSaveData.altEnding && self.abstractRoom.name.StartsWith("SS")
+        if (self.game != null && self.game.IsStorySession && self.game.IsCaterator() && !self.game.GetStorySession.saveState.deathPersistentSaveData.altEnding && self.abstractRoom.name.StartsWith("SS")
             && self.roomSettings != null && self.roomSettings.placedObjects.Count > 0)
         {
 
@@ -69,7 +69,7 @@ public class SSRoomEffects
     private static void ZapCoilLight_Update(On.ZapCoilLight.orig_Update orig, ZapCoilLight self, bool eu)
     {
         orig(self, eu);
-        if (self.room != null && self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter) && self.room.abstractRoom.name.StartsWith("SS"))
+        if (self.room != null && self.room.game.IsStorySession && self.room.game.IsCaterator() && self.room.abstractRoom.name.StartsWith("SS"))
         {
             self.lightSource.alpha = 0f;
         }
@@ -83,7 +83,7 @@ public class SSRoomEffects
     private static void AbstractRoom_RealizeRoom(On.AbstractRoom.orig_RealizeRoom orig, AbstractRoom self, World world, RainWorldGame game)
     {
         orig(self, world, game);
-        if (self.realizedRoom == null || !game.IsStorySession || !Enums.IsCaterator(game.StoryCharacter) || !self.name.StartsWith("SS")) { return; }
+        if (self.realizedRoom == null || !game.IsStorySession || !game.IsCaterator() || !self.name.StartsWith("SS")) { return; }
 
 
         RoomSettings settings = self.realizedRoom.roomSettings;
@@ -163,7 +163,7 @@ public class SSRoomEffects
     private static void SSLightRod_Update(On.SSLightRod.orig_Update orig, SSLightRod self, bool eu)
     {
         orig(self, eu);
-        if (self.room != null && self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter) && self.room.abstractRoom.name.StartsWith("SS"))
+        if (self.room != null && self.room.game.IsStorySession && self.room.game.IsCaterator() && self.room.abstractRoom.name.StartsWith("SS"))
         {
             self.lights = new List<SSLightRod.LightVessel>();
             self.color = new Color(0.1f, 0.1f, 0.1f);
@@ -209,7 +209,7 @@ public class SSRoomEffects
     {
         try
         {
-            if (self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter) && Enums.IsCaterator(self.room.game.StoryCharacter) && self.room.abstractRoom.name.StartsWith("SS"))
+            if (self.room.game.IsStorySession && self.room.game.IsCaterator() && self.room.abstractRoom.name.StartsWith("SS"))
             {
                 self.powered = false;
             }
@@ -228,7 +228,7 @@ public class SSRoomEffects
     private static void GravityDisruptor_Update(On.GravityDisruptor.orig_Update orig, GravityDisruptor self, bool eu)
     {
         orig(self, eu);
-        if (self.room != null && self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter) && self.room.abstractRoom.name.StartsWith("SS"))
+        if (self.room != null && self.room.game.IsStorySession && self.room.game.IsCaterator() && self.room.abstractRoom.name.StartsWith("SS"))
         {
             self.power = 0f;
 
@@ -243,7 +243,7 @@ public class SSRoomEffects
     // 啊啊啊啊啊啊啊啊啊别放音乐了
     private static void CoralBrain_SSMusicTrigger_Trigger(On.CoralBrain.SSMusicTrigger.orig_Trigger orig, CoralBrain.SSMusicTrigger self)
     {
-        if (self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter) && self.room.abstractRoom.name.StartsWith("SS"))
+        if (self.room.game.IsStorySession && self.room.game.IsCaterator() && self.room.abstractRoom.name.StartsWith("SS"))
         {
             return;
         }

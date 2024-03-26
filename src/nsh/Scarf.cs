@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 using RWCustom;
 using System.Drawing;
 
-namespace Caterators_merged.nsh;
+namespace Caterators_by_syhnne.nsh;
 
 // 改的炸矛飘带的代码
 // 这应该只包括围巾飘在空中的那部分，剩下的准备直接画贴图上（
@@ -44,7 +44,7 @@ public class Scarf
 
     public void InitiateSprite(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
-        Plugin.Log("nshScarf initesprite");
+        // Plugin.Log("nshScarf initesprite");
         sLeaser.sprites[startSprite] = TriangleMesh.MakeLongMesh(this.rag.GetLength(0), false, false);
         sLeaser.sprites[startSprite + 1] = new FSprite("Futile_White", true);
         // sLeaser.sprites[startSprite].shader = rCam.game.rainWorld.Shaders["JaggedSquare"];

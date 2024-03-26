@@ -7,7 +7,7 @@
 
 		"color": "ffcf58",
 		"custom_colors": [
-			{ "name": "Body", "story": "ffffff" },
+			{ "name": "Body", "story": "ffcf58" },
 			{ "name": "Eyes", "story": "010101" }
 		],
 
@@ -27,10 +27,11 @@
 		"the_glow": true,
 		"food_min": 11,
 		"food_max": 14,
+		"crouch_stealth": [ 1.5, 1.2 ],
 
 		"guide_overseer": 3,
 		"start_room": "OE_S04",
-		"world_state": [ "SRSslugcat", "White", "Saint" ],
+		"world_state": [ "SRSslugcat", "White" ],
 		"timeline_after": "White",
 		"cycle_length_min": 15,
 

@@ -18,7 +18,7 @@ using Mono.Cecil.Cil;
 
 
 
-namespace Caterators_merged.fp;
+namespace Caterators_by_syhnne.fp;
 
 internal class PlayerHooks
 {
@@ -44,7 +44,7 @@ internal class PlayerHooks
         {
             PlayerState playerState = player.abstractCreature.world.game.Players[0].state as PlayerState;
             add = Math.Min(add, Math.Max(player.MaxFoodInStomach - playerState.foodInStomach, 0));
-            Plugin.LogStat(string.Format("Player add food {0}. Amount to add {1}", player.playerState.playerNumber, add), false);
+            Plugin.Log(string.Format("Player add food {0}. Amount to add {1}", player.playerState.playerNumber, add), false);
             playerState.foodInStomach += add;
         }
         if (player.abstractCreature.world.game.IsStorySession && player.AI == null)
@@ -60,7 +60,7 @@ internal class PlayerHooks
         {
             if (player.redsIllness != null)
             {
-                Plugin.LogStat("FoodToBeOkay: ", player.redsIllness.FoodToBeOkay);
+                Plugin.Log("FoodToBeOkay: ", player.redsIllness.FoodToBeOkay);
                 player.redsIllness.GetBetter();
                 return;
             }
@@ -160,7 +160,7 @@ internal class PlayerHooks
                 spearDmgBonus /= self.pyroJumpCounter;
             }
             spear.spearDamageBonus *= (0.5f + spearDmgBonus);
-            Plugin.LogStat("spearDmgBonus: " + (0.5f + spearDmgBonus) + "  result: " + spear.spearDamageBonus);
+            Plugin.Log("spearDmgBonus: " + (0.5f + spearDmgBonus) + "  result: " + spear.spearDamageBonus);
         }
 
     }
@@ -980,7 +980,7 @@ internal class PlayerHooks
             c.Emit(OpCodes.Ldloc_0);
             c.EmitDelegate<Func<bool, Player, bool>>((isRed, player) =>
             {
-                return isRed || (player.room.game.IsStorySession && player.room.game.GetStorySession.saveState.saveStateNumber == Enums.FPname && !player.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding);
+                return isRed || (player.room.game.IsStorySession && player.room.game.StoryCharacter == Enums.FPname && !player.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding);
             });
         }
 
@@ -1111,7 +1111,7 @@ internal class PlayerHooks
             Menu.SleepAndDeathScreen owner = (self.hud.owner as Menu.SleepAndDeathScreen);
             if (CycleGetFood(package.saveState.cycleNumber - 1) < CycleGetFood(package.saveState.cycleNumber))
             {
-                // Plugin.LogStat("HUD_FoodMeter_SleepUpdate - FOOD CHANGING survival limit: ", player.survivalLimit, " start malnourished: ", owner.startMalnourished);
+                // Plugin.Log("HUD_FoodMeter_SleepUpdate - FOOD CHANGING survival limit: ", player.survivalLimit, " start malnourished: ", owner.startMalnourished);
                 owner.startMalnourished = true;
                 // 强制玩家观看动画。反正占不了他们几秒，但我可是做了一下午，都给我看（
                 if (CycleGetFood(package.saveState.cycleNumber) == Plugin.MinFood + 1)

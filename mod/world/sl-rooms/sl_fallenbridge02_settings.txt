@@ -10,4 +10,4 @@ Palette: 13
 EffectColorA: 6
 Effects: Fog-0.2934783-20-20, Darkness-0.02173913-0-0, Flies-0.1086956-37-125, 
 PlacedObjects: DeadSeedCob><235.6143><221.6031><, 
-FadePalette: 35, 0.5
+FadePalette: 5, 0.0326087

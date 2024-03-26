@@ -6,15 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Caterators_merged.srs;
+namespace Caterators_by_syhnne.srs;
 
 
 // 理论上这个可以给联机队友保温，但我还没试过冻死是什么感觉
 // 啊 是时候改apply palette了（目死
-public class LightSourceModule : IProvideWarmth
+// 妈的 这不起作用啊 咋回事
+public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
 {
     public Player player;
     public LightSource[] lightSources;
+    public string type;
 
 
     public Vector2 Position()
@@ -22,8 +24,8 @@ public class LightSourceModule : IProvideWarmth
         return player.mainBodyChunk.pos;
     }
 
-    public Room loadedRoom 
-    { 
+    public Room loadedRoom
+    {
         get
         {
             return player.room;
@@ -31,19 +33,19 @@ public class LightSourceModule : IProvideWarmth
     }
 
 
-    public float warmth 
+    public float warmth
     {
         get
         {
-            return (player.Malnourished? 1:3) * RainWorldGame.DefaultHeatSourceWarmth;
+            return (player.Malnourished ? 1 : 3) * RainWorldGame.DefaultHeatSourceWarmth;
         }
     }
 
-    public float range 
+    public float range
     {
         get
         {
-            return 700f;
+            return player.Malnourished ? 300f : 700f;
         }
     }
 
@@ -63,6 +65,7 @@ public class LightSourceModule : IProvideWarmth
     public void AddLightSource()
     {
         if (player.room == null) { return; }
+
         lightSources = new LightSource[2]
         {
             new LightSource(player.mainBodyChunk.pos, false, Color.Lerp(PlayerGraphicsModule.spearColor, PlayerGraphicsModule.bodyColor, 0.6f), player)
@@ -87,6 +90,7 @@ public class LightSourceModule : IProvideWarmth
         {
             player.room.AddObject(source);
         }
+        player.room.AddObject(this);
     }
 
 
@@ -97,6 +101,7 @@ public class LightSourceModule : IProvideWarmth
         else if (lightSources == null) AddLightSource();
         for (int i = 0; i < lightSources.Length; i++)
         {
+            if (lightSources[i] == null) continue;
             lightSources[i].stayAlive = true;
             lightSources[i].setPos = new Vector2?(player.mainBodyChunk.pos);
             if (lightSources[i].slatedForDeletetion)
@@ -109,7 +114,13 @@ public class LightSourceModule : IProvideWarmth
 
     public void Clear()
     {
+        foreach (var source in lightSources)
+        {
+            if (source == null) continue;
+            player.room.RemoveObject(source);
+        }
         lightSources = null;
+        player.room.RemoveObject(this);
     }
 
 

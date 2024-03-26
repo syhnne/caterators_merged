@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using RWCustom;
 
-namespace Caterators_merged.fp;
+namespace Caterators_by_syhnne.fp;
 
 public class PlayerGraphicsModule
 {

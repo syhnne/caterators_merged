@@ -5,8 +5,13 @@ using SlugBase.Features;
 using static SlugBase.Features.FeatureTypes;
 using System.Runtime.CompilerServices;
 using BepInEx.Logging;
+using RWCustom;
+using MoreSlugcats;
+using Fisobs.Core;
+using Caterators_by_syhnne.srs;
+using Caterators_by_syhnne.nsh;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 
 
@@ -28,8 +33,8 @@ class Plugin : BaseUnityPlugin
     public static Plugin instance;
     public ConfigOptions option;
 
-    internal static readonly bool ShowLogs = true;
-    internal static readonly bool DevMode = true;
+    internal const bool ShowLogs = true;
+    internal const bool DevMode = true;
 
     #region player_ctor
     // 以下自定义属性会覆盖slugbase的属性，我的建议是别改，现在json文件里已经没有饱食度数据了，但我不知道有了会导致什么后果
@@ -41,22 +46,37 @@ class Plugin : BaseUnityPlugin
 
     public void OnEnable()
     {
-        instance = this;
-        option = new ConfigOptions();
-        On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-        MachineConnector.SetRegisteredOI(MOD_ID, option);
+        try
+        {
+            Logger = base.Logger;
+            instance = this;
+            option = new ConfigOptions();
+            ConfigOptions.RegisterOI();
+            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
 
-        On.Player.ctor += Player_ctor;
-        On.World.GetNode += World_GetNode;
-        PlayerHooks.Apply();
-        PlayerGraphicsModule.Apply();
-        CustomLore.Apply();
-        SLOracleHooks.Apply();
-        SSRoomEffects.Apply();
-        fp.ShelterSS_AI.Apply();
+            // 我晕……没加下面这句话导致我被物品不生成的bug困扰半个月
+            Content.Register(new OxygenMaskModules.OxygenMaskFisob());
+            Content.Register(new ReviveSwarmerModules.ReviveSwarmerFisob());
 
-        // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
-        SSOracleHooks.Apply();
+
+            On.Player.ctor += Player_ctor;
+            On.World.GetNode += World_GetNode;
+            PlayerHooks.Apply();
+            PlayerGraphicsModule.Apply();
+            CustomLore.Apply();
+            SLOracleHooks.Apply();
+            SSRoomEffects.Apply();
+            CustomSaveData.Apply();
+            fp.ShelterSS_AI.Apply();
+
+            // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
+            SSOracleHooks.Apply();
+        }
+        catch (Exception ex) 
+        { 
+            Logger.LogError(ex);
+            throw;
+        }
     }
     
     private void LoadResources(RainWorld rainWorld)
@@ -72,41 +92,19 @@ class Plugin : BaseUnityPlugin
     }
 
 
-    /// <summary>
-    /// 输出日志。搜索的时候带上后面的冒号
-    /// </summary>
-    /// <param name="text"></param>
+
+    // 太狼狈了，以后我的日志要寄生在jollylog里面了，因为这个Debug.log不知道为啥压根不干活
+    // 不过能输出日志总归是好的……
     public static void Log(params object[] text)
     {
-        if (ShowLogs)
+        string log = "[syhnne.caterators] : ";
+        foreach (object s in text)
         {
-            string log = "";
-            foreach (object s in text)
-            {
-                log += s.ToString();
-                log += " ";
-            }
-            Debug.Log("[syhnne.caterators] : " + log);
+            log += s.ToString();
+            log += " ";
         }
-
-    }
-    /// <summary>
-    /// 用来输出一些我暂时用不到，但测试时可能有用的日志，后面没有那个冒号，这样我不想搜索的时候就搜不到
-    /// </summary>
-    /// <param name="text"></param>
-    public static void LogStat(params object[] text)
-    {
-        if (ShowLogs)
-        {
-            string log = "";
-            foreach (object s in text)
-            {
-                log += s.ToString();
-                log += " ";
-            }
-            Debug.Log("[syhnne.caterators] " + log);
-        }
-
+        Debug.Log(log);
+        JollyCoop.JollyCustom.Log(log);
     }
 
 
@@ -123,10 +121,7 @@ class Plugin : BaseUnityPlugin
             playerModules.Add(self, new PlayerModule(self));
         }
 
-        if (self.SlugCatClass == Enums.SRSname)
-        {
-            srs.PlayerHooks.Player_ctor(self, abstractCreature, world);
-        }
+
 
 
         // (fp)
@@ -137,7 +132,7 @@ class Plugin : BaseUnityPlugin
             bool altEnding = (world.game.session as StoryGameSession).saveState.deathPersistentSaveData.altEnding;
             bool ascended = (world.game.session as StoryGameSession).saveState.deathPersistentSaveData.ascended;
 
-            Plugin.LogStat("Player_ctor - cycle: ", cycle, " altEnding: ", altEnding, "ascended:", ascended);
+            Plugin.Log("Player_ctor - cycle: ", cycle, " altEnding: ", altEnding, "ascended:", ascended);
 
             MinFoodNow = MinFood;
             self.slugcatStats.maxFood = MaxFood;
@@ -154,15 +149,15 @@ class Plugin : BaseUnityPlugin
             {
                 self.redsIllness = new RedsIllness(self, cycle - 5);
             }
-            else if (altEnding && !ascended && CustomLore.DPSaveData != null && CustomLore.DPSaveData.CyclesFromLastEnterSSAI > 5)
+            else if (altEnding && !ascended && world.game.GetDeathPersistent().CyclesFromLastEnterSSAI > 5)
             {
-                self.redsIllness = new RedsIllness(self, CustomLore.DPSaveData.CyclesFromLastEnterSSAI - 5);
+                self.redsIllness = new RedsIllness(self, world.game.GetDeathPersistent().CyclesFromLastEnterSSAI - 5);
             }
 
             if (!altEnding)
             {
                 self.slugcatStats.foodToHibernate = MinFoodNow;
-                Plugin.LogStat("Player_ctor - minfoodnow: ", MinFoodNow, "food to hibernate(after): ", self.slugcatStats.foodToHibernate, " maxfood: ", MaxFood);
+                Plugin.Log("Player_ctor - minfoodnow: ", MinFoodNow, "food to hibernate(after): ", self.slugcatStats.foodToHibernate, " maxfood: ", MaxFood);
             }
         }
     }
@@ -184,9 +179,6 @@ class Plugin : BaseUnityPlugin
         }
         return orig(self, c);
     }
-
-
-
 
 
 

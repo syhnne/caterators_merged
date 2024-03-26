@@ -17,8 +17,14 @@ using Menu.Remix.MixedUI;
 using System.ComponentModel;
 using System.Linq;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
+
+
+// 想了一些阴间小寄巧解决applypalette的问题，那就是用减法，在贴图上只画缺的颜色，他和玩家自身颜色正片叠底混合起来后就是我要的颜色。
+// 对于nsh的围巾来说意外地非常好用。因为我选了一个很深的围巾颜色，他的绿色跟一种发紫的亮粉色叠起来刚好就是那个颜色
+// srs那个更好办了，红色和什么叠起来都是红的
+// 这个办法唯独对月姐不生效（实际上fp那边效果也不是很好，但他那个时间线冻不死猫，所以我不管了（）所以脑门上的标志得单独贴图（
 public class PlayerGraphicsModule
 {
 
@@ -59,6 +65,10 @@ public class PlayerGraphicsModule
         if (self.player.SlugCatClass == Enums.SRSname && Plugin.playerModules.TryGetValue(self.player, out var module))
         {
             srs.PlayerGraphicsModule.PlayerGraphics_Update(self, module);
+        }
+        else if (self.player.SlugCatClass == Enums.Moonname)
+        {
+            moon.PlayerGraphicsModule.PlayerGraphics_Update(self);
         }
         orig(self);
         if (self.player.SlugCatClass == Enums.NSHname && Plugin.playerModules.TryGetValue(self.player, out var module2))

@@ -8,7 +8,7 @@ using RWCustom;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 
-namespace Caterators_merged.srs;
+namespace Caterators_by_syhnne.srs;
 
 public class PlayerGraphicsModule
 {
@@ -219,17 +219,7 @@ public class PlayerGraphicsModule
     // 如果能让贴图不按正片叠底混合，而是覆盖在原本的颜色之上，那我简直用不着动这个函数
     public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
     {
-        for (int i = 0; i < 12; i++)
-        {
-            if (ColoredBodyParts.Contains(i))
-            {
-                sLeaser.sprites[i].color = new Color(1f, 1f, 1f);
-            }
-            else
-            {
-                sLeaser.sprites[i].color = bodyColor;
-            }
-        }
+
     }
 
 

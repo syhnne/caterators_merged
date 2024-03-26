@@ -6,7 +6,7 @@ using HUD;
 
 
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 
 
@@ -32,7 +32,7 @@ public class GravityController : UpdatableAndDeletable
     public GravityController(Player player)
     {
         this.player = player;
-        unlocked = (player.room.game.IsStorySession && Enums.IsCaterator(player.room.game.StoryCharacter) && player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended) || Plugin.DevMode;
+        unlocked = (player.room.game.IsStorySession && player.room.game.IsCaterator() && player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended) || Plugin.DevMode;
         /*if (player.room != null && player.room.abstractRoom.name == "SS_AI" && player.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding)
         {
             gravityBonus = 0;
@@ -56,8 +56,8 @@ public class GravityController : UpdatableAndDeletable
             if (gravityBonus != (int)Mathf.Round((1f - Mathf.InverseLerp(0f, 0.85f, 1f - player.room.gravity)) * 10f)
             && gravityBonus != (int)Mathf.Round(10f * 1f - player.room.gravity))
             {
-                Plugin.LogStat("gravity mismatch IN BROKEN ZEROG AREA");
-                Plugin.LogStat("-- room gravity: ", player.room.gravity);
+                Plugin.Log("gravity mismatch IN BROKEN ZEROG AREA");
+                Plugin.Log("-- room gravity: ", player.room.gravity);
                 gravityBonus = (int)Mathf.Round((1f - Mathf.InverseLerp(0f, 0.85f, 1f - player.room.gravity)) * 10f);
             }
         }
@@ -65,15 +65,15 @@ public class GravityController : UpdatableAndDeletable
         {
             if (gravityBonus != (int)Mathf.Round((1f - Mathf.InverseLerp(0f, 0.85f, 1f - player.room.gravity)) * 10f))
             {
-                Plugin.LogStat("gravity mismatch IN ZEROG AREA");
-                Plugin.LogStat("-- room gravity: ", player.room.gravity);
+                Plugin.Log("gravity mismatch IN ZEROG AREA");
+                Plugin.Log("-- room gravity: ", player.room.gravity);
                 gravityBonus = (int)Mathf.Round((1f - Mathf.InverseLerp(0f, 0.85f, 1f - player.room.gravity)) * 10f);
             }
         }
         else if (gravityBonus != (int)Mathf.Round(10f * player.room.gravity))
         {
-            Plugin.LogStat("gravity mismatch or coop player changing gravity: ");
-            Plugin.LogStat("-- room gravity: ", player.room.gravity);
+            Plugin.Log("gravity mismatch or coop player changing gravity: ");
+            Plugin.Log("-- room gravity: ", player.room.gravity);
             gravityBonus = (int)Mathf.Round(10f * player.room.gravity);
         }
 
@@ -101,7 +101,7 @@ public class GravityController : UpdatableAndDeletable
 
                     if (player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG) != null || player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG) != null || player.room.abstractRoom.name == "SS_AI")
                     {
-                        Plugin.LogStat("HAS GRAVITY EFFECT");
+                        Plugin.Log("HAS GRAVITY EFFECT");
                         if (gravityBonus <= 10)
                         {
                             if (player.room.abstractRoom.name == "SS_AI") { }
@@ -112,12 +112,12 @@ public class GravityController : UpdatableAndDeletable
                                 if (player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG) != null)
                                 {
                                     player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG).amount = 0.1f * (10 - gravityBonus);
-                                    Plugin.LogStat("zeroG amount: ", 0.1f * (10 - gravityBonus));
+                                    Plugin.Log("zeroG amount: ", 0.1f * (10 - gravityBonus));
                                 }
                                 if (player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG) != null)
                                 {
                                     player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG).amount = 0.1f * (10 - gravityBonus);
-                                    Plugin.LogStat("broken zeroG amount: ", 0.1f * (10 - gravityBonus));
+                                    Plugin.Log("broken zeroG amount: ", 0.1f * (10 - gravityBonus));
                                 }
                             }
 
@@ -138,7 +138,7 @@ public class GravityController : UpdatableAndDeletable
                 }
                 else { gravityBonus = 0; }
 
-                Plugin.LogStat("player gravity control RESULT" + player.room.gravity);
+                Plugin.Log("player gravity control RESULT" + player.room.gravity);
                 gravityControlCounter = 0;
             }
         }
@@ -208,24 +208,24 @@ public class GravityController : UpdatableAndDeletable
                 {
                     amountZeroG = player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG).amount;
                     player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG).amount = 0.1f * (10 - gravityBonus);
-                    Plugin.LogStat("room effect set - newroom - z, amount:", amountZeroG, " to: ", 0.1f * (10 - gravityBonus));
+                    Plugin.Log("room effect set - newroom - z, amount:", amountZeroG, " to: ", 0.1f * (10 - gravityBonus));
                     z = true;
                 }
                 if (player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG) != null)
                 {
                     amountBrokenZeroG = player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG).amount;
                     player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG).amount = 0.1f * (10 - gravityBonus);
-                    Plugin.LogStat("room effect set - newroom - b, amount:", amountBrokenZeroG, " to: ", 0.1f * (10 - gravityBonus));
+                    Plugin.Log("room effect set - newroom - b, amount:", amountBrokenZeroG, " to: ", 0.1f * (10 - gravityBonus));
                     b = true;
                 }
 
                 if (!z) amountZeroG = 0f;
                 if (!b) amountBrokenZeroG = 0f;
-                Plugin.LogStat("NewRoom ! z: ", amountZeroG, " b: ", amountBrokenZeroG);
+                Plugin.Log("NewRoom ! z: ", amountZeroG, " b: ", amountBrokenZeroG);
             }
             else
             {
-                Plugin.LogStat("gravityBonus out of range, cleared");
+                Plugin.Log("gravityBonus out of range, cleared");
                 gravityBonus = (int)Mathf.Round(10f * player.room.gravity);
             }
         }
@@ -254,13 +254,13 @@ public class GravityController : UpdatableAndDeletable
                 if (player.room.roomSettings.effects[i].type == RoomSettings.RoomEffect.Type.ZeroG)
                 {
                     player.room.roomSettings.effects[i].amount = amountZeroG;
-                    Plugin.LogStat("room effect set to original value because player died - ZeroG ", player.room.roomSettings.effects[i].amount);
+                    Plugin.Log("room effect set to original value because player died - ZeroG ", player.room.roomSettings.effects[i].amount);
                     break;
                 }
                 if (player.room.roomSettings.effects[i].type == RoomSettings.RoomEffect.Type.BrokenZeroG)
                 {
                     player.room.roomSettings.effects[i].amount = amountBrokenZeroG;
-                    Plugin.LogStat("room effect set to original value because player died - BrokenZeroG ", player.room.roomSettings.effects[i].amount);
+                    Plugin.Log("room effect set to original value because player died - BrokenZeroG ", player.room.roomSettings.effects[i].amount);
                     player.room.world.rainCycle.brokenAntiGrav.on = true;
                     break;
                 }
@@ -270,7 +270,7 @@ public class GravityController : UpdatableAndDeletable
         {
             player.room.gravity = 1f;
             gravityBonus = 10;
-            Plugin.LogStat("gravity set to 1.0 because player died");
+            Plugin.Log("gravity set to 1.0 because player died");
         }
 
     }

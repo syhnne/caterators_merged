@@ -1,7 +1,8 @@
 ﻿using System;
+using Caterators_by_syhnne.srs;
 
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 public class PlayerModule
 {
@@ -12,7 +13,7 @@ public class PlayerModule
     public readonly bool isCaterator;
     public GravityController gravityController;
     public nsh.Scarf nshScarf;
-    public srs.LightSourceModule srsLightSource;
+    public LightSourceModule srsLightSource;
 
 
     public PlayerModule(Player player)
@@ -33,7 +34,7 @@ public class PlayerModule
 
         if (isCaterator && storyName != null)
         {
-            Plugin.LogStat("gravity controller added for", playerName);
+            Plugin.Log("gravity controller added for", playerName);
             gravityController = new GravityController(player);
         }
 

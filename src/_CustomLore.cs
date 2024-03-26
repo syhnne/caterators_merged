@@ -16,9 +16,12 @@ using MonoMod.Cil;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Menu;
-using static Caterators_merged.srs.OxygenMaskModules;
+using static Caterators_by_syhnne.srs.OxygenMaskModules;
+using SlugBase.SaveData;
+using SlugBase;
 
-namespace Caterators_merged;
+
+namespace Caterators_by_syhnne;
 
 
 
@@ -27,7 +30,6 @@ public class CustomLore
 
 
 
-    public static CustomDeathPersistentSaveData DPSaveData;
 
     public static void Apply()
     {
@@ -45,9 +47,14 @@ public class CustomLore
         On.Menu.SlideShow.ctor += SlideShow_ctor;
 
 
-        On.SaveState.ctor += SaveState_ctor;
+        /*On.SaveState.ctor += SaveState_ctor;
         On.DeathPersistentSaveData.SaveToString += DeathPersistentSaveData_SaveToString;
-        On.DeathPersistentSaveData.FromString += DeathPersistentSaveData_FromString;
+        On.DeathPersistentSaveData.FromString += DeathPersistentSaveData_FromString;*/
+
+        // 
+        On.SlugcatStats.SlugcatUnlocked += SlugcatStats_SlugcatUnlocked;
+        // On.Menu.SlugcatSelectMenu.SlugcatPageNewGame.ctor += SlugcatSelectMenu_SlugcatPage_SlugcatPageNewGame_ctor;
+        // On.Menu.SlugcatSelectMenu.SetSlugcatColorOrder += SlugcatSelectMenu_SetSlugcatColorOrder;
 
         // OxygenMask
         On.AbstractPhysicalObject.UsesAPersistantTracker += AbstractPhysicalObject_UsesAPersistantTracker;
@@ -62,7 +69,7 @@ public class CustomLore
     private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
     {
         orig(self, manager);
-        if (self.IsStorySession && Enums.IsCaterator(self.StoryCharacter) && self.StoryCharacter != Enums.FPname)
+        if (self.IsStorySession && self.IsCaterator() && self.StoryCharacter != Enums.FPname)
         {
             // self.GetStorySession.saveState.miscWorldSaveData.moonRevived = true;
             self.GetStorySession.saveState.miscWorldSaveData.moonHeartRestored = true;
@@ -73,7 +80,58 @@ public class CustomLore
 
 
 
+    // 修改未解锁的角色描述
+    // 本想直接改游戏的，但不知道那mod启用顺序咋回事，我一动slugbase就卡bug，那就直接改slugbase数据吧（
+    // 但 这玩意儿刷新的及时吗
+    private static bool SlugcatStats_SlugcatUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugcatStats.Name i, RainWorld rainWorld) 
+    {
+        if (ModManager.MSC && MoreSlugcats.MoreSlugcats.chtUnlockCampaigns.Value)
+        {
+            return true;
+        }
+        else if (i == Enums.NSHname)
+        {
+            if (rainWorld.GetMiscProgression().beaten_fp || rainWorld.GetMiscProgression().beaten_srs)
+            {
+                return true;
+            }
+            if (SlugBaseCharacter.TryGet(i, out var chara))
+            {
+                chara.Description = "Clear the game as FP or SRS to unlock.";
+            }
+            return false;
+        }
+        else if (i == Enums.Moonname)
+        {
+            if (rainWorld.GetMiscProgression().beaten_nsh)
+            {
+                return true;
+            }
+            if (SlugBaseCharacter.TryGet(i, out var chara))
+            {
+                chara.Description = "Clear the game as NSH to unlock.";
+            }
+            return false;
+        }
+        return i == Enums.FPname || i == Enums.SRSname || orig(i, rainWorld);
+    }
 
+
+
+
+    private static void SlugcatSelectMenu_SetSlugcatColorOrder(On.Menu.SlugcatSelectMenu.orig_SetSlugcatColorOrder orig, SlugcatSelectMenu self)
+    {
+        orig(self);
+
+        string str = "--slugcatColorOrder:";
+        foreach (var name in self.slugcatColorOrder)
+        {
+            str += name.value + " ";
+        }
+        Plugin.Log(str);
+
+
+    }
 
 
 
@@ -82,7 +140,7 @@ public class CustomLore
     // 防止玩家用特殊手段归乡（别想在酒吧点炒饭
     private static void MSCRoomSpecificScript_GourmandEnding_Update(On.MoreSlugcats.MSCRoomSpecificScript.OE_GourmandEnding.orig_Update orig, MSCRoomSpecificScript.OE_GourmandEnding self, bool eu)
     {
-        if (self.room.game.IsStorySession && Enums.IsCaterator(self.room.game.StoryCharacter)) return;
+        if (self.room.game.IsStorySession && self.room.game.IsCaterator()) return;
         orig(self, eu);
     }
 
@@ -135,21 +193,15 @@ public class CustomLore
 
     private static void Room_Loaded(On.Room.orig_Loaded orig, Room self)
     {
-        if (self.game != null && self.game.IsStorySession && Enums.IsCaterator(self.game.StoryCharacter)) 
+        if (self.game != null && self.game.IsStorySession && self.game.IsCaterator()) 
         {
             if (self.game.StoryCharacter == Enums.FPname)
             {
                 fp.CustomLore.AddRoomSpecificScripts(self);
             }
-            else if (self.game.StoryCharacter == Enums.SRSname && self.abstractRoom.name == "SS_AI" && DPSaveData != null && !DPSaveData.OxygenMaskTaken)
+            else if (self.game.StoryCharacter == Enums.SRSname)
             {
-                Plugin.Log("Add OxygenMask");
-
-                AbstractPhysicalObject abstr = new OxygenMaskAbstract(self.game.world, new WorldCoordinate(self.abstractRoom.index, -1, -1, 0), self.game.GetNewID(), 3);
-                abstr.destroyOnAbstraction = true;
-                self.abstractRoom.AddEntity(abstr);
-                abstr.RealizeInRoom();
-                (abstr.realizedObject as OxygenMask).firstChunk.pos = new Vector2(300f, 300f);
+                srs.CustomLore.Room_Loaded(self);
             }
         }
         
@@ -161,47 +213,9 @@ public class CustomLore
 
 
 
-    private static void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
-    {
-        orig(self, saveStateNumber, progression);
-        if (DPSaveData == null)
-        {
-            DPSaveData = new(saveStateNumber);
-        }
-        else
-        {
-            DPSaveData.ClearData(saveStateNumber);
-        }
-    }
 
-    private static string DeathPersistentSaveData_SaveToString(On.DeathPersistentSaveData.orig_SaveToString orig, DeathPersistentSaveData self, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
-    {
-        string result = orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
 
-        result = DPSaveData.SaveToString(result);
-        Plugin.LogStat("DPSaveData:", result);
-        return result;
-    }
 
-    static private void DeathPersistentSaveData_FromString(On.DeathPersistentSaveData.orig_FromString orig, DeathPersistentSaveData self, string s)
-    {
-        orig(self, s);
-
-        DPSaveData.FromString(self.unrecognizedSaveStrings);
-        List<string> ToRemove = DPSaveData.saveStrings;
-
-        for (int k = 0; k < self.unrecognizedSaveStrings.Count; k++)
-        {
-            foreach (string str in ToRemove)
-            {
-                if (self.unrecognizedSaveStrings[k].Contains(str))
-                {
-                    self.unrecognizedSaveStrings.RemoveAt(k);
-                }
-            }
-        }
-
-    }
 
 
 

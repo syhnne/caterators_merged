@@ -17,7 +17,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Menu;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 
 
@@ -29,7 +29,10 @@ namespace Caterators_merged;
 internal static class Enums
 {
 
+    public static bool IsCaterator(this SaveState saveState) => IsCaterator(saveState.saveStateNumber);
 
+    public static bool IsCaterator(this RainWorldGame game) => game.IsStorySession && IsCaterator(game.StoryCharacter);
+    
     public static bool IsCaterator(SlugcatStats.Name name)
     {
         if (name == FPname || name == SRSname || name == NSHname || name == Moonname) { return true; }

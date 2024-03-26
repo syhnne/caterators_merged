@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Caterators_merged.nsh;
+namespace Caterators_by_syhnne.nsh;
 
 public class PlayerGraphicsModule
 {
@@ -66,7 +66,6 @@ public class PlayerGraphicsModule
         sLeaser.sprites[2] = triangleMesh;
         if (Futile.atlasManager.DoesContainElementWithName("nsh_HeadA0"))
         {
-            Plugin.Log("nsh_HeadA0 loaded");
             sLeaser.sprites[3] = new FSprite("nsh_HeadA0", true);
         }
         else
@@ -106,7 +105,7 @@ public class PlayerGraphicsModule
     {
         if (!Plugin.playerModules.TryGetValue(self.player, out var module) || module.playerName != Enums.NSHname) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
-        Plugin.Log(sLeaser.sprites.Count());
+        // Plugin.Log(sLeaser.sprites.Count());
         // if (sLeaser.sprites.Count() <= module.nshScarf.startSprite) return;
         // rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[module.nshScarf.startSprite]);
 
@@ -155,13 +154,9 @@ public class PlayerGraphicsModule
         if (!Plugin.playerModules.TryGetValue(self.player, out var module) || module.playerName != Enums.NSHname) { return; }
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
-            if (sLeaser.sprites[i].element.name.StartsWith(sLeaser.sprites[i].element.name))
+            if (Futile.atlasManager.DoesContainElementWithName("nsh_" + sLeaser.sprites[i].element.name))
             {
-                if (Futile.atlasManager.DoesContainElementWithName("nsh_" + sLeaser.sprites[i].element.name))
-                {
-                    sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "nsh_" + sLeaser.sprites[i].element.name));
-                }
-
+                sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "nsh_" + sLeaser.sprites[i].element.name));
             }
         }
         module.nshScarf?.DrawSprite(sLeaser, rCam, timeStacker, camPos);
@@ -177,17 +172,6 @@ public class PlayerGraphicsModule
 
     public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
     {
-        for (int i = 0; i < 12; i++)
-        {
-            if (ColoredBodyParts.Contains(i))
-            {
-                sLeaser.sprites[i].color = new Color(1f, 1f, 1f);
-            }
-            else
-            {
-                sLeaser.sprites[i].color = bodyColor;
-            }
-        }
         if (Plugin.playerModules.TryGetValue(self.player, out var module))
         {
             module.nshScarf?.ApplyPalette(sLeaser, rCam, palette);

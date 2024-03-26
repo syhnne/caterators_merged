@@ -1,12 +1,21 @@
 ﻿using Menu.Remix.MixedUI;
 using RWCustom;
+using System.Xml.Linq;
 using UnityEngine;
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 
 internal class ConfigOptions : OptionInterface
 {
+    public static ConfigOptions Instance { get; } = new();
+    public static void RegisterOI()
+    {
+        if (MachineConnector.GetRegisteredOI(Plugin.MOD_ID) != Instance)
+            MachineConnector.SetRegisteredOI(Plugin.MOD_ID, Instance);
+    }
+
+
     internal readonly int DefaultExplosionCapacity = 10;
     public static Configurable<int> ExplosionCapacity;
     public Configurable<KeyCode> GravityControlKey;

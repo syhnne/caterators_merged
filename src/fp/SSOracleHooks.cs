@@ -7,14 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Caterators_merged.fp;
+namespace Caterators_by_syhnne.fp;
 
 public class SSOracleHooks
 {
     public static void Apply()
     {
         On.SSOracleBehavior.storedPearlOrbitLocation += SSOracleBehavior_storedPearlOrbitLocation;
-        // On.PebblesPearl.Update += PebblesPearl_Update;
+        On.PebblesPearl.Update += PebblesPearl_Update;
         new Hook(
             typeof(SSOracleBehavior).GetProperty(nameof(SSOracleBehavior.EyesClosed), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
             SSOracleBehavior_EyesClosed
@@ -63,8 +63,15 @@ public class SSOracleHooks
         if (self.hoverPos == null && self.oracle != null && self.oracle.room == self.room)
         {
             if (!self.oracle.Consious) self.orbitObj = null;
-            else if ((self.oracle.oracleBehavior as SSOracleBehavior).player != null) { self.orbitObj = (self.oracle.oracleBehavior as SSOracleBehavior).player; }
-            else self.orbitObj = self.oracle;
+            // 写这个&&false 是因为我把console砍了
+            else if ((self.oracle.oracleBehavior as SSOracleBehavior).player != null && false)
+            {
+                self.orbitObj = (self.oracle.oracleBehavior as SSOracleBehavior).player;
+            }
+            else 
+            { 
+                self.orbitObj = self.oracle; 
+            }
 
         }
 

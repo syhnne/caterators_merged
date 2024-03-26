@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Caterators_merged.fp;
+namespace Caterators_by_syhnne.fp;
 
 public class SLOracleHooks
 {

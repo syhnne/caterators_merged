@@ -26,11 +26,11 @@ using SlugBase;
 using System.Runtime.InteropServices;
 using static MonoMod.Cil.RuntimeILReferenceBag;
 using System.Security.Cryptography;
-using Caterators_merged.srs;
+using Caterators_by_syhnne.srs;
 
 
 
-namespace Caterators_merged;
+namespace Caterators_by_syhnne;
 
 public class PlayerHooks
 {
@@ -40,7 +40,7 @@ public class PlayerHooks
         On.Player.Jump += Player_Jump;
         On.Player.Update += Player_Update;
         On.Player.LungUpdate += Player_LungUpdate;
-        On.Player.IsObjectThrowable += Player_IsObjectThrowable;
+        // On.Player.IsObjectThrowable += Player_IsObjectThrowable;
         On.Player.NewRoom += Player_NewRoom;
 
 
@@ -107,23 +107,37 @@ public class PlayerHooks
     private static void Player_NewRoom(On.Player.orig_NewRoom orig, Player self, Room newRoom)
     {
         orig(self, newRoom);
-        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && Enums.IsCaterator(module.playerName);
-        if (self.dead || !getModule || Enums.IsCaterator(self.SlugCatClass)) return;
+        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
+        if (self.dead || !getModule || !Enums.IsCaterator(self.SlugCatClass)) return;
         module.gravityController?.NewRoom(module.IsMyStory);
-        // 这咋也不好使？
 
-        if (newRoom.abstractRoom.name == "SS_AI" && CustomLore.DPSaveData != null && CustomLore.DPSaveData.saveStateNumber == Enums.FPname)
-        {
-            CustomLore.DPSaveData.CyclesFromLastEnterSSAI = 0;
-            Plugin.LogStat("CustomLore.DPSaveData.CyclesFromLastEnterSSAI CLEEARED");
-        }
-
-        if (self.room == null) { return; }
-
-        if (module.srsLightSource != null && module.srsLightSource.lightSources == null && self.SlugCatClass == Enums.SRSname) 
+        if (self.room != null && module.srsLightSource != null && module.srsLightSource.lightSources == null && self.SlugCatClass == Enums.SRSname)
         {
             module.srsLightSource.AddLightSource();
         }
+
+        if (!newRoom.game.IsStorySession) { return; }
+
+        if (newRoom.abstractRoom.name == "SS_AI" &&  newRoom.game.StoryCharacter == Enums.FPname)
+        {
+            newRoom.game.GetDeathPersistent().CyclesFromLastEnterSSAI = 0;
+            Plugin.Log("CyclesFromLastEnterSSAI CLEARED");
+        }
+        else if (newRoom.abstractRoom.name == "SS_AI")
+        {
+            // TODO: 这里要不要这么写，有待商榷
+            if (newRoom.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad <= 0)
+            {
+                newRoom.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad += 1;
+            }
+            if (!newRoom.game.GetStorySession.lastEverMetPebbles)
+            {
+                newRoom.game.GetStorySession.lastEverMetPebbles = true;
+            }
+        }
+
+        
+
 
         // 我感觉用不着这么写了 写的时候再说吧
         // TODO:
@@ -141,22 +155,34 @@ public class PlayerHooks
 
 
         // logs
-        if (!Plugin.DevMode) return;
+        if (!Plugin.DevMode || !newRoom.game.IsStorySession) { return; }
 
-        Plugin.LogStat("ROOM: ", self.room.abstractRoom.name, " SHELTER INDEX: ", self.room.abstractRoom.shelterIndex);
-        if (self.room.abstractRoom.isAncientShelter) { Plugin.LogStat("IS ANCIENT SHELTER"); }
+        CustomSaveData.SaveDeathPersistent dp = newRoom.game.GetDeathPersistent();
+        CustomSaveData.SaveMiscProgression mp = newRoom.game.GetMiscProgression();
 
-        Plugin.Log("CustomLore.DPSaveData.CyclesFromLastEnterSSAI:", CustomLore.DPSaveData.CyclesFromLastEnterSSAI, CustomLore.DPSaveData.saveStateNumber.value);
 
-        Plugin.Log("self.slugcatStats.foodToHibernate:", self.slugcatStats.foodToHibernate);
+        Plugin.Log("ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
 
+        Plugin.Log("--CustomSaveData: CyclesFromLastEnterSSAI", dp.CyclesFromLastEnterSSAI);
+
+        Plugin.Log("--CustomSaveData:", mp.beaten_fp, mp.beaten_srs, mp.beaten_nsh, mp.beaten_moon);
+
+        string warmth = "--IProvideWarmth:";
+        foreach (IProvideWarmth obj in newRoom.blizzardHeatSources)
+        {
+            warmth += obj.GetType().Name + " ";
+        }
+        Plugin.Log(warmth);
+
+        string phyObj = "--physicalObj:";
         foreach (var obj in newRoom.physicalObjects)
         {
             foreach (var obj2 in obj)
             {
-                Plugin.Log("physicalObj:", obj2.GetType().Name);
+                phyObj += obj2.GetType().Name + " ";
             }
         }
+        Plugin.Log(phyObj);
     }
 
 
@@ -233,6 +259,10 @@ public class PlayerHooks
             module.gravityController.Die();
         }
         orig(self);
+        if (self.SlugCatClass == Enums.SRSname)
+        {
+            srs.PlayerHooks.Player_Die(self, module);
+        }
 
     }
 
@@ -246,7 +276,7 @@ public class PlayerHooks
         bool getModule = Plugin.playerModules.TryGetValue((self.owner as Player), out var module) && module.isCaterator;
         if (getModule)
         {
-            Plugin.LogStat("HUD gravityMeter");
+            Plugin.Log("HUD gravityMeter");
             self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
         }
 
@@ -341,7 +371,7 @@ public class PlayerHooks
 
         // TODO: 哈？这代码在我程序里躺了三个月了，合着他有bug？
         // NullReferenceException: Object reference not set to an instance of an object
-        // Caterators_merged.PlayerHooks +<> c.< IL_Player_GrabUpdate > b__2_1(System.Boolean isArtificer, Player self)(at<aab3b65dddfb4301bfff24fdbbdb21cb>:0)
+        // Caterators_by_syhnne.PlayerHooks +<> c.< IL_Player_GrabUpdate > b__2_1(System.Boolean isArtificer, Player self)(at<aab3b65dddfb4301bfff24fdbbdb21cb>:0)
         // MonoMod.Cil.RuntimeILReferenceBag + FastDelegateInvokers.Invoke[T1, T2, TResult](T1 arg1, T2 arg2, MonoMod.Cil.RuntimeILReferenceBag + FastDelegateInvokers + Func`3[T1, T2, TResult] del)(at < 03f8e64dbb9c4841b4665e15d94870d1 >:0)
 
         // 533末尾，骗代码说我是工匠，让我合成
