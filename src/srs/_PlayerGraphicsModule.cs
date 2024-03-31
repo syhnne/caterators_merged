@@ -18,24 +18,8 @@ public class PlayerGraphicsModule
     internal static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, };
 
 
-    
-
-
-
-
-    // 整一个超亮的自发光
     public static void PlayerGraphics_Update(PlayerGraphics self, PlayerModule module)
     {
-        /*if (self.lightSource == null)
-        {
-            self.lightSource = new LightSource(self.player.mainBodyChunk.pos, false, Color.Lerp(spearColor, bodyColor, 0.8f), self.player);
-            self.lightSource.requireUpKeep = true;
-            self.lightSource.setRad = new float?(700f);
-            self.lightSource.setAlpha = new float?(3f);
-            self.player.room.AddObject(self.lightSource);
-        }*/
-
-        
         if (self.player.room != null && module.srsLightSource == null)
         {
             module.srsLightSource = new LightSourceModule(self.player);
@@ -45,6 +29,8 @@ public class PlayerGraphicsModule
             module.srsLightSource.Update();
         }
     }
+
+
 
 
 
@@ -68,9 +54,7 @@ public class PlayerGraphicsModule
             self.tail[3] = new TailSegment(self, 3.5f, 7f, self.tail[2], 0.85f, 1f, 0.5f, true);
             self.tail.Append(new TailSegment(self, 2f, 5f, self.tail[3], 0.85f, 1f, 0.5f, true));
         }
-        if (self.player.room == null) { return; }
-        Plugin.playerModules.TryGetValue(self.player, out var module);
-        module.srsLightSource = new LightSourceModule(self.player);
+        
     }
 
 

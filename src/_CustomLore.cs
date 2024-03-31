@@ -37,7 +37,7 @@ public class CustomLore
         On.RainWorldGame.ctor += RainWorldGame_ctor;
         On.MoreSlugcats.MSCRoomSpecificScript.OE_GourmandEnding.Update += MSCRoomSpecificScript_GourmandEnding_Update;
 
-        
+        On.RainWorldGame.Win += RainWorldGame_Win;
         On.RainWorldGame.GoToRedsGameOver += RainWorldGame_GoToRedsGameOver;
         On.RainWorldGame.BeatGameMode += RainWorldGame_BeatGameMode;
         On.Room.Loaded += Room_Loaded;
@@ -47,18 +47,10 @@ public class CustomLore
         On.Menu.SlideShow.ctor += SlideShow_ctor;
 
 
-        /*On.SaveState.ctor += SaveState_ctor;
-        On.DeathPersistentSaveData.SaveToString += DeathPersistentSaveData_SaveToString;
-        On.DeathPersistentSaveData.FromString += DeathPersistentSaveData_FromString;*/
-
-        // 
         On.SlugcatStats.SlugcatUnlocked += SlugcatStats_SlugcatUnlocked;
-        // On.Menu.SlugcatSelectMenu.SlugcatPageNewGame.ctor += SlugcatSelectMenu_SlugcatPage_SlugcatPageNewGame_ctor;
-        // On.Menu.SlugcatSelectMenu.SetSlugcatColorOrder += SlugcatSelectMenu_SetSlugcatColorOrder;
 
         // OxygenMask
         On.AbstractPhysicalObject.UsesAPersistantTracker += AbstractPhysicalObject_UsesAPersistantTracker;
-        On.SaveState.SaveToString += SaveState_SaveToString;
 
         fp.CustomLore.Apply();
         srs.CustomLore.Apply();
@@ -147,6 +139,23 @@ public class CustomLore
 
 
 
+
+    // 防止玩家在循环耗尽的时候正常睡觉
+    // 并且保存数据
+    private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
+    {
+        if (self.manager.upcomingProcess != null || !self.IsStorySession) return;
+
+        if (self.StoryCharacter == Enums.FPname)
+        {
+            fp.CustomLore.RainWorldGame_Win(self, malnourished);
+        }
+        orig(self, malnourished);
+    }
+
+
+
+
     private static void RainWorldGame_BeatGameMode(On.RainWorldGame.orig_BeatGameMode orig, RainWorldGame game, bool standardVoidSea)
     {
         orig(game, standardVoidSea);
@@ -228,15 +237,6 @@ public class CustomLore
             return true;
         }
         return orig(abs);
-    }
-
-
-    private static string SaveState_SaveToString(On.SaveState.orig_SaveToString orig, SaveState self)
-    {
-        string result = orig(self);
-        Plugin.Log("SaveState:", result);
-        return result;
-
     }
 
     #endregion

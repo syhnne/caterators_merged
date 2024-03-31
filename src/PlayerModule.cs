@@ -1,5 +1,5 @@
 ﻿using System;
-using Caterators_by_syhnne.srs;
+
 
 
 namespace Caterators_by_syhnne;
@@ -11,9 +11,11 @@ public class PlayerModule
     public readonly SlugcatStats.Name storyName;
     public readonly bool IsMyStory;
     public readonly bool isCaterator;
+
     public GravityController gravityController;
     public nsh.Scarf nshScarf;
-    public LightSourceModule srsLightSource;
+    public nsh.Inventory nshInventory;
+    public srs.LightSourceModule srsLightSource;
 
 
     public PlayerModule(Player player)
@@ -34,17 +36,27 @@ public class PlayerModule
 
         if (isCaterator && storyName != null)
         {
-            Plugin.Log("gravity controller added for", playerName);
             gravityController = new GravityController(player);
         }
-
+        if (playerName == Enums.NSHname)
+        {
+            nshInventory = new nsh.Inventory(player);
+        }
+        if (playerName == Enums.SRSname)
+        {
+            srsLightSource = new srs.LightSourceModule(player);
+        }
 
     }
 
     public void Update(Player player, bool eu)
     {
         if (player.room == null || player.dead) return;
+        nshInventory?.Update(eu);
         gravityController?.Update(eu, storyName == playerName);
+        
+
+
 
     }
 

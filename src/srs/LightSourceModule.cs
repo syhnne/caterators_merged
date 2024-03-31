@@ -11,7 +11,6 @@ namespace Caterators_by_syhnne.srs;
 
 // 理论上这个可以给联机队友保温，但我还没试过冻死是什么感觉
 // 啊 是时候改apply palette了（目死
-// 妈的 这不起作用啊 咋回事
 public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
 {
     public Player player;

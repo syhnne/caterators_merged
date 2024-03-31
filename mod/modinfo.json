@@ -3,8 +3,8 @@
 	"name": "_Caterators (alpha ver.)",
 	"version": "0.1.0",
 	"authors": "syhnne",
-	"description": "在这个时候更新，，",
-	"requirements": [ "slime-cubed.slugbase", "moreslugcats", "fisobs", "crs" ],
-	"requirements_names": [ "SlugBase", "More Slugcats Expansion", "Fisobs", "Custom Regions Support" ],
+	"description": "我依赖项也不多啊，区区五个而已",
+	"requirements": [ "slime-cubed.slugbase", "moreslugcats", "fisobs", "crs", "pom" ],
+	"requirements_names": [ "SlugBase", "More Slugcats Expansion", "Fisobs", "Custom Regions Support", "POM" ],
 	"tags": [ "Custom Slugcat" ]
 }

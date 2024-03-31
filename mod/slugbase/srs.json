@@ -28,6 +28,7 @@
 		"food_min": 11,
 		"food_max": 14,
 		"crouch_stealth": [ 1.5, 1.2 ],
+		"loudness": [ 1.5, 1.2 ],
 
 		"guide_overseer": 3,
 		"start_room": "OE_S04",

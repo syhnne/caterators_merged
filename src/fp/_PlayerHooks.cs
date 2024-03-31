@@ -1111,7 +1111,7 @@ internal class PlayerHooks
             Menu.SleepAndDeathScreen owner = (self.hud.owner as Menu.SleepAndDeathScreen);
             if (CycleGetFood(package.saveState.cycleNumber - 1) < CycleGetFood(package.saveState.cycleNumber))
             {
-                // Plugin.Log("HUD_FoodMeter_SleepUpdate - FOOD CHANGING survival limit: ", player.survivalLimit, " start malnourished: ", owner.startMalnourished);
+                // Plugin.Log("HUD_FoodMeter_SleepUpdate - FOOD CHANGING survival limit: ", player.survivalLimit, " start malnourished: ", player.startMalnourished);
                 owner.startMalnourished = true;
                 // 强制玩家观看动画。反正占不了他们几秒，但我可是做了一下午，都给我看（
                 if (CycleGetFood(package.saveState.cycleNumber) == Plugin.MinFood + 1)

@@ -19,12 +19,14 @@ internal class ConfigOptions : OptionInterface
     internal readonly int DefaultExplosionCapacity = 10;
     public static Configurable<int> ExplosionCapacity;
     public Configurable<KeyCode> GravityControlKey;
+    public Configurable<KeyCode> InventoryKey;
     public Configurable<KeyCode> CraftKey;
     public ConfigOptions()
     {
         ExplosionCapacity = config.Bind<int>("ExplosionCapacity", 10);
         GravityControlKey = config.Bind<KeyCode>("GravityControlKey", KeyCode.G);
         CraftKey = config.Bind<KeyCode>("CraftKey", KeyCode.None);
+        InventoryKey = config.Bind<KeyCode>("InventoryKey", KeyCode.D);
     }
 
     public override void Initialize()
@@ -70,6 +72,14 @@ internal class ConfigOptions : OptionInterface
             { description = inGameTranslator.Translate(desc) },
             new OpKeyBinder(CraftKey, new Vector2(xposOpt, ymax - yspacing - 100f), new Vector2(50f, 10f), true, OpKeyBinder.BindController.AnyController)
             { description = inGameTranslator.Translate(desc) }
+        );
+
+        desc = "(NSH)The key to be pressed when adding/removing objects from inventory";
+        Tabs[1].AddItems(
+            new OpLabel(xposLabel, ymax - yspacing - 150f, inGameTranslator.Translate("Inventory key"), false)
+            { description = desc },
+            new OpKeyBinder(InventoryKey, new Vector2(xposOpt, ymax - yspacing - 150f), new Vector2(50f, 10f), true, OpKeyBinder.BindController.AnyController)
+            { description = desc }
         );
 
     }

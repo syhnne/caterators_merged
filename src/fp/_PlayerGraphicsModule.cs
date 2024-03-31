@@ -89,7 +89,7 @@ public class PlayerGraphicsModule
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             // 2是尾巴，9是眼睛，56是手，除此以外都涂成粉色。。
-            // TODO: 这属于硬编码禁止玩家改颜色了，虽然确实不太应该让他们改颜色，但至少得让原版函数正常运行吧（。
+            // 这个只能硬编码了，不管了（
             if (ColoredBodyParts.Contains(i))
             {
                 sLeaser.sprites[i].color = eyesColor_hard;

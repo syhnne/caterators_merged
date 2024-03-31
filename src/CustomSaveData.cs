@@ -11,7 +11,7 @@ namespace Caterators_by_syhnne;
 
 // 抄的珍珠猫代码
 // 呃啊 原来slugbase有这个功能啊（晕厥）我都不会用 看document看不懂 不抄不知道
-// 虽然我屡次三番想要抄珍珠猫代码，但今天是我第一次看懂这个代码。。纪念一下这个伟大的日子吧，今天是2024.3.25，差不多是mod开发的第四个月
+// 虽然我屡次三番想要抄珍珠猫代码，但今天是我第一次看懂这个代码。。
 public static class CustomSaveData
 {
 
@@ -30,8 +30,8 @@ public static class CustomSaveData
 
         // 哇 这是什么写法 好神奇 马上给isCaterator安排一个
         var miscProg = self.miscProgressionData?.GetMiscProgression();
-        var ssn = self.currentSaveState.saveStateNumber;
-        if ( miscProg != null && saveCurrentState && self.currentSaveState.IsCaterator())
+        var ssn = self.currentSaveState?.saveStateNumber;
+        if ( miscProg != null && ssn != null && saveCurrentState && self.currentSaveState != null && self.currentSaveState.IsCaterator())
         {
             if (ssn == Enums.FPname)
             {
@@ -82,6 +82,7 @@ public static class CustomSaveData
     public class SaveMiscProgression
     {
         public SlugcatStats.Name StoryCharacter {  get; set; }
+        public bool IsNewSave {  get; set; }
         public bool beaten_fp { get; set; }
         public bool alt2ending_fp {  get; set; }
         public bool beaten_srs {  get; set; }
@@ -112,6 +113,8 @@ public static class CustomSaveData
         public bool alt2ending_srs { get; set; }
         public bool alt2ending_nsh { get; set; }
         public bool alt2ending_moon { get; set; }
+
+        public List<AbstractPhysicalObject>[] nshInventory { get; set; }
     }
 
 

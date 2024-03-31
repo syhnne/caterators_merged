@@ -109,6 +109,28 @@ internal class CustomLore
 
 
 
+
+    // 防止玩家在循环耗尽的时候正常睡觉
+    // 并且保存数据
+    public static void RainWorldGame_Win(RainWorldGame self, bool malnourished)
+    {
+        SaveState save = self.GetStorySession.saveState;
+        self.GetDeathPersistent().CyclesFromLastEnterSSAI++;
+        Plugin.Log("RainWorldGame_Win: cycle: " + save.cycleNumber, "CyclesFromLastEnterSSAI:", self.GetDeathPersistent().CyclesFromLastEnterSSAI);
+
+        if (!save.deathPersistentSaveData.altEnding && save.cycleNumber >= Plugin.Cycles)
+        {
+            Plugin.Log("FPslug Game Over !!! cycle:" + save.cycleNumber);
+            save.deathPersistentSaveData.redsDeath = true;
+            save.deathPersistentSaveData.ascended = false;
+            self.GoToRedsGameOver();
+            return;
+        }
+    }
+
+
+
+
     public static void RainWorldGame_GoToRedsGameOver(RainWorldGame self)
     {
         Plugin.Log("RainWorldGame_GoToRedsGameOver:");
@@ -221,8 +243,7 @@ internal class CustomLore
         On.Menu.StoryGameStatisticsScreen.CommunicateWithUpcomingProcess += Menu_StoryGameStatisticsScreen_CommunicateWithUpcomingProcess;
         On.Menu.SlugcatSelectMenu.UpdateStartButtonText += Menu_SlugcatSelectMenu_UpdateStartButtonText;
         On.Menu.SlugcatSelectMenu.ContinueStartedGame += Menu_SlugcatSelectMenu_ContinueStartedGame;
-        On.RainWorldGame.Win += RainWorldGame_Win;
-        IL.SaveState.LoadGame += SaveState_LoadGame;
+        // IL.SaveState.LoadGame += SaveState_LoadGame;
     }
 
 
@@ -254,29 +275,7 @@ internal class CustomLore
 
 
 
-    // 防止玩家在循环耗尽的时候正常睡觉
-    // 并且保存数据
-    private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
-    {
-        if (self.manager.upcomingProcess != null || !self.IsStorySession) return;
-
-        SaveState save = self.GetStorySession.saveState;
-        if (self.StoryCharacter == Enums.FPname)
-        {
-            self.GetDeathPersistent().CyclesFromLastEnterSSAI++;
-            Plugin.Log("RainWorldGame_Win: cycle: " + save.cycleNumber, "CyclesFromLastEnterSSAI:", self.GetDeathPersistent().CyclesFromLastEnterSSAI);
-
-            if (!save.deathPersistentSaveData.altEnding && save.cycleNumber >= Plugin.Cycles)
-            {
-                Plugin.Log("FPslug Game Over !!! cycle:" + save.cycleNumber);
-                save.deathPersistentSaveData.redsDeath = true;
-                save.deathPersistentSaveData.ascended = false;
-                self.GoToRedsGameOver();
-                return;
-            }
-        }
-        orig(self, malnourished);
-    }
+    
 
 
 

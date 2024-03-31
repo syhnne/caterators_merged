@@ -295,10 +295,10 @@ public class SSOracleSubBehavior : SSOracleBehavior.ConversationBehavior
     /*public override void NewAction(SSOracleBehavior.Action oldAction, SSOracleBehavior.Action newAction)
     {
         base.NewAction(oldAction, newAction);
-        if (newAction == SSOracleBehavior.Action.ThrowOut_KillOnSight && this.owner.conversation != null)
+        if (newAction == SSOracleBehavior.Action.ThrowOut_KillOnSight && this.player.conversation != null)
         {
-            this.owner.conversation.Destroy();
-            this.owner.conversation = null;
+            this.player.conversation.Destroy();
+            this.player.conversation = null;
         }
     }*/
 

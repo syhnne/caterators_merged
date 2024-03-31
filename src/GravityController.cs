@@ -20,7 +20,7 @@ public class GravityController : UpdatableAndDeletable
     private bool everUsed = false;
     public int gravityControlCounter = 0;
     public int gravityBonus = 10;
-    private static readonly int gravityControlSpeed = 15;
+    private static readonly int gravityControlSpeed = 20;
     public float amountZeroG;
     public float amountBrokenZeroG;
     public bool enabled = true;
@@ -356,7 +356,7 @@ public class GravityMeter : HudPart
     {
         get
         {
-            return (owner != null && owner.isAbleToUse);
+            return (owner != null && owner.player.room != null && owner.isAbleToUse);
         }
     }
 
@@ -368,12 +368,12 @@ public class GravityMeter : HudPart
         base.Update();
         lastPos = pos;
         lastFade = fade;
-        Vector2 vector = Vector2.zero;
+        Vector2 camPos = Vector2.zero;
         if (owner.player.room != null)
         {
-            vector = owner.player.room.game.cameras[0].pos;
+            camPos = owner.player.room.game.cameras[0].pos;
         }
-        pos = owner.player.mainBodyChunk.pos - vector;
+        pos = owner.player.mainBodyChunk.pos - camPos;
         int gravityInt = owner.gravityBonus % 10;
         int gravityLevel = owner.gravityBonus / 10;
         // if (gravityLevel >= 7) gravityLevel = 7;

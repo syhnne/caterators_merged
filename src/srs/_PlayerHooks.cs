@@ -32,15 +32,7 @@ namespace Caterators_by_syhnne.srs;
 internal class PlayerHooks
 {
 
-    public static void Player_Die(Player self, PlayerModule module)
-    {
-        if (module.srsLightSource != null)
-        {
-            module.srsLightSource.Clear();
-            module.srsLightSource = null;
-        }
-        
-    }
+
 
 
 
@@ -129,7 +121,7 @@ internal class PlayerHooks
 
 
     // 使蜘蛛远离玩家
-    // 我很怀疑，小蜘蛛用的是这个ai吗
+    // 我很怀疑，小蜘蛛用的是这个ai吗，他咋不起作用
     private static CreatureTemplate.Relationship IUseARelationshipTracker_UpdateDynamicRelationship(On.BigSpiderAI.orig_IUseARelationshipTracker_UpdateDynamicRelationship orig, BigSpiderAI self,RelationshipTracker.DynamicRelationship dRelation)
     {
         var result = orig(self, dRelation); 
@@ -138,7 +130,7 @@ internal class PlayerHooks
             Player player = dRelation.trackerRep.representedCreature.realizedCreature as Player;
             if (player.glowing && player.SlugCatClass == Enums.SRSname)
             {
-                result = new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Afraid, player.Malnourished? 0.7f : 0.4f);
+                result = new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Afraid, player.Malnourished? 0.8f : 0.4f);
             }
 
             

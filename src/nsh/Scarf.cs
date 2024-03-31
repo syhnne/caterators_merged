@@ -17,7 +17,8 @@ namespace Caterators_by_syhnne.nsh;
 // 血压上来了，为什么这玩意儿跟srs的尾巴一样能穿墙
 // 而且他这是双重意义上的穿墙，他在物理上穿墙，在贴图上也穿墙，，
 // 他不仅能穿墙，还特么能瞬移，，我真的谢
-// TODO: 修好这个瞬移bug
+// 好了，修好了。看来我以前写的代码已经很好了，只是忘了先更新attachPos
+// TODO: 但联机队友被围巾遮挡这事我真没办法（汗）这可是连机猫都会遇到的bug啊，要不我就不修了罢（你
 public class Scarf
 {
 
@@ -56,24 +57,26 @@ public class Scarf
     // 全复制的，一点也不敢动（。
     public void DrawSprite(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
-        spriteLastVisible = spriteVisible;
-        spriteVisible = owner.player.room != null;
-        sLeaser.sprites[startSprite].isVisible = spriteVisible && spriteLastVisible;
-        sLeaser.sprites[startSprite + 1].isVisible = false;
-        if (!spriteVisible) { return; }
-
         // attach pos
         Vector2 vector = Vector2.Lerp(owner.player.firstChunk.lastPos, owner.player.firstChunk.pos, timeStacker);
         PlayerGraphics.PlayerSpineData playerSpineData = owner.SpinePosition(1f, timeStacker);
         vector += playerSpineData.dir * playerSpineData.rad;
         AttachPos = vector;
 
-        /*sLeaser.sprites[startSprite + 1].x = vector.x - camPos.x;
-        sLeaser.sprites[startSprite + 1].y = vector.y - camPos.y;
-        sLeaser.sprites[startSprite + 1].scaleY = 0.2f;
-        sLeaser.sprites[startSprite + 1].scaleX = 0.8f;
-        Plugin.Log(owner.player.bodyChunks[0].Rotation, owner.player.bodyChunks[1].Rotation);
-        sLeaser.sprites[startSprite + 1].rotation = Custom.VecToDeg(owner.player.bodyChunks[1].Rotation);*/
+
+        spriteLastVisible = spriteVisible;
+        spriteVisible = owner.player.room != null;
+        if (spriteLastVisible != spriteVisible)
+        {
+            ResetRag();
+        }
+        sLeaser.sprites[startSprite].isVisible = spriteVisible && spriteLastVisible;
+        sLeaser.sprites[startSprite + 1].isVisible = false;
+        if (!spriteVisible && !spriteLastVisible) { return; }
+
+
+        
+
 
         float num = 0f;
         for (int i = 0; i < this.rag.GetLength(0); i++)
@@ -83,11 +86,6 @@ public class Scarf
             float num3 = (2f + 2f * Mathf.Sin(Mathf.Pow(num2, 2f) * 3.1415927f)) * Vector3.Slerp(this.rag[i, 4], this.rag[i, 3], timeStacker).x;
             Vector2 normalized = (vector - vector2).normalized;
             Vector2 vector3 = Custom.PerpendicularVector(normalized);
-            /*// 无奈出此下策。你就说是不是垂直向量吧。长度怎么样我不太清楚。
-            // 没事了，是程序引用集的问题
-            Vector2 vector3;
-            vector3.x = -normalized.y;
-            vector3.y = normalized.x;*/
             float num4 = Vector2.Distance(vector, vector2) / 5f;
             (sLeaser.sprites[startSprite] as TriangleMesh).MoveVertice(i * 4, vector - normalized * num4 - vector3 * (num3 + num) * 0.5f - camPos);
             (sLeaser.sprites[startSprite] as TriangleMesh).MoveVertice(i * 4 + 1, vector - normalized * num4 + vector3 * (num3 + num) * 0.5f - camPos);
@@ -115,17 +113,25 @@ public class Scarf
 
 
 
+
+    public void ResetRag()
+    {
+        Vector2 vector = this.AttachPos;
+        for (int i = 0; i < this.rag.GetLength(0); i++)
+        {
+            this.rag[i, 0] = vector;
+            this.rag[i, 1] = vector;
+            this.rag[i, 2] *= 0f;
+        }
+    }
+
+
+
     public void Update()
     {
-        if (owner.player.room == null)
+        if (spriteLastVisible != spriteVisible)
         {
-            for (int i = 0; i < this.rag.GetLength(0); i++)
-            {
-                this.rag[i, 0] = AttachPos;
-                this.rag[i, 1] = AttachPos;
-                this.rag[i, 2] *= 0f;
-            }
-            return;
+            ResetRag();
         }
 
 

@@ -10,6 +10,10 @@ using MoreSlugcats;
 using Fisobs.Core;
 using Caterators_by_syhnne.srs;
 using Caterators_by_syhnne.nsh;
+using EffExt;
+
+// 淦 我找不到怎么让vs自动生成我这个新的命名空间 拿这个来检查有没有忘改命名空间的罢
+// using Caterators_merged;
 
 namespace Caterators_by_syhnne;
 
@@ -68,6 +72,12 @@ class Plugin : BaseUnityPlugin
             SSRoomEffects.Apply();
             CustomSaveData.Apply();
             fp.ShelterSS_AI.Apply();
+            new EffectDefinitionBuilder("HiddenGeometry")
+                .AddFloatField("position", 0f, 1f, 0.01f, 0.8f, "position")
+                .AddBoolField("direction", true, "direction")
+                .SetEffectInitializer((room, data, firstTimeRealized) => new HiddenGeometryEffect(data))
+                .SetCategory("POMEffectsExamples")
+                .Register();
 
             // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
             SSOracleHooks.Apply();
