@@ -1,7 +1,7 @@
 {
     "id": "NSHslugcat",
     "name": "nsh",
-    "description": "graphics only",
+    "description": "记得把出生点改掉（",
     "features": {
         "color": "7fe66f",
         "custom_colors": [
@@ -11,7 +11,7 @@
         "select_menu_scene": "Slugcat_nsh",
         "select_menu_scene_ascended": "Ghost_nsh",
 
-        "back_spear": true,
+        "back_spear": false,
         "walk_speed": 1.5,
         "climb_speed": 1.5,
         "tunnel_speed": 1.5,
@@ -27,13 +27,15 @@
         "food_max": 9,
 
         "guide_overseer": 2,
-        "start_room": "CC_A02",
+        "start_room": "LC_streets",
         "world_state": [ "NSHslugcat", "Rivulet", "Yellow" ],
         "timeline_after": "Yellow",
         "cycle_length_min": 5,
 
         "diet": {
             "base": "Red",
+            "plants": 0.25,
+            "meat": 0.25,
             "overrides": {
 
             }

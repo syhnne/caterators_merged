@@ -41,10 +41,7 @@ internal class PlayerHooks
     public static void Player_Update(Player self, bool eu)
     {
         // 为了防止玩家发现虚空流体就是水这个事实（。
-        if (!self.Malnourished && self.Submersion > 0.2f && self.room.abstractRoom.name != "SB_L01" && self.room.abstractRoom.name != "FR_FINAL")
-        {
-            WaterDeath(self, self.room);
-        }
+        WaterUpdate(self, self.room);
         /*if (self.room != null && self.room.blizzard && self.Hypothermia > 0f)
         {
             self.Hypothermia -= Mathf.Lerp((self.Malnourished? 1 : 3) * RainWorldGame.DefaultHeatSourceWarmth, 0f, self.HypothermiaExposure);
@@ -59,9 +56,12 @@ internal class PlayerHooks
     // 不知道咋写，先凑合一下（
     // 啊啊啊啊啊啊啊啊啊啊啊啊啊我的耳朵！！
     // 嗷 原来是他被调用好几次（
-    public static void WaterDeath(Player player, Room room)
+    public static void WaterUpdate(Player player, Room room)
     {
         if (player.dead) { return; }
+
+        // Plugin.Log(player.Hypothermia, player.HypothermiaGain, player.HypothermiaExposure, Mathf.Lerp(1f, 0f, player.Hypothermia));
+
         for (int i = 0; i < player.grasps.Length; i++)
         {
             if (player.grasps[i] != null && (player.grasps[i].grabbed is OxygenMaskModules.OxygenMask))
@@ -79,15 +79,30 @@ internal class PlayerHooks
                 if (bubbleGrass.AbstrBubbleGrass.oxygenLeft > 0f) return;
             }
         }
+
+        if (!player.Malnourished && player.Submersion > 0.2f && player.room.abstractRoom.name != "SB_L01" && player.room.abstractRoom.name != "FR_FINAL")
+        {
+            player.Hypothermia += 0.03f * player.Submersion;
+            if (player.room.roomSettings.DangerType != MoreSlugcatsEnums.RoomRainDangerType.Blizzard && player.Hypothermia > 1.9f)
+            {
+                Plugin.Log("waterdeath");
+                Vector2 vector = Vector2.Lerp(player.firstChunk.pos, player.firstChunk.lastPos, 0.35f);
+                room.InGameNoise(new InGameNoise(vector, 8000f, player, 1f));
+                player.Die();
+            }
+        }
+
+
         // 咋说，这玩意儿应该不能被放在肚子里，这很奇怪（
         // if (player.objectInStomach is OxygenMaskModules.OxygenMaskAbstract) { return; }
 
-        Plugin.Log("waterdeath");
+
+        /*Plugin.Log("waterdeath");
         Vector2 vector = Vector2.Lerp(player.firstChunk.pos, player.firstChunk.lastPos, 0.35f);
         room.PlaySound(SoundID.Firecracker_Burn, vector);
         room.ScreenMovement(new Vector2?(vector), default(Vector2), 1.3f);
         room.InGameNoise(new InGameNoise(vector, 8000f, player, 1f));
-        player.Die();
+        player.Die();*/
     }
 
 
@@ -105,7 +120,7 @@ internal class PlayerHooks
     public static void Apply()
     {
         
-        On.Player.CanIPickThisUp += Player_CanIPickThisUp;
+        
 
         On.Player.ClassMechanicsSpearmaster += Player_ClassMechanicsSpearmaster;
         On.Player.Grabability += Player_Grabability;
@@ -140,15 +155,7 @@ internal class PlayerHooks
 
 
 
-    // 只是为了避免写一些对话而已。实际上好像并不能避免，我防不住雨鹿请联机队友替自己吃神经元（
-    private static bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
-    {
-        if (self.slugcatStats.name == Enums.SRSname && obj is SLOracleSwarmer)
-        {
-            return false;
-        }
-        return orig(self, obj);
-    }
+    
 
 
 
@@ -294,6 +301,8 @@ internal class PlayerHooks
         // 20
         if (!self.input[0].pckp || self.input[0].y != 1)
         {
+            
+
             PlayerGraphics.TailSpeckles tailSpecks = (self.graphicsModule as PlayerGraphics).tailSpecks;
             if (tailSpecks.spearProg > 0f)
             {
@@ -322,6 +331,14 @@ internal class PlayerHooks
         // 174 需要按住拾取和上键
         if ((self.grasps[0] == null || self.grasps[1] == null) && num5 == -1 && self.input[0].y == 1)
         {
+            // 防止拔矛的时候把背上的玩家扔下来
+            // 总之我自己感觉体验极差，遂改之。尤其是在杆子上拔矛的时候，任何一个联机p2都能给我拽掉地上去
+            // 希望这个不会引发别的问题
+            // TODO: 看样子不会 太好了 我认为这是史上最伟大的修复 应该给矛大师也整一个
+            if (self.slugOnBack.HasASlug)
+            {
+                self.slugOnBack.counter = 0;
+            }
 
             PlayerGraphics.TailSpeckles tailSpecks = (self.graphicsModule as PlayerGraphics).tailSpecks;
             if (tailSpecks.spearProg == 0f)

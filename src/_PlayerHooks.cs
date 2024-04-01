@@ -39,6 +39,7 @@ public class PlayerHooks
     public static void Apply()
     {
         On.ShelterDoor.DoorClosed += ShelterDoor_DoorClosed;
+        On.Player.CanIPickThisUp += Player_CanIPickThisUp;
 
 
         On.Player.Jump += Player_Jump;
@@ -88,19 +89,16 @@ public class PlayerHooks
         // 好像按太快了就会出问题
         try
         {
+            // 谨记，挂在playermodule里面的东西，一律在playermodule那里进行update
+            // 由于我刚搬运代码的时候乱写，我两周了才发现gravityController每帧update两次
             bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && Enums.IsCaterator(module.playerName);
             if (getModule)
             {
                 module.Update(self, eu);
-                if (self.room == null && module.srsLightSource != null)
-                {
-                    module.srsLightSource.lightSources = null;
-                }
             }
             orig(self, eu);
 
             if (self.room == null || self.dead || !getModule || !Enums.IsCaterator(self.SlugCatClass)) return;
-            module.gravityController?.Update(eu, module.IsMyStory);
 
             if (self.SlugCatClass == Enums.FPname) { fp.PlayerHooks.Player_Update(self, eu, module.IsMyStory); }
             else if (self.SlugCatClass == Enums.SRSname) { srs.PlayerHooks.Player_Update(self, eu); }
@@ -121,12 +119,17 @@ public class PlayerHooks
     {
         orig(self, newRoom);
         bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
-        if (self.dead || !getModule || !Enums.IsCaterator(self.SlugCatClass)) return;
-        module.gravityController?.NewRoom(module.IsMyStory);
+        
+        
+        if (getModule && !self.dead && Enums.IsCaterator(self.SlugCatClass))
+        {
+            module.gravityController?.NewRoom(module.IsMyStory);
+        }
+        
 
         if (self.room != null && module.srsLightSource != null && module.srsLightSource.lightSources == null)
         {
-            module.srsLightSource.AddLightSource();
+            module.srsLightSource.AddModules();
         }
 
         if (!newRoom.game.IsStorySession) { return; }
@@ -223,7 +226,7 @@ public class PlayerHooks
 
 
 
-
+    #region nshInventory
 
     // 吐出背包里的所有物品
     // 这主要是因为我暂时懒得写存档，但玩家一觉醒来捡东西会比较麻烦
@@ -233,7 +236,7 @@ public class PlayerHooks
         List<PhysicalObject> players = (from x in self.room.physicalObjects.SelectMany((List<PhysicalObject> x) => x)
                                         where x is Player
                                         select x).ToList<PhysicalObject>();
-        foreach (Player player in players)
+        foreach (Player player in players.Cast<Player>())
         {
             if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null)
             {
@@ -244,6 +247,19 @@ public class PlayerHooks
 
     }
 
+
+    // 只是为了避免写一些对话而已。实际上好像并不能避免，我防不住雨鹿请联机队友替自己吃神经元（
+    private static bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
+    {
+        if (self.slugcatStats.name == Enums.SRSname && obj is SLOracleSwarmer)
+        {
+            return false;
+        }
+        return orig(self, obj);
+    }
+
+
+    #endregion
 
 
 
@@ -261,7 +277,7 @@ public class PlayerHooks
                 module.gravityController.inputY = self.input[0].y;
                 self.input[0].y = 0;
             }
-            if (module.nshInventory != null && module.nshInventory.isActive)
+            if (module.nshInventory != null && module.nshInventory.IsActive)
             {
                 module.nshInventory.inputY = self.input[0].y;
                 self.input[0].y = 0;
@@ -295,12 +311,8 @@ public class PlayerHooks
         bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
         if (getModule)
         {
-            module.gravityController.Die();
-            if (module.srsLightSource != null)
-            {
-                module.srsLightSource.Clear();
-                module.srsLightSource = null;
-            }
+            module.gravityController?.Die();
+            module.nshInventory?.RemoveAllObjects();
         }
 
 

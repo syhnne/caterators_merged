@@ -1,8 +1,8 @@
   fp: 70%
 
- srs: 50%
+ srs: 55%
 
- nsh: 15%
+ nsh: 20%
 
 moon: 2%
 

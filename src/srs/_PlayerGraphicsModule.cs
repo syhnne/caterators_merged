@@ -20,14 +20,7 @@ public class PlayerGraphicsModule
 
     public static void PlayerGraphics_Update(PlayerGraphics self, PlayerModule module)
     {
-        if (self.player.room != null && module.srsLightSource == null)
-        {
-            module.srsLightSource = new LightSourceModule(self.player);
-        }
-        else
-        {
-            module.srsLightSource.Update();
-        }
+
     }
 
 
@@ -249,7 +242,7 @@ public class PlayerGraphicsModule
         orig(self, pos, newRoom, spitOutAllSticks);
         if (self.SlugCatClass == Enums.SRSname && Plugin.playerModules.TryGetValue(self, out var module) && module.srsLightSource != null)
         {
-            module.srsLightSource.AddLightSource();
+            module.srsLightSource.AddModules();
         }
     }
 

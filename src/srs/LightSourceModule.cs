@@ -9,25 +9,31 @@ using System.Threading.Tasks;
 namespace Caterators_by_syhnne.srs;
 
 
-// 理论上这个可以给联机队友保温，但我还没试过冻死是什么感觉
-// 啊 是时候改apply palette了（目死
-public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
+// 你说得对，但我是大sb
+// 这真的是我学了三个月c#之后写的东西吗？看完感觉小脑萎缩了一下
+
+public class SRSHeatSource : UpdatableAndDeletable, IProvideWarmth
 {
-    public Player player;
-    public LightSource[] lightSources;
-    public string type;
+
+    public LightSourceModule owner;
+
+    public SRSHeatSource(LightSourceModule owner) 
+    {
+        this.owner = owner;
+    }
+
 
 
     public Vector2 Position()
     {
-        return player.mainBodyChunk.pos;
+        return owner.player.mainBodyChunk.pos;
     }
 
     public Room loadedRoom
     {
         get
         {
-            return player.room;
+            return owner.player.room;
         }
     }
 
@@ -36,7 +42,7 @@ public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
     {
         get
         {
-            return (player.Malnourished ? 1 : 3) * RainWorldGame.DefaultHeatSourceWarmth;
+            return (owner.player.Malnourished ? 1 : Mathf.Lerp(3f, 1f, owner.player.Hypothermia)) * RainWorldGame.DefaultHeatSourceWarmth;
         }
     }
 
@@ -44,9 +50,24 @@ public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
     {
         get
         {
-            return player.Malnourished ? 300f : 700f;
+            return owner.LightSourceRad(0);
         }
     }
+}
+
+
+
+public class LightSourceModule
+{
+    public Player player;
+    public LightSource[] lightSources;
+    public SRSHeatSource heatSource;
+    public string type;
+    public int deletionCounter;
+    public bool slatedForDeletion;
+
+
+    
 
 
 
@@ -54,17 +75,17 @@ public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
     public LightSourceModule(Player player)
     {
         this.player = player;
-        AddLightSource();
+        AddModules();
     }
 
 
 
     // 真正添加自发光的代码。写的很乱，请看查找引用
     // warp模组传送之后会显示不出来，钻个管道就能解决，懒得管了（
-    public void AddLightSource()
+    public void AddModules()
     {
-        if (player.room == null) { return; }
-
+        if (player.room == null || player.dead) { return; }
+        deletionCounter = 0;
         lightSources = new LightSource[2]
         {
             new LightSource(player.mainBodyChunk.pos, false, Color.Lerp(PlayerGraphicsModule.spearColor, PlayerGraphicsModule.bodyColor, 0.6f), player)
@@ -89,37 +110,90 @@ public class LightSourceModule : UpdatableAndDeletable, IProvideWarmth
         {
             player.room.AddObject(source);
         }
-        player.room.AddObject(this);
+        heatSource = new SRSHeatSource(this);
+        player.room.AddObject(heatSource);
     }
+
+
 
 
 
     public void Update()
     {
-        if (player.room == null) return;
-        else if (lightSources == null) AddLightSource();
+        if (deletionCounter > 100)
+        {
+            slatedForDeletion = true;
+            Clear();
+            return;
+        }
+        else if (player.room == null) 
+        { 
+            lightSources = null;
+            return;
+        }
+        else if (lightSources == null || heatSource == null) AddModules();
+
+        if (player.dead) deletionCounter++;
         for (int i = 0; i < lightSources.Length; i++)
         {
+            
             if (lightSources[i] == null) continue;
-            lightSources[i].stayAlive = true;
-            lightSources[i].setPos = new Vector2?(player.mainBodyChunk.pos);
             if (lightSources[i].slatedForDeletetion)
             {
                 lightSources[i] = null;
+                continue;
             }
+            lightSources[i].stayAlive = true;
+            lightSources[i].setPos = new Vector2?(player.mainBodyChunk.pos);
+            lightSources[i].rad = LightSourceRad(i);
         }
     }
 
 
+    public float LightSourceRad(int index)
+    {
+        if (index == 0)
+        {
+            return Mathf.Lerp(
+                Mathf.Lerp(
+                    player.Malnourished? 300f:700f, 
+                    0f, 
+                    0.25f * Mathf.Clamp(player.Hypothermia, 0f, 4f)), 
+                0f, 
+                deletionCounter * 0.01f);
+
+        }
+        else if (index == 1)
+        {
+            return Mathf.Lerp(
+                Mathf.Lerp(
+                    100f,
+                    0f,
+                    0.25f * Mathf.Clamp(player.Hypothermia, 0f, 4f)),
+                0f,
+                deletionCounter * 0.01f);
+        }
+        else { return 0f; }
+    }
+
     public void Clear()
     {
-        foreach (var source in lightSources)
+        if (lightSources != null)
         {
-            if (source == null) continue;
-            player.room.RemoveObject(source);
+            foreach (var source in lightSources)
+            {
+                if (source == null) continue;
+                player.room.RemoveObject(source);
+            }
+            lightSources = null;
         }
-        lightSources = null;
-        player.room.RemoveObject(this);
+        if (heatSource != null)
+        {
+            player.room.RemoveObject(heatSource);
+            heatSource.slatedForDeletetion = true;
+            heatSource = null;
+        }
+
     }
 
 

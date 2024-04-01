@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Caterators_by_syhnne;
 
-
+// TODO: 显示啊！tnnd，为什么不显示！！
 internal class ConfigOptions : OptionInterface
 {
     public static ConfigOptions Instance { get; } = new();
@@ -21,12 +21,15 @@ internal class ConfigOptions : OptionInterface
     public Configurable<KeyCode> GravityControlKey;
     public Configurable<KeyCode> InventoryKey;
     public Configurable<KeyCode> CraftKey;
+    public static Configurable<bool> RetrieveSlugFix;
+
     public ConfigOptions()
     {
         ExplosionCapacity = config.Bind<int>("ExplosionCapacity", 10);
         GravityControlKey = config.Bind<KeyCode>("GravityControlKey", KeyCode.G);
         CraftKey = config.Bind<KeyCode>("CraftKey", KeyCode.None);
         InventoryKey = config.Bind<KeyCode>("InventoryKey", KeyCode.D);
+        RetrieveSlugFix = config.Bind<bool>("RetrieveSlugFix", true);
     }
 
     public override void Initialize()
@@ -53,7 +56,7 @@ internal class ConfigOptions : OptionInterface
             { description = desc }
         );
 
-        desc = "Explosion capacity ";
+        desc = "(FP)Explosion capacity ";
         Tabs[1].AddItems(
             new OpLabel(xposLabel, ymax - yspacing, inGameTranslator.Translate("Explosion capacity"))
             { description = inGameTranslator.Translate(desc) },
@@ -81,6 +84,15 @@ internal class ConfigOptions : OptionInterface
             new OpKeyBinder(InventoryKey, new Vector2(xposOpt, ymax - yspacing - 150f), new Vector2(50f, 10f), true, OpKeyBinder.BindController.AnyController)
             { description = desc }
         );
+
+        // 这个我懒得写了 要不直接认为是true吧 我想正常玩家放下背上的猫崽/联机玩家都是用拾取+下键的
+        /*desc = "(SRS)Prevent slugcat on back from being retrieved when making a needle (that bugged me all the time so i think you might need it)";
+        Tabs[1].AddItems(
+            new OpLabel(xposLabel, ymax - yspacing - 200f, inGameTranslator.Translate("RetrieveSlugFix"), false)
+            { description = desc },
+            new OpCheckBox(RetrieveSlugFix, new Vector2(xposOpt, ymax - yspacing - 200f))
+            { description = desc }
+        );*/
 
     }
 

@@ -16,28 +16,33 @@ public class Inventory
     /// <summary>
     /// 让nsh可以把任何东西装进背包，包括大型生物的尸体，包括联机队友。如果装了moregrabs我不知道会发生什么。
     /// </summary>
+    /// 等我抽空试试能不能把五卵石打包带走
     private const bool unlimited = false;
     public List<AbstractPhysicalObject> Items {  get; set; }
     public Player player;
     public InventoryHUD hud;
+    public InventoryItemsOnBack itemsOnBack;
 
     // 保证按一次下键只能添加一个物品，不会一股脑把东西全倒出来
     public int lastInputY;
     public int inputY;
 
-    
+    public static readonly int capacity = 50;
+    public int currCapacity;
 
-    public Inventory(Player owner) 
+    public Inventory(Player owner)
     {
         this.player = owner;
         Items = new();
         lastInputY = 0;
         inputY = 0;
+        itemsOnBack = new(this);
+        currCapacity = 0;
         // isActive = false;
     }
 
 
-    public bool isActive
+    public bool IsActive
     {
         get
         {
@@ -56,30 +61,36 @@ public class Inventory
             str += item.GetType().Name + " ";
         }
         Plugin.Log(str);
+        Plugin.Log("--capacity:", currCapacity);
     }
 
 
     public void Update(bool eu)
     {
-        
-        if (isActive && inputY == 1 && lastInputY != 1)
+
+        itemsOnBack?.Update(eu);
+       
+        if (IsActive && inputY == 1 && lastInputY != 1)
         {
             for (int i = 0; i < 2; i++)
             {
-                if (player.grasps[i] != null && CanBePutIntoBag(player.grasps[i].grabbed))
+                if (player.grasps[i] != null && CanBePutIntoBag(player.grasps[i].grabbed.abstractPhysicalObject))
                 {
                     AddObject(player.grasps[i].grabbed);
                     break;
                 }
             }
         }
-        if (isActive && inputY == -1 && lastInputY != -1)
+        if (IsActive && inputY == -1 && lastInputY != -1)
         {
             RemoveObject(eu);
         }
 
         lastInputY = inputY;
     }
+
+
+
 
 
     public void AddObject(PhysicalObject obj)
@@ -92,13 +103,28 @@ public class Inventory
 
         obj.AllGraspsLetGoOfThisObject(true);
         Items.Add(obj.abstractPhysicalObject);
-        player.room.RemoveObject(obj);
-        player.room.abstractRoom.RemoveEntity(obj.abstractPhysicalObject);
+        // currCapacity += ItemVolume(obj);
+
+        
+        if (obj is Spear && itemsOnBack.AddSpear(obj as Spear))
+        {
+        }
+        else 
+        {
+            player.room.RemoveObject(obj);
+            player.room.abstractRoom.RemoveEntity(obj.abstractPhysicalObject);
+            obj.abstractPhysicalObject.realizedObject = null;
+        }
+
+
+        ReloadCapacity();
         hud?.ResetObjects();
 
         Plugin.Log("inventory add obj:", obj.GetType().Name);
         UpdateLog();
     }
+
+
 
 
     public void RemoveObject(bool eu)
@@ -108,11 +134,26 @@ public class Inventory
         AbstractPhysicalObject obj = Items[Items.Count - 1];
         
         Items.Remove(obj);
-        player.room.abstractRoom.AddEntity(obj);
-        obj.pos = player.abstractCreature.pos;
-        obj.RealizeInRoom();
-        PhysicalObject realObj = obj.realizedObject;
         
+        
+        if (obj.realizedObject != null && obj.realizedObject is Spear)
+        {
+            if (player.graphicsModule != null && player.FreeHand() > -1)
+            {
+                (obj.realizedObject as Spear).firstChunk.MoveFromOutsideMyUpdate(eu, (player.graphicsModule as PlayerGraphics).hands[player.FreeHand()].pos);
+            }
+            // 别删这输出日志 他是代码而不是单纯的输出日志
+            Plugin.Log("retrieve spear from back:", itemsOnBack.RemoveSpear(obj.realizedObject as Spear));
+        }
+        else
+        {
+            player.room.abstractRoom.AddEntity(obj);
+            obj.pos = player.abstractCreature.pos;
+            obj.RealizeInRoom();
+        }
+        
+        PhysicalObject realObj = obj.realizedObject;
+        // currCapacity -= ItemVolumeFromAbstr(obj);
 
         if (ModManager.MMF && MMF.cfgKeyItemTracking.Value && AbstractPhysicalObject.UsesAPersistantTracker(obj) && player.room.game.IsStorySession)
         {
@@ -126,6 +167,7 @@ public class Inventory
         }
 
         hud?.ResetObjects();
+        ReloadCapacity();
 
         Plugin.Log("inventory remove obj:", realObj.GetType().Name);
         UpdateLog();
@@ -161,11 +203,22 @@ public class Inventory
         if (player.room == null || Items.Count <= 0) { return; }
         foreach (AbstractPhysicalObject obj in Items)
         {
-            player.room.abstractRoom.AddEntity(obj);
-            obj.pos = player.abstractCreature.pos;
-            obj.RealizeInRoom();
+            
+            if (obj.realizedObject != null && obj.realizedObject is Spear)
+            {
+                // 别删这输出日志 他是代码而不是单纯的输出日志
+                Plugin.Log("retrieve spear from back:", itemsOnBack.RemoveSpear(obj.realizedObject as Spear));
+            }
+            else
+            {
+                player.room.abstractRoom.AddEntity(obj);
+                obj.pos = player.abstractCreature.pos;
+                obj.RealizeInRoom();
+            }
+            
         }
         Items.Clear();
+        currCapacity = 0;
         hud?.ResetObjects();
         
 
@@ -186,12 +239,61 @@ public class Inventory
 
 
 
-    public bool CanBePutIntoBag(PhysicalObject obj)
+    public bool CanBePutIntoBag(AbstractPhysicalObject obj)
     {
-        return (unlimited || player.CanBeSwallowed(obj) || obj is IPlayerEdible || obj is PlayerCarryableItem || obj is EnergyCell || (obj is Creature && (obj as Creature).dead) && !player.HeavyCarry(obj));
+        if (obj is AbstractSpear)
+        {
+            return (itemsOnBack.CanAddASpear() != null);
+        }
+        return currCapacity + ItemVolumeFromAbstr(obj) <= capacity;
     }
 
 
+
+    // TODO: 这玩意儿也有bug 点的快了他容易算不出来，最好是用abstractobj计算，每次加东西的时候reset一遍
+    // AbstractPhysicalObject.AbstractObjectType
+
+    #pragma warning disable CS0162 // 检测到无法访问的代码
+    /*public int ItemVolume(PhysicalObject obj)
+    {
+        
+        if (unlimited) return 0;
+        if (obj is Spear) return 5;
+        if (player.CanBeSwallowed((PhysicalObject)obj) || obj is IPlayerEdible) return 10;
+        if (player.Grabability(obj) <= Player.ObjectGrabability.BigOneHand) return 15;
+        if (!player.HeavyCarry(obj)) return 25;
+        return 100;
+    }*/
+
+
+
+    public int ItemVolumeFromAbstr(AbstractPhysicalObject obj)
+    {
+
+        if (unlimited) return 0;
+        if (obj is AbstractSpear) return 5;
+        if (obj.type == AbstractPhysicalObject.AbstractObjectType.Oracle
+            || obj.type == AbstractPhysicalObject.AbstractObjectType.Creature
+            || obj.type == AbstractPhysicalObject.AbstractObjectType.SeedCob
+            || obj.type == AbstractPhysicalObject.AbstractObjectType.CollisionField
+            || obj.type == MoreSlugcatsEnums.AbstractObjectType.HRGuard) return 100;
+        if (obj.type == MoreSlugcatsEnums.AbstractObjectType.EnergyCell
+            || obj.type == MoreSlugcatsEnums.AbstractObjectType.JokeRifle) return 30;
+        return 10;
+    }
+#pragma warning restore CS0162 // 检测到无法访问的代码
+
+
+
+    public void ReloadCapacity()
+    {
+        int result = 0;
+        foreach (AbstractPhysicalObject obj in Items) 
+        {
+            result += ItemVolumeFromAbstr(obj);
+        }
+        currCapacity = result;
+    }
 }
 
 
@@ -249,7 +351,7 @@ public class InventoryHUD : HudPart
     {
         get
         {
-            return (owner != null && owner.isActive && owner.player.room != null);
+            return (owner != null && owner.IsActive && owner.player.room != null);
         }
     }
 
