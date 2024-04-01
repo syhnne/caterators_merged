@@ -51,10 +51,13 @@ public class PlayerModule
 
     public void Update(Player player, bool eu)
     {
+        if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
+        srsLightSource?.Update();
         if (player.room == null || player.dead) return;
         nshInventory?.Update(eu);
         gravityController?.Update(eu, storyName == playerName);
         
+
 
 
 

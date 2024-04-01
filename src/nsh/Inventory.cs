@@ -20,19 +20,23 @@ public class Inventory
     public List<AbstractPhysicalObject> Items {  get; set; }
     public Player player;
     public InventoryHUD hud;
+    public InventoryItemsOnBack spearsOnBack;
 
     // 保证按一次下键只能添加一个物品，不会一股脑把东西全倒出来
     public int lastInputY;
     public int inputY;
 
-    
+    public static readonly int capacity = 50;
+    public int currCapacity;
 
-    public Inventory(Player owner) 
+    public Inventory(Player owner)
     {
         this.player = owner;
         Items = new();
         lastInputY = 0;
         inputY = 0;
+        spearsOnBack = new(this);
+        currCapacity = 0;
         // isActive = false;
     }
 
@@ -56,12 +60,14 @@ public class Inventory
             str += item.GetType().Name + " ";
         }
         Plugin.Log(str);
+        Plugin.Log("--capacity:", currCapacity);
     }
 
 
     public void Update(bool eu)
     {
-        
+        spearsOnBack?.DrawSpears(true, eu);
+       
         if (isActive && inputY == 1 && lastInputY != 1)
         {
             for (int i = 0; i < 2; i++)
@@ -92,7 +98,15 @@ public class Inventory
 
         obj.AllGraspsLetGoOfThisObject(true);
         Items.Add(obj.abstractPhysicalObject);
-        player.room.RemoveObject(obj);
+        currCapacity += ItemVolume(obj);
+        if (obj is Spear && spearsOnBack.AddSpear(obj as Spear))
+        {
+        }
+        else 
+        { 
+            player.room.RemoveObject(obj); 
+        }
+        
         player.room.abstractRoom.RemoveEntity(obj.abstractPhysicalObject);
         hud?.ResetObjects();
 
@@ -110,9 +124,18 @@ public class Inventory
         Items.Remove(obj);
         player.room.abstractRoom.AddEntity(obj);
         obj.pos = player.abstractCreature.pos;
-        obj.RealizeInRoom();
-        PhysicalObject realObj = obj.realizedObject;
+        if (obj.realizedObject != null && obj.realizedObject is Spear && spearsOnBack.spears.Contains(obj.realizedObject as Spear))
+        {
+            Plugin.Log("retrieve spear from back");
+            spearsOnBack.RemoveSpear(obj.realizedObject as Spear);
+        }
+        else
+        {
+            obj.RealizeInRoom();
+        }
         
+        PhysicalObject realObj = obj.realizedObject;
+        currCapacity -= ItemVolume(realObj);
 
         if (ModManager.MMF && MMF.cfgKeyItemTracking.Value && AbstractPhysicalObject.UsesAPersistantTracker(obj) && player.room.game.IsStorySession)
         {
@@ -166,6 +189,7 @@ public class Inventory
             obj.RealizeInRoom();
         }
         Items.Clear();
+        currCapacity = 0;
         hud?.ResetObjects();
         
 
@@ -188,9 +212,23 @@ public class Inventory
 
     public bool CanBePutIntoBag(PhysicalObject obj)
     {
-        return (unlimited || player.CanBeSwallowed(obj) || obj is IPlayerEdible || obj is PlayerCarryableItem || obj is EnergyCell || (obj is Creature && (obj as Creature).dead) && !player.HeavyCarry(obj));
+        if (obj is Spear) return spearsOnBack.spears.Count < spearsOnBack.spearCapacity;
+        return currCapacity + ItemVolume(obj) <= capacity;
     }
 
+
+    #pragma warning disable CS0162 // 检测到无法访问的代码
+    public int ItemVolume(PhysicalObject obj)
+    {
+        
+        if (unlimited) return 0;
+        if (obj is Spear) return 5;
+        if (player.CanBeSwallowed((PhysicalObject)obj) || obj is IPlayerEdible) return 10;
+        if (player.Grabability(obj) <= Player.ObjectGrabability.BigOneHand) return 15;
+        if (!player.HeavyCarry(obj)) return 25;
+        return 100;
+    }
+    #pragma warning restore CS0162 // 检测到无法访问的代码
 
 }
 
