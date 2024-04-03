@@ -285,6 +285,19 @@ public class Inventory
 
 
 
+    #pragma warning disable CS0162 // 检测到无法访问的代码
+    public int ItemVolume(PhysicalObject obj)
+    {
+        
+        if (unlimited) return 0;
+        if (obj is Spear) return 5;
+        if (player.CanBeSwallowed((PhysicalObject)obj) || obj is IPlayerEdible) return 10;
+        if (player.Grabability(obj) <= Player.ObjectGrabability.BigOneHand) return 15;
+        if (!player.HeavyCarry(obj)) return 25;
+        return 100;
+    }
+    #pragma warning restore CS0162 // 检测到无法访问的代码
+
     public void ReloadCapacity()
     {
         int result = 0;

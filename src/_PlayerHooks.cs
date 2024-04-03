@@ -96,6 +96,10 @@ public class PlayerHooks
             {
                 module.Update(self, eu);
             }
+                {
+                    module.srsLightSource.lightSources = null;
+                }
+            }
             orig(self, eu);
 
             if (self.room == null || self.dead || !getModule || !Enums.IsCaterator(self.SlugCatClass)) return;
@@ -222,11 +226,10 @@ public class PlayerHooks
     }
 
 
-
-
-
-
     #region nshInventory
+
+
+
 
     // 吐出背包里的所有物品
     // 这主要是因为我暂时懒得写存档，但玩家一觉醒来捡东西会比较麻烦
@@ -251,6 +254,26 @@ public class PlayerHooks
     // 只是为了避免写一些对话而已。实际上好像并不能避免，我防不住雨鹿请联机队友替自己吃神经元（
     private static bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
     {
+        if (self.slugcatStats.name == Enums.SRSname && obj is SLOracleSwarmer)
+        {
+            return false;
+        }
+        return orig(self, obj);
+    }
+
+
+    #endregion
+
+    // 只是为了避免写一些对话而已。实际上好像并不能避免，我防不住雨鹿请联机队友替自己吃神经元（
+    private static bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
+    {
+        if (Plugin.playerModules.TryGetValue(self, out var module) && module.nshInventory != null && module.nshInventory.spearsOnBack.spears.Count > 0)
+        {
+            if (obj is Spear && module.nshInventory.spearsOnBack.spears.Contains(obj))
+            {
+                return false;
+            }
+        }
         if (self.slugcatStats.name == Enums.SRSname && obj is SLOracleSwarmer)
         {
             return false;
@@ -307,12 +330,16 @@ public class PlayerHooks
     private static void Player_Die(On.Player.orig_Die orig, Player self)
     {
         
-        orig(self);
-        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
-        if (getModule)
-        {
             module.gravityController?.Die();
             module.nshInventory?.RemoveAllObjects();
+        if (getModule)
+        {
+            module.gravityController.Die();
+            if (module.srsLightSource != null)
+            {
+                module.srsLightSource.Clear();
+                module.srsLightSource = null;
+            }
         }
 
 

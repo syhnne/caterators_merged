@@ -31,6 +31,8 @@ public class InventoryItemsOnBack
     public int spearCapacity;
     public Player player;
 
+    public bool increment;
+    public int counter;
 
     public InventoryItemsOnBack(Inventory owner)
     {
@@ -41,7 +43,7 @@ public class InventoryItemsOnBack
         for (int i = 0; i < spearCapacity; i++)
         {
             spears.Add(new SpearOnBack(this));
-        }
+    }
 
     }
 
@@ -54,11 +56,12 @@ public class InventoryItemsOnBack
             if (!spearOnBack.HasASpear)
             {
                 return spearOnBack;
-            }
+    }
         }
         return null;
     }
     #nullable disable
+
 
 
     public bool AddSpear(Spear spear)
@@ -67,8 +70,8 @@ public class InventoryItemsOnBack
         if ( sprOnBack != null)
         {
             sprOnBack.Add(spear);
-            return true;
-        }
+        return true;
+    }
         return false;
     }
 
@@ -141,7 +144,7 @@ public class SpearOnBack : ItemsOnBack
 
 
     public override void Remove()
-    {
+        {
         if (spear == null) return;
         base.Remove();
         spear.ChangeMode(Weapon.Mode.Free);
@@ -149,8 +152,8 @@ public class SpearOnBack : ItemsOnBack
         // spear.PlaceInRoom(owner.player.room);
         Plugin.Log("spearonback.add ???!!!!!!!!!!!!!!!!!!", spear.mode);
         spear = null;
-    }
-
+        }
+        
 
 
     // Adapted from Player.SpearOnBack.GraphicsModuleUpdated()
@@ -166,73 +169,73 @@ public class SpearOnBack : ItemsOnBack
         {
             spear.mode = Weapon.Mode.OnBack;
         }
-        if (spear.slatedForDeletetion || spear.grabbedBy.Count > 0)
-        {
+            if (spear.slatedForDeletetion || spear.grabbedBy.Count > 0)
+            {
             this.abstractStick?.Deactivate();
             this.spear = null;
             return;
-        }
-        Vector2 mainChunkPos = player.mainBodyChunk.pos;
-        Vector2 chunk1Pos = player.bodyChunks[1].pos;
-        if (player.graphicsModule != null)
-        {
-            mainChunkPos = Vector2.Lerp((player.graphicsModule as PlayerGraphics).drawPositions[0, 0], (player.graphicsModule as PlayerGraphics).head.pos, 0.2f);
-            chunk1Pos = (player.graphicsModule as PlayerGraphics).drawPositions[1, 0];
-        }
-        Vector2 chunkDir = Custom.DirVec(chunk1Pos, mainChunkPos);
-
-        float flip = 0f;
-
-
-        if (player.Consious && player.bodyMode != Player.BodyModeIndex.ZeroG && player.EffectiveRoomGravity > 0f)
-        {
-            if (player.bodyMode == Player.BodyModeIndex.Default && player.animation == Player.AnimationIndex.None && player.standing && player.bodyChunks[1].pos.y < player.bodyChunks[0].pos.y - 6f)
-            {
-                flip = Custom.LerpAndTick(flip, player.input[0].x * 0.3f, 0.05f, 0.02f);
             }
-            else if (player.bodyMode == Player.BodyModeIndex.Stand && player.input[0].x != 0)
+            Vector2 mainChunkPos = player.mainBodyChunk.pos;
+            Vector2 chunk1Pos = player.bodyChunks[1].pos;
+            if (player.graphicsModule != null)
             {
-                flip = Custom.LerpAndTick(flip, (float)player.input[0].x, 0.02f, 0.1f);
+                mainChunkPos = Vector2.Lerp((player.graphicsModule as PlayerGraphics).drawPositions[0, 0], (player.graphicsModule as PlayerGraphics).head.pos, 0.2f);
+                chunk1Pos = (player.graphicsModule as PlayerGraphics).drawPositions[1, 0];
             }
-            else
+            Vector2 chunkDir = Custom.DirVec(chunk1Pos, mainChunkPos);
+
+            float flip = 0f;
+
+
+            if (player.Consious && player.bodyMode != Player.BodyModeIndex.ZeroG && player.EffectiveRoomGravity > 0f)
             {
-                flip = Custom.LerpAndTick(flip, (float)player.flipDirection * Mathf.Abs(chunkDir.x), 0.15f, 0.16666667f);
-            }
-            if (player.input[0].x != 0 && player.standing && player.animation != Player.AnimationIndex.ClimbOnBeam)
-            {
-                float num = 0f;
-                for (int j = 0; j < player.grasps.Length; j++)
+                if (player.bodyMode == Player.BodyModeIndex.Default && player.animation == Player.AnimationIndex.None && player.standing && player.bodyChunks[1].pos.y < player.bodyChunks[0].pos.y - 6f)
                 {
-                    if (player.grasps[j] == null)
-                    {
-                        num = ((j == 0) ? -1f : 1f);
-                        break;
-                    }
+                    flip = Custom.LerpAndTick(flip, player.input[0].x * 0.3f, 0.05f, 0.02f);
                 }
+                else if (player.bodyMode == Player.BodyModeIndex.Stand && player.input[0].x != 0)
+                {
+                    flip = Custom.LerpAndTick(flip, (float)player.input[0].x, 0.02f, 0.1f);
+                }
+                else
+                {
+                    flip = Custom.LerpAndTick(flip, (float)player.flipDirection * Mathf.Abs(chunkDir.x), 0.15f, 0.16666667f);
+                }
+            if (player.input[0].x != 0 && player.standing && player.animation != Player.AnimationIndex.ClimbOnBeam)
+                {
+                    float num = 0f;
+                    for (int j = 0; j < player.grasps.Length; j++)
+                    {
+                        if (player.grasps[j] == null)
+                        {
+                            num = ((j == 0) ? -1f : 1f);
+                            break;
+                        }
+                    }
                 spear.setRotation = new Vector2?(Custom.DegToVec(Custom.AimFromOneVectorToAnother(chunk1Pos, mainChunkPos) + Custom.LerpMap(1, 12f, 20f, 0f, 360f * num)));
+                }
+                else
+                {
+                    spear.setRotation = new Vector2?((chunkDir - Custom.PerpendicularVector(chunkDir) * 0.9f * (1f - Mathf.Abs(flip))).normalized);
+                }
+                // spear.setRotation = new Vector2?((chunkDir - Custom.PerpendicularVector(chunkDir) * 0.9f * (1f - Mathf.Abs(flip))).normalized);
+                spear.ChangeOverlap(chunkDir.y < -0.1f && player.bodyMode != Player.BodyModeIndex.ClimbingOnBeam);
             }
             else
             {
-                spear.setRotation = new Vector2?((chunkDir - Custom.PerpendicularVector(chunkDir) * 0.9f * (1f - Mathf.Abs(flip))).normalized);
+                flip = Custom.LerpAndTick(flip, 0f, 0.15f, 0.14285715f);
+                spear.setRotation = new Vector2?(chunkDir - Custom.PerpendicularVector(chunkDir) * 0.9f);
+                spear.ChangeOverlap(false);
             }
-            // spear.setRotation = new Vector2?((chunkDir - Custom.PerpendicularVector(chunkDir) * 0.9f * (1f - Mathf.Abs(flip))).normalized);
-            spear.ChangeOverlap(chunkDir.y < -0.1f && player.bodyMode != Player.BodyModeIndex.ClimbingOnBeam);
-        }
-        else
-        {
-            flip = Custom.LerpAndTick(flip, 0f, 0.15f, 0.14285715f);
-            spear.setRotation = new Vector2?(chunkDir - Custom.PerpendicularVector(chunkDir) * 0.9f);
-            spear.ChangeOverlap(false);
-        }
-        spear.firstChunk.MoveFromOutsideMyUpdate(eu, Vector2.Lerp(chunk1Pos, mainChunkPos, 0.6f) - Custom.PerpendicularVector(chunk1Pos, mainChunkPos) * 7.5f * flip);
-        spear.firstChunk.vel = player.mainBodyChunk.vel;
-        spear.rotationSpeed = 0f;
+            spear.firstChunk.MoveFromOutsideMyUpdate(eu, Vector2.Lerp(chunk1Pos, mainChunkPos, 0.6f) - Custom.PerpendicularVector(chunk1Pos, mainChunkPos) * 7.5f * flip);
+            spear.firstChunk.vel = player.mainBodyChunk.vel;
+            spear.rotationSpeed = 0f;
 
 
     }
 
 
-}
+        }
 
 
 
