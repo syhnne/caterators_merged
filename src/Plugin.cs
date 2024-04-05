@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using BepInEx;
 using UnityEngine;
 using SlugBase.Features;
@@ -11,6 +15,8 @@ using Fisobs.Core;
 using Caterators_by_syhnne.srs;
 using Caterators_by_syhnne.nsh;
 using EffExt;
+using System.Net.Configuration;
+using Caterators_by_syhnne.effects;
 
 // 淦 我找不到怎么让vs自动生成我这个新的命名空间 拿这个来检查有没有忘改命名空间的罢
 // using Caterators_merged;
@@ -40,12 +46,15 @@ class Plugin : BaseUnityPlugin
     internal const bool ShowLogs = true;
     internal const bool DevMode = true;
 
-    #region player_ctor
-    // 以下自定义属性会覆盖slugbase的属性，我的建议是别改，现在json文件里已经没有饱食度数据了，但我不知道有了会导致什么后果
+
+    #region 暂存区
+    // 正常人基本不会在这种地方存数据，但我不是正常人，我是菜狗，让让我吧
     public static readonly int Cycles = 21;
     public static readonly int MaxFood = 8;
     public static readonly int MinFood = 5;
     public int MinFoodNow = MinFood;
+
+    public List<AbstractPhysicalObject>[] nshInventoryList = new List<AbstractPhysicalObject>[4];
     #endregion
 
     public void OnEnable()
@@ -65,6 +74,9 @@ class Plugin : BaseUnityPlugin
 
             On.Player.ctor += Player_ctor;
             On.World.GetNode += World_GetNode;
+            On.OverWorld.GateRequestsSwitchInitiation += OverWorld_GateRequestsSwitchInitiation;
+            On.RainWorldGame.ContinuePaused += RainWorldGame_ContinuePaused;
+
             PlayerHooks.Apply();
             PlayerGraphicsModule.Apply();
             CustomLore.Apply();
@@ -72,10 +84,9 @@ class Plugin : BaseUnityPlugin
             SSRoomEffects.Apply();
             CustomSaveData.Apply();
             fp.ShelterSS_AI.Apply();
-            new EffectDefinitionBuilder("HiddenGeometry")
-                .AddFloatField("position", 0f, 1f, 0.01f, 0.8f, "position")
-                .AddBoolField("direction", true, "direction")
-                .SetEffectInitializer((room, data, firstTimeRealized) => new HiddenGeometryEffect(data))
+            new EffectDefinitionBuilder("MyRoofTopView_syhnne")
+                .AddFloatField("position", 0f, 100f, 1f, 26f, "floorLevel")
+                .SetUADFactory((room, data, firstTimeRealized) => new MyRoofTopView(room, data))
                 .SetCategory("POMEffectsExamples")
                 .Register();
 
@@ -122,7 +133,7 @@ class Plugin : BaseUnityPlugin
 
 
 
-    #region Player
+    #region 需要暂存的函数
     private void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
     {
         orig(self, abstractCreature, world);
@@ -172,6 +183,34 @@ class Plugin : BaseUnityPlugin
         }
     }
 
+
+
+    private void OverWorld_GateRequestsSwitchInitiation(On.OverWorld.orig_GateRequestsSwitchInitiation orig, OverWorld self, RegionGate reportBackToGate)
+    {
+        foreach (AbstractCreature player in self.game.Players)
+        {
+            if (player.realizedCreature != null && Plugin.playerModules.TryGetValue(player.realizedCreature as Player, out var module) && module.nshInventory != null && module.nshInventory.Items != null)
+            {
+                nshInventoryList[player.ID.number] = module.nshInventory.Items;
+                Plugin.Log("nshInventory saved for player", player.ID.number);
+            }
+        }
+        orig(self, reportBackToGate);
+    }
+
+
+    private void RainWorldGame_ContinuePaused(On.RainWorldGame.orig_ContinuePaused orig, RainWorldGame self)
+    {
+        foreach (AbstractCreature player in self.Players)
+        {
+            if (player.realizedCreature != null && Plugin.playerModules.TryGetValue(player.realizedCreature as Player, out var module) && module.nshInventory != null && module.nshInventory.Items != null)
+            {
+                nshInventoryList[player.ID.number] = module.nshInventory.Items;
+                Plugin.Log("nshInventory saved for player", player.ID.number);
+            }
+        }
+        orig(self);
+    }
 
     #endregion
 

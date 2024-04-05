@@ -1,0 +1,19 @@
+Template: NONE
+DangerType: AerieBlizzard
+CeilingDrips: 0.05434782
+RainIntensity: 0.4021739
+RumbleIntensity: 0.4456522
+WaveSpeed: 0.5011265
+WaveLength: 0.9994367
+WaveAmplitude: 0.0002946773
+SecondWaveLength: 0.1775363
+SecondWaveAmplitude: 0
+Clouds: 0.06521739
+Grime: 0.02173913
+Palette: 37
+EffectColorA: 11
+EffectColorB: 8
+Effects: Coldness-1-20-20, Dustpuffs-1-30-30, 
+PlacedObjects: SnowSource><2200.808><441.5562><Strip~480~-16~-80~-160.3975~0.8804348~0.25, SnowSource><414.4999><448.95><Strip~-355~-328~50~86.60254~1~0, SnowSource><1489.226><447.5515><Strip~656~-154~50~86.60254~1~0, SnowSource><-28.388><381.1052><Radial~357~276~50~86.60254~0.8586956~0, SnowSource><2409.2><667.2451><Radial~317~-177~-106~-302.3975~0.7826087~0, SnowSource><2507.802><45.77966><Radial~81~137~50~86.60254~1~0, SnowSource><2886.552><670.5306><Radial~-86~-184~-331~-95.39746~0.9782609~0, 
+AmbientSounds: OMNI><AM_WIN-MedWind.ogg><745.869><537.4011><0.6521739><1, OMNI><AM_WIN-HowlingWnd.ogg><741.3217><463.5906><0.5652174><0.7847826, OMNI><MSC-MetalVariety.ogg><744.6196><382.6603><0.2173913><0.6869565, 
+FadePalette: 40, 0.75, 0.6847826, 0.6630435

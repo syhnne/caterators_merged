@@ -1,0 +1,8 @@
+Template: RL_SettingsTemplate_Aerie
+WaveSpeed: 0.5184624
+WaveLength: 0.9907688
+WaveAmplitude: 1.078277E-10
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0
+FadePalette: 10, 0.2065217

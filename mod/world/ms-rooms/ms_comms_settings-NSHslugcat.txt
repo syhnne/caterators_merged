@@ -1,0 +1,20 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0.2065217
+RainIntensity: 0.4673913
+RumbleIntensity: 0.7391304
+WaveSpeed: 0.4999788
+WaveLength: 0.9914001
+WaveAmplitude: 0.003393052
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0.01086957
+Grime: 0.1195652
+Palette: 32
+EffectColorA: 11
+EffectColorB: 8
+Effects: Coldness-1-20-20, Dustpuffs-1-21-77, Bloom-0.04347826-28-129, 
+PlacedObjects: DeadTokenStalk><513.4734><2638.552><-39~71, DeadTokenStalk><508.5151><2786.551><-33~-46, BlueToken><477.9213><2887.418><-13~-146~99~-99~1~MirosVulture~White|Yellow|Red|Artificer|Saint|Spear|Gourmand~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0~0, SnowSource><532.4819><2113.551><Radial~-536~-561~59~50.60254~0.8478261~1, SnowSource><494.3801><2854.402><Radial~-207~-319~95~-213.3975~0.5543478~0.7173913, SnowSource><485.5085><442.9498><Radial~511~-396~50~86.60254~0.7717391~1, SnowSource><1124.313><1180.06><Radial~-406~-229~-501~-160.3975~1~1, SnowSource><30.4314><1465.584><Radial~214~-170~172~-295.3975~0.6956522~0.9782609, 
+AmbientSounds: SPOT><SO_IND-Humm.ogg><558.3062><596.7006><0.1847826><1><478.3062><1166.701><-249.3553><-268.3553><0><0.4369566, SPOT><SO_IND-Deep50hz.ogg><558.6835><471.3297><0.3369565><1><480.6835><1179.33><-292.3553><-338.3553><0><0.5565219, SPOT><AM_IND-Utility02.ogg><570.6245><346.5943><0.4130435><1><280.6245><1195.594><-98.35535><-235.3553><0><0.2413045, SPOT><SO_SFX-Data4.ogg><587.8022><215.2201><0.423913><1><551.8022><1294.22><-145.3553><-216.3553><0><0.2413045, OMNI><AM_ENV-CityTone.ogg><794.813><568.1898><0.1304348><1, OMNI><AM_ENV-WinterHum.ogg><792.1833><491.5798><0.1304348><1, OMNI><AM_ENV-WinterTrees.ogg><793.0629><417.3207><0.1847826><1, OMNI><AM_WIN-MedWind.ogg><800.597><336.5751><0.2934783><1, OMNI><AM_WIN-HowlingWnd.ogg><811.6006><258.1331><0.2717391><0.6478261, OMNI><MSC-ShadowAlley.ogg><809.1799><178.0873><0.1521739><1.078261, 
+FadePalette: 40, 0.9565217, 0.8478261, 0.7282609, 0.8043478
+RoomSpecificScriptActive: ON

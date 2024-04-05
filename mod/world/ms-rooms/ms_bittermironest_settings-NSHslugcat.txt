@@ -1,0 +1,17 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0.1956522
+RainIntensity: 0.3043478
+WaveSpeed: 0.5000812
+WaveLength: 0.9999593
+WaveAmplitude: 0.0001198694
+SecondWaveLength: 0.1775363
+SecondWaveAmplitude: 0
+Grime: 0.1304348
+Palette: 37
+EffectColorA: 11
+EffectColorB: 6
+Effects: RockFlea-0.2173913-64-97, Coldness-0.9565217-60-44, Dustpuffs-1-321-45, 
+PlacedObjects: SnowSource><181.0808><592.3934><Radial~818~-499~313~-227.3975~0.9565217~0, SnowSource><477.0902><226.1298><UnSnow~346~-93~-74~-184.3975~0.3152174~0.8586956, SnowSource><892.238><337.3004><UnSnow~-2~181~-103~-266.3975~1~0, DeadTokenStalk><316.5699><291.5871><-18~-40, DeadTokenStalk><233.5825><314.6092><16~-48, RedToken><294.8825><355.4119><-14~-101~37~115~0~MS~~0~0~1~0~0~0~1, 
+AmbientSounds: OMNI><AM_ENV-WinterHum.ogg><745.8013><399.2727><0.5326087><0.823913, SPOT><AM_WIN-MedWind.ogg><746.66><536.6786><0.6086956><1><20.65997><367.6786><114.6447><-186.3553><0><0.6978262, SPOT><AM_WIN-HowlingWnd.ogg><872.5517><458.7241><0.5><1><136.5517><646.7241><15.64465><-238.3553><0><0.1, SPOT><AM_IND-DeepHum.ogg><770.8644><309.4141><0.5><1><802.8644><264.4141><-101.3553><-187.3553><0><0.1, 
+FadePalette: 40, 0.2608696

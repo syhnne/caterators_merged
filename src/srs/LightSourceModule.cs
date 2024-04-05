@@ -11,13 +11,18 @@ namespace Caterators_by_syhnne.srs;
 
 // 你说得对，但我是大sb
 // 这真的是我学了三个月c#之后写的东西吗？看完感觉小脑萎缩了一下
+// 喜报，重开了
 
-public class SRSHeatSource : UpdatableAndDeletable, IProvideWarmth
+
+
+
+
+
+public class SRSLightSource : LightSource, IProvideWarmth
 {
 
     public LightSourceModule owner;
-
-    public SRSHeatSource(LightSourceModule owner) 
+    public SRSLightSource(LightSourceModule owner) : base(owner.player.mainBodyChunk.pos, false, Color.Lerp(PlayerGraphicsModule.spearColor, PlayerGraphicsModule.bodyColor, 0.6f), owner.player)
     {
         this.owner = owner;
     }
@@ -42,7 +47,7 @@ public class SRSHeatSource : UpdatableAndDeletable, IProvideWarmth
     {
         get
         {
-            return (owner.player.Malnourished ? 1 : Mathf.Lerp(3f, 1f, owner.player.Hypothermia)) * RainWorldGame.DefaultHeatSourceWarmth;
+            return (owner.player.Malnourished ? 1 : Mathf.Lerp(3f, 1.5f, owner.player.Hypothermia)) * RainWorldGame.DefaultHeatSourceWarmth;
         }
     }
 
@@ -57,11 +62,14 @@ public class SRSHeatSource : UpdatableAndDeletable, IProvideWarmth
 
 
 
+
+
+
+
 public class LightSourceModule
 {
     public Player player;
     public LightSource[] lightSources;
-    public SRSHeatSource heatSource;
     public string type;
     public int deletionCounter;
     public bool slatedForDeletion;
@@ -88,7 +96,7 @@ public class LightSourceModule
         deletionCounter = 0;
         lightSources = new LightSource[2]
         {
-            new LightSource(player.mainBodyChunk.pos, false, Color.Lerp(PlayerGraphicsModule.spearColor, PlayerGraphicsModule.bodyColor, 0.6f), player)
+            new SRSLightSource(this)
             {
                 requireUpKeep = true,
                 setRad = new float?(player.Malnourished? 300f : 700f),
@@ -110,8 +118,6 @@ public class LightSourceModule
         {
             player.room.AddObject(source);
         }
-        heatSource = new SRSHeatSource(this);
-        player.room.AddObject(heatSource);
     }
 
 
@@ -126,27 +132,45 @@ public class LightSourceModule
             Clear();
             return;
         }
-        else if (player.room == null) 
-        { 
-            lightSources = null;
-            return;
-        }
-        else if (lightSources == null || heatSource == null) AddModules();
 
-        if (player.dead) deletionCounter++;
-        for (int i = 0; i < lightSources.Length; i++)
+        if (lightSources == null)
         {
-            
-            if (lightSources[i] == null) continue;
-            if (lightSources[i].slatedForDeletetion)
-            {
-                lightSources[i] = null;
-                continue;
-            }
-            lightSources[i].stayAlive = true;
-            lightSources[i].setPos = new Vector2?(player.mainBodyChunk.pos);
-            lightSources[i].rad = LightSourceRad(i);
+            AddModules();
         }
+        else
+        {
+            if (player.dead) deletionCounter++;
+            else
+            {
+                for (int i = 0; i < lightSources.Length; i++)
+                {
+
+                    if (lightSources[i] == null) continue;
+                    if (lightSources[i].slatedForDeletetion)
+                    {
+                        lightSources[i] = null;
+                        continue;
+                    }
+                    lightSources[i].stayAlive = true;
+                    lightSources[i].setPos = new Vector2?(player.mainBodyChunk.pos);
+                    lightSources[i].rad = LightSourceRad(i);
+                    // 懂了 下面这句话才是让灯光跟随玩家的关键
+                    if (lightSources[i].room != player.room)
+                    {
+                        lightSources[i].slatedForDeletetion = true;
+                        lightSources = null;
+                        return;
+                    }
+                }
+            }
+        }
+
+
+
+        
+ 
+        
+        
     }
 
 
@@ -186,12 +210,6 @@ public class LightSourceModule
                 player.room.RemoveObject(source);
             }
             lightSources = null;
-        }
-        if (heatSource != null)
-        {
-            player.room.RemoveObject(heatSource);
-            heatSource.slatedForDeletetion = true;
-            heatSource = null;
         }
 
     }

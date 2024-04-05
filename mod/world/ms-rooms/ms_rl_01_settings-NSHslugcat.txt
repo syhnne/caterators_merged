@@ -1,0 +1,11 @@
+Template: MS_SettingsTemplate_Aerie
+DangerType: Blizzard
+WaveSpeed: 0.5047053
+WaveLength: 0.9858293
+WaveAmplitude: 0.004694144
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 1
+EffectColorA: 11
+Effects: Contrast-0.1521739-20-20, Darkness-0.3586957-32-77, 
+FadePalette: 40, 0.4021739

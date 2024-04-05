@@ -213,7 +213,7 @@ public class CustomLore
                 srs.CustomLore.Room_Loaded(self);
             }
         }
-        
+
 
         orig(self);
 

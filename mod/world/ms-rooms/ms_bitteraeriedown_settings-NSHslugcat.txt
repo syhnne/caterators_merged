@@ -1,0 +1,15 @@
+Template: MS_SettingsTemplate_Aerie
+DangerType: Blizzard
+CeilingDrips: 0
+RainIntensity: 0.8043478
+RumbleIntensity: 0.5543478
+WaveSpeed: 0.4969583
+WaveLength: 0.7973922
+WaveAmplitude: 0.04021738
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+EffectColorA: 11
+EffectColorB: 8
+Effects: Coldness-1-20-20, Dustpuffs-1-30-30, 
+PlacedObjects: SnowSource><620.5508><2042.018><Radial~737~-392~50~86.60254~0.6739131~0.6521739, SnowSource><605.8633><1068.915><Radial~713~-200~50~86.60254~0.4565217~0, SnowSource><609.8491><1111.619><UnSnow~0~100~50~86.60254~1~0, SnowSource><578.0556><160.4531><Radial~731~608~50~86.60254~0.7065217~0.3152174, SnowSource><1220.781><130.4475><UnSnow~96~250~-145~15.60254~1~0, SnowSource><907.2193><91.19763><UnSnow~5~180~50~86.60254~0.326087~0, SnowSource><476.9183><25.93256><UnSnow~145~37~-142~206.6025~0.423913~0, SnowSource><701.7991><27.80609><UnSnow~0~100~50~86.60254~1~0, CustomDecal><233.4656><79.94702><-56~744~675~756~696~40~-159~109~0.01086957~1~0~Rust2~0.4456522~1~0.4456522~1~0.4456522~1~0.4456522~1, 
+FadePalette: 40, 0.5217391, 0.423913, 0.3695652

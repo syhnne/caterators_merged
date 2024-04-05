@@ -1,0 +1,21 @@
+DangerType: Blizzard
+CeilingDrips: 0
+RainIntensity: 0.8
+RumbleIntensity: 0.8
+WaveSpeed: 0.5236096
+WaveLength: 0.9881952
+WaveAmplitude: 1.256252E-07
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0
+Grime: 0.09782609
+BkgDroneVolume: 0.3
+BkgDroneNoThreatVolume: 1
+RandomItemDensity: 0.5
+RandomItemSpearChance: 0.2
+WaterReflectionAlpha: 1
+Palette: 37
+EffectColorA: 11
+EffectColorB: 10
+Effects: Darkness-0.04347826-30-30, Contrast-0.1086956-34-132, DayNight-1-31-88, 
+AmbientSounds: OMNI><AM_ENV-CityTone.ogg><736.9156><564.4313><0.06521739><1, OMNI><AM_ENV-WinterHum.ogg><747.6525><474.1293><0.1847826><1, OMNI><AM_WIN-HowlingWnd.ogg><805.55><229.7533><0.02173913><1, OMNI><AM_ENV-WinterTrees.ogg><760.3197><403.5865><0.1847826><1, OMNI><AM_WIN-MedWind.ogg><791.1071><307.36><0.2934783><1, OMNI><MSC-ShadowAlley.ogg><820.4478><140.9706><0.1521739><1.078261, 

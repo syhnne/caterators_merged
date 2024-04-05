@@ -1,0 +1,9 @@
+Template: RL_SettingsTemplate_Aerie
+WaveSpeed: 0.4547525
+WaveLength: 0.9773762
+WaveAmplitude: 1.533529E-06
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Effects: Contrast-0.01086957-34-130, Darkness-0.4130435-20-20, 
+PlacedObjects: SnowSource><496.6478><118.9219><Radial~243~422~50~86.60254~0.326087~0.2282609, LightSource><631.6992><247.4817><1~Environment~6~160~50~86.60254~1~0~None~0~1, LightSource><346.0653><406.1733><1~Environment~180~56~50~86.60254~1~0~None~0~1, 
+FadePalette: 40, 0

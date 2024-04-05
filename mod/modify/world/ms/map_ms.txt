@@ -1,0 +1,301 @@
+GATE_SL_MS: -588.7191><1541.214><-553.1256><1264.883><0><><48><35
+GATE_MS_SL: -2046.715><-653.7902><-1625.127><-558.1133><0><><48><35
+MS_ENTRANCE: -1877.715><-686.7894><-1513.127><-607.114><2><><48><45
+MS_S01: -1731.715><-677.7894><-1398.127><-578.114><2><><48><35
+MS_M03: -1877.715><-442.7915><-1506.127><-306.9118><2><><48><112
+MS_CROSSOVER02: -1877.048><-961.9556><-1505.46><-1104.248><1><><48><192
+MS_U03: -1547.048><-951.2432><-1169.314><-985.6747><1><><150><35
+MS_O03: -2230.882><-479.3128><-1739.486><-419.7998><2><><104><78
+MS_O04: -2114.429><-807.4304><-1750.71><-717.7607><2><><104><35
+MS_O05: -2196.047><-996.4185><-1849.7><-923.7491><2><><150><75
+MS_O06: -2163.132><-1195.979><-1828.767><-1055.561><1><><151><35
+MS_VISTA: -2556.132><-1202.979><-2057.767><-1063.561><1><><104><35
+MS_I01: -1717.362><-592.8054><-1475.111><-441.4665><1><><247><40
+MS_I03: -1276.47><-582.1052><-805.2103><-465.9665><1><Submerged Superstructure><48><35
+MS_I02: -1220.012><-348.2888><-815.1196><-295.6932><1><Submerged Superstructure><152><121
+MS_S04: -1093.429><-321.7896><-463.9559><-162.0257><2><><48><35
+MS_CROSSOVER01: -1285.429><-106.8661><-1002.184><2.820024><1><Submerged Superstructure><158><35
+MS_MEM01: -561.5573><619.558><-449.4518><584.5117><2><Submerged Superstructure><104><78
+MS_MEM02: -816.8584><-108.0092><-664.1132><-1.179997><1><Submerged Superstructure><152><35
+MS_MEM03: -482.6577><-80.74175><-343.3817><9.352755><1><Submerged Superstructure><48><35
+MS_MEM04: -479.4702><-356.1795><-339.2567><-305.4596><1><><48><112
+MS_C13: -978.1201><693.199><-776.3342><668.4716><2><Submerged Superstructure><152><35
+MS_MEM05: -701.6507><755.4664><-636.9246><797.0092><0><Submerged Superstructure><198><35
+MS_MEM06: -280.5372><929.3702><-221.3687><846.7675><0><><48><74
+MS_ARTERY12: 314.5255><401.4597><-26.40206><-22.19727><1><><250><35
+MS_CAPI04: 424.5255><401.4597><-26.40206><-22.19727><1><><149><35
+MS_I06: -525.2357><-600.8253><-544.4918><-429.2837><1><><246><40
+MS_I13: -521.3458><-738.7681><-384.9926><-587.1736><1><><48><35
+MS_S05: -372.6087><-714.0847><-262.0446><-583.1205><1><><48><35
+MS_I08: -88.25981><-607.8356><-147.1462><-295.1695><2><Submerged Superstructure (Vents)><48><112
+MS_I07: -70.35387><-724.3577><-32.52539><-425.598><1><Submerged Superstructure (Vents)><48><112
+MS_S03: -23.26318><-495.8604><-30.07072><-140.5524><1><><48><35
+MS_VENT01: -1229.176><-862.2493><-853.9379><-1021.425><1><><66><112
+MS_VENT02: -1083.63><-909.6453><-701.4163><-870.9142><2><><48><35
+MS_VENT03: -1056.88><-681.6467><-688.2028><-594.4333><1><><61><112
+MS_AIR01: -845.2781><-599.3477><-525.7277><-587.7416><1><><48><35
+MS_VENT04: -1060.985><-1162.834><-702.4189><-1238.362><1><Submerged Superstructure (Vents)><101><152
+MS_S06: -984.7991><-1111.011><-480.1919><-1022.662><2><><48><35
+MS_VENT05: -820.6817><-1114.558><-477.6333><-1150.252><2><Submerged Superstructure (Vents)><48><35
+MS_VENT06: 274.7957><-1054.756><203.7706><-1090.696><0><Submerged Superstructure (Vents)><48><114
+MS_VENT07: 93.38398><-1042.89><204.0047><-769.183><0><Submerged Superstructure (Vents)><48><35
+MS_VENT08: -593.6015><-1359.77><-327.2838><-1377.186><1><Submerged Superstructure (Vents)><101><114
+MS_AIR02: -1356.741><-1327.127><-814.2847><-1296.44><2><Submerged Superstructure (Vents)><48><35
+MS_VENT09: -830.0446><-1557.11><-477.5763><-1464.571><1><Submerged Superstructure (Vents)><66><114
+MS_VENT10: -1102.075><-1462.812><-702.2305><-1369.04><1><Submerged Superstructure (Vents)><101><35
+MS_AIR03: -491.7491><-1657.277><-328.528><-1584.858><2><Submerged Superstructure (Vents)><152><72
+MS_VENT11: -168.6409><-1567.235><-98.56998><-1351.05><1><Submerged Superstructure (Vents)><48><72
+MS_VENT12: -181.5547><-1499.792><-109.8658><-1118.472><2><Submerged Superstructure (Vents)><148><72
+MS_VENT13: 442.3468><-1236.095><327.5487><-776.9543><0><Submerged Superstructure (Vents)><48><35
+MS_VENT14: 244.926><-1375.026><325.4162><-982.032><1><Submerged Superstructure (Vents)><101><72
+MS_VENT15: -155.4427><-1213.871><-114.3218><-918.2289><1><Submerged Superstructure (Vents)><148><72
+MS_VENT16: 237.0061><-744.6439><82.27834><-421.0839><2><Submerged Superstructure (Vents)><148><35
+MS_VENT17: 177.3308><-633.7363><81.70975><-293.2248><1><><101><35
+MS_VENT18: 672.5332><-1163.689><443.8087><-778.9767><1><Submerged Superstructure (Vents)><198><37
+MS_VENT19: 1031.212><-978.6746><687.7814><-445.4076><2><Submerged Superstructure (Vents)><101><35
+MS_VENT20: 2260.964><-697.0474><1538.065><-283.0987><0><Submerged Superstructure (Vents)><101><35
+MS_VENT21: 1511.868><-884.3898><1032.441><-443.2154><1><Submerged Superstructure (Vents)><61><72
+MS_VENT22: 1940.86><-792.9968><1183.853><-376.956><0><Submerged Superstructure (Vents)><148><52
+MS_VENT23: -1740.14><-1256.14><-1133.719><-1264.124><2><Submerged Superstructure (Vents)><151><72
+MS_FARSIDE: 2619.733><-411.9984><1910.108><-168.486><1><Submerged Superstructure><151><91
+MS_EAST01: 2119.652><-342.812><1481.472><-37.7027><2><><201><35
+MS_EAST02: 1751.965><-205.7577><1365.264><-27.78505><2><><48><35
+MS_S09: 1743.155><-84.77142><1362.061><100.5121><2><><48><35
+MS_EAST03: 1449.452><-249.1312><1044.306><-98.38038><2><Submerged Superstructure><151><72
+MS_EAST04: 1178.738><-66.21606><819.691><-15.80289><2><Submerged Superstructure><101><35
+MS_EAST05: 1250.879><-447.3316><1034.176><-234.7643><2><><48><35
+MS_EAST06: 1266.269><-697.2548><798.4689><-315.4224><2><><48><112
+MS_EAST07: 769.2745><-612.0629><266.3013><-167.7235><2><><251><35
+MS_ARTERY01: -577.9682><-800.0405><-637.2305><-712.1722><0><Submerged Superstructure (The Heart)><241><35
+MS_CAPI01: -385.9595><-700.0004><-316.7213><-836.4529><0><Submerged Superstructure (The Heart)><48><35
+MS_ARTERY02: -1415.009><-800.1608><-1158.627><-716.4529><0><Submerged Superstructure (The Heart)><245><35
+MS_CAPI02: -1379.892><-912.7009><-958.8519><-843.3517><0><Submerged Superstructure (The Heart)><48><37
+MS_ARTERY03: -1934.061><-808.0596><-1382.595><-736.7972><0><Submerged Superstructure (The Heart)><96><54
+MS_CAPI03: -2039.634><-937.9578><-1384.34><-861.1899><0><><48><35
+MS_ARTERY04: -1375.134><-413.312><-934.1677><-500.7974><0><><48><177
+MS_ARTERY05: 2361.618><-545.218><1788.837><-251.9442><0><><48><72
+MS_ARTERY06: 1869.817><-525.9008><856.1423><-568.9272><0><Submerged Superstructure (The Heart)><248><35
+MS_ARTERY07: 134.8974><-669.6873><-128.7439><-715.368><0><Submerged Superstructure (The Heart)><151><117
+MS_ARTERY08: 1175.108><-596.3654><509.2413><-643.2578><0><Submerged Superstructure (The Heart)><148><72
+MS_ARTERY09: 649.4574><-682.2064><195.304><-641.2411><0><Submerged Superstructure (The Heart)><148><35
+MS_ARTERY10: 1034.488><-251.6706><918.027><-388.8545><0><><48><149
+MS_ARTERY11: 257.3376><-358.3175><265.3472><-47.01862><0><Submerged Superstructure (The Heart)><151><82
+MS_HEART: 412.3813><73.394><380.5576><188.7355><0><Submerged Superstructure (The Heart)><152><188
+MS_CORE: 412.7032><71.994><685.5845><187.518><2><Submerged Superstructure (The Heart)><48><35
+MS_CORTEX: -1193.574><130.6961><-949.7421><131.9963><0><Submerged Superstructure><172><76
+MS_MEMTUBE: -887.8645><295.5701><-679.3682><330.2268><1><Submerged Superstructure><148><35
+MS_MEMOUTSIDE: -589.7047><129.4477><-591.9166><132.6696><0><Submerged Superstructure><172><76
+MS_AI: -1362.298><436.5154><-1000.288><331.7851><0><Submerged Superstructure><151><112
+MS_MEMENTRANCE: -848.9978><449.6349><-681.1951><456.1066><0><Submerged Superstructure><151><35
+MS_LAB1: -280.8324><732.4609><-222.9247><694.7794><1><Submerged Superstructure><48><35
+MS_LAB2: -85.91299><730.4009><-105.3344><711.8596><1><Submerged Superstructure><48><35
+MS_LAB3: 112.9453><729.1592><20.68542><699.1826><1><Submerged Superstructure><48><35
+MS_LAB4: -280.7036><576.3619><-224.687><567.3535><1><Submerged Superstructure><48><35
+MS_LAB5: -86.73569><578.6813><-106.1889><555.0659><1><Submerged Superstructure><48><35
+MS_LAB6: 112.7513><578.2911><19.03224><553.5399><1><Submerged Superstructure><48><35
+MS_LAB7: -478.0468><421.4892><-357.6864><454.4479><1><Submerged Superstructure><48><35
+MS_LAB8: -282.6488><420.3549><-225.584><400.9627><1><Submerged Superstructure><48><35
+MS_LAB9: -87.97778><423.9651><-103.6837><417.3507><1><Submerged Superstructure><48><35
+MS_LAB10: 113.4939><424.8676><19.30015><417.1184><1><Submerged Superstructure><48><35
+MS_LAB12: -282.4664><264.7303><-225.5954><253.5187><1><Submerged Superstructure><48><35
+MS_LAB13: -87.2869><268.1797><-101.9547><250.3612><1><Submerged Superstructure><48><35
+MS_LAB14: 112.4789><94.33514><18.68944><39.99499><1><Submerged Superstructure><48><152
+MS_I12: 116.2375><-276.3569><146.6456><68.08282><1><Submerged Superstructure><48><35
+MS_I11: 261.9438><-339.7047><148.5916><-166.4717><1><><48><78
+MS_WILLSNAGGING01: -445.4631><1525.016><-428.6929><1240.43><0><Bitter Aerie><48><35
+MS_S07: -358.9725><1487.964><-429.5484><1389.502><1><><48><35
+MS_aeriestart: -248.2404><1413.933><-310.5253><1239.432><0><Bitter Aerie><174><41
+MS_startsewers: 290.7592><1411.933><59.47456><1246.432><0><Bitter Aerie><226><38
+MS_splitsewers: 854.4814><1397.723><396.8217><896.8643><0><Bitter Aerie><156><121
+MS_scavtrader: 1245.097><1256.48><750.9087><835.4351><0><Bitter Aerie><100><35
+MS_bitteraerie1: 1148.123><1759.588><748.5278><1091.481><1><Bitter Aerie><49><158
+MS_bitteraerie2: 1261.689><1724.313><987.529><1195.049><0><Bitter Aerie><48><39
+MS_bitteraerie3: 1257.689><2010.022><875.8392><1315.804><0><Bitter Aerie><50><148
+MS_bitteraerie4: 1125.993><2116.937><740.4913><1478.304><1><Bitter Aerie><48><70
+MS_bitteraerie5: 1173.301><2301.417><740.3367><1673.203><0><Bitter Aerie><117><39
+MS_bittermironest: 1006.732><2063.007><631.1141><1468.508><0><Bitter Aerie><48><35
+MS_bittershelter: 1217.993><1755.938><874.4872><1195.305><2><><48><35
+MS_pumps: 1068.722><1389.353><782.4288><953.8914><1><Bitter Aerie><70><41
+MS_sewerbridge: 795.0339><1244.494><408.3636><738.0861><1><Bitter Aerie><70><41
+MS_bitteraerie6: 1811.722><1976.037><1388.593><1496.102><0><Auxiliary Transmission Array><152><35
+MS_COMMS: 1500.13><2043.542><1255.441><1387.184><0><Auxiliary Transmission Array><59><152
+MS_bitterpipe: 914.7225><1115.037><568.592><688.1031><1><Bitter Aerie><48><35
+MS_bittervents: 623.7233><1449.041><271.5946><1088.109><1><><48><37
+MS_bitteraccess: 622.686><1287.244><274.386><861.3372><1><><48><72
+MS_bitterunderground: 1546.284><1460.901><1106.254><1125.237><0><Bitter Aerie><198><76
+MS_bitteredge: 1910.698><1446.369><1518.327><981.4777><1><><48><72
+MS_bitteraeriedown: 1851.284><1745.901><1519.254><1208.237><0><Auxiliary Transmission Array><49><116
+MS_bitteraeriepipeu: 1314.274><1747.713><991.941><1336.583><1><Bitter Aerie><111><146
+MS_Jtrap: 1193.498><1210.516><970.5432><665.533><1><Bitter Aerie><48><122
+MS_bitterentrance: 1535.245><1424.136><1118.988><892.4091><1><Bitter Aerie><186><82
+MS_bittersafe: 1873.703><1074.062><1518.477><832.119><1><><48><35
+MS_S10: 2008.545><1047.016><1627.635><830.71><1><><48><35
+MS_X02: 1700.484><1060.499><1405.202><756.5659><1><><48><35
+MS_bitterstart: 1457.729><1011.853><1180.291><759.7509><1><><101><35
+MS_RL_01: 314.5255><-98.54036><1720.598><1497.803><1><Auxiliary Transmission Array><48><35
+GATE_MS_RL: 424.5255><-98.54036><1843.598><1498.803><1><><48><35
+OffScreenDen_MS: -1963.715><-816.788><-315.127><-896.1122><1><Submerged Superstructure><0><0
+Connection: GATE_SL_MS,MS_WILLSNAGGING01,45,9,8,14,0,2
+Connection: GATE_MS_SL,MS_ENTRANCE,45,9,2,25,0,2
+Connection: MS_ENTRANCE,MS_M03,38,30,39,3,0,3
+Connection: MS_ENTRANCE,MS_S01,38,26,16,18,0,2
+Connection: MS_ENTRANCE,MS_CROSSOVER02,38,22,42,170,0,1
+Connection: MS_M03,MS_O03,13,77,96,72,2,0
+Connection: MS_CROSSOVER02,MS_U03,39,95,5,22,0,3
+Connection: MS_U03,MS_VENT01,141,14,13,23,0,2
+Connection: MS_O03,MS_I01,97,18,27,37,0,2
+Connection: MS_O04,MS_ARTERY03,90,19,30,29,0,2
+Connection: MS_O04,MS_O05,22,4,72,72,3,1
+Connection: MS_O05,MS_O06,120,2,110,32,3,1
+Connection: MS_O06,MS_VISTA,6,13,99,16,2,0
+Connection: MS_O06,MS_VENT23,140,11,12,48,0,2
+Connection: MS_I01,MS_I03,243,13,4,7,0,2
+Connection: MS_I03,MS_I02,41,28,74,12,1,3
+Connection: MS_I03,MS_VENT01,41,2,34,108,3,1
+Connection: MS_I02,MS_CROSSOVER01,54,118,79,5,1,3
+Connection: MS_I02,MS_S04,82,64,10,12,0,2
+Connection: MS_I02,MS_VENT03,126,13,26,108,3,1
+Connection: MS_CROSSOVER01,MS_MEM02,153,16,8,24,0,3
+Connection: MS_MEM01,MS_C13,5,63,147,17,2,0
+Connection: MS_MEM01,MS_LAB4,97,12,5,10,1,3
+Connection: MS_MEM02,MS_MEM03,149,30,2,21,0,2
+Connection: MS_MEM03,MS_MEMOUTSIDE,41,30,146,13,1,3
+Connection: MS_MEM03,MS_MEM04,43,4,42,105,3,0
+Connection: MS_MEM04,MS_I08,45,6,3,90,0,2
+Connection: MS_MEM04,MS_I06,19,4,120,35,2,1
+Connection: MS_C13,MS_MEM05,70,31,31,14,0,2
+Connection: MS_MEM05,MS_MEM06,191,28,6,3,1,2
+Connection: MS_MEM06,MS_ARTERY12,26,39,58,5,1,3
+Connection: MS_ARTERY12,MS_CAPI04,233,28,62,3,0,2
+Connection: MS_CAPI04,MS_bitteraccess,138,19,7,5,0,2
+Connection: MS_I06,MS_I13,125,10,24,30,3,1
+Connection: MS_I13,MS_S05,34,16,15,14,0,3
+Connection: MS_I13,MS_ARTERY01,19,5,130,23,3,0
+Connection: MS_I08,MS_I07,42,25,36,87,1,3
+Connection: MS_I08,MS_VENT16,44,5,12,12,0,2
+Connection: MS_I07,MS_S03,36,105,21,12,1,3
+Connection: MS_I07,MS_VENT17,44,93,6,30,0,2
+Connection: MS_I07,MS_VENT07,26,14,3,25,3,2
+Connection: MS_VENT01,MS_VENT02,49,20,19,6,0,2
+Connection: MS_VENT02,MS_VENT03,30,28,23,7,1,3
+Connection: MS_VENT02,MS_VENT04,43,11,67,126,0,0
+Connection: MS_VENT03,MS_AIR01,47,78,4,15,0,2
+Connection: MS_VENT04,MS_S06,51,94,18,18,0,2
+Connection: MS_VENT04,MS_VENT05,60,60,5,25,1,3
+Connection: MS_VENT04,MS_VENT09,85,10,15,105,0,2
+Connection: MS_VENT04,MS_AIR02,17,11,39,8,3,3
+Connection: MS_VENT05,MS_VENT08,41,6,18,101,0,1
+Connection: MS_VENT06,MS_ARTERY07,39,107,137,8,1,3
+Connection: MS_VENT06,MS_VENT07,6,83,42,12,3,1
+Connection: MS_VENT06,MS_VENT13,40,8,4,20,0,2
+Connection: MS_VENT07,MS_VENT15,6,3,128,56,3,1
+Connection: MS_VENT08,MS_VENT09,23,10,57,52,2,0
+Connection: MS_VENT08,MS_AIR03,73,9,64,68,3,1
+Connection: MS_AIR02,MS_VENT23,4,27,148,21,2,0
+Connection: MS_AIR02,MS_VENT10,31,5,2,25,0,2
+Connection: MS_VENT09,MS_VENT10,12,65,92,10,1,0
+Connection: MS_VENT09,MS_AIR03,52,9,5,10,3,2
+Connection: MS_AIR03,MS_VENT11,139,11,15,6,0,2
+Connection: MS_VENT11,MS_VENT12,9,44,19,11,3,0
+Connection: MS_VENT12,MS_VENT15,40,66,59,3,0,2
+Connection: MS_VENT12,MS_VENT14,141,44,14,12,0,2
+Connection: MS_VENT13,MS_VENT18,45,6,69,10,1,3
+Connection: MS_VENT13,MS_VENT14,16,3,92,65,2,0
+Connection: MS_VENT14,MS_VENT15,6,62,131,6,2,3
+Connection: MS_VENT14,MS_VENT18,97,45,15,9,1,2
+Connection: MS_VENT16,MS_EAST07,139,27,13,5,1,3
+Connection: MS_VENT17,MS_I11,87,31,35,4,1,3
+Connection: MS_VENT18,MS_VENT19,161,23,4,11,1,3
+Connection: MS_VENT19,MS_EAST06,95,26,6,8,0,3
+Connection: MS_VENT19,MS_VENT21,88,5,9,12,0,2
+Connection: MS_VENT20,MS_ARTERY05,86,18,26,5,1,3
+Connection: MS_VENT20,MS_VENT22,19,2,138,31,3,1
+Connection: MS_VENT21,MS_VENT22,56,60,8,33,1,2
+Connection: MS_VENT21,MS_EAST06,14,51,44,3,2,0
+Connection: MS_FARSIDE,MS_EAST01,19,72,197,21,2,0
+Connection: MS_FARSIDE,MS_ARTERY05,11,46,42,46,3,1
+Connection: MS_EAST01,MS_EAST02,4,28,40,4,2,3
+Connection: MS_EAST02,MS_S09,3,25,6,19,1,3
+Connection: MS_EAST02,MS_EAST03,7,10,144,43,2,0
+Connection: MS_EAST03,MS_EAST04,10,66,54,3,2,3
+Connection: MS_EAST03,MS_EAST05,8,15,22,30,3,1
+Connection: MS_EAST04,MS_ARTERY10,19,23,41,142,2,0
+Connection: MS_EAST05,MS_EAST06,24,3,19,101,3,1
+Connection: MS_EAST06,MS_EAST07,6,86,247,19,2,0
+Connection: MS_ARTERY01,MS_CAPI01,163,30,3,1,1,3
+Connection: MS_ARTERY01,MS_ARTERY02,5,18,235,18,2,0
+Connection: MS_ARTERY01,MS_ARTERY07,236,14,4,12,0,2
+Connection: MS_ARTERY02,MS_ARTERY04,139,32,27,4,1,3
+Connection: MS_ARTERY02,MS_ARTERY03,6,23,90,35,2,0
+Connection: MS_ARTERY02,MS_CAPI02,105,2,8,33,3,1
+Connection: MS_ARTERY03,MS_CAPI03,18,7,29,32,3,1
+Connection: MS_ARTERY04,MS_CORTEX,26,172,25,13,1,3
+Connection: MS_ARTERY05,MS_ARTERY06,4,41,241,16,2,0
+Connection: MS_ARTERY06,MS_ARTERY08,6,9,142,51,2,0
+Connection: MS_ARTERY07,MS_ARTERY11,66,105,26,6,1,3
+Connection: MS_ARTERY07,MS_ARTERY09,146,45,5,8,0,2
+Connection: MS_ARTERY08,MS_ARTERY10,22,63,19,8,1,3
+Connection: MS_ARTERY08,MS_ARTERY09,7,11,138,21,2,0
+Connection: MS_ARTERY11,MS_HEART,124,77,73,12,1,3
+Connection: MS_HEART,MS_CORE,75,106,23,27,3,1
+Connection: MS_CORTEX,MS_AI,37,65,83,7,1,3
+Connection: MS_CORTEX,MS_MEMTUBE,139,47,22,4,1,3
+Connection: MS_MEMTUBE,MS_AI,5,31,142,46,2,3
+Connection: MS_MEMTUBE,MS_MEMOUTSIDE,130,3,41,49,3,1
+Connection: MS_MEMOUTSIDE,MS_LAB12,148,67,3,3,0,2
+Connection: MS_AI,MS_MEMENTRANCE,143,64,3,21,0,2
+Connection: MS_MEMENTRANCE,MS_LAB7,139,21,3,19,0,2
+Connection: MS_LAB1,MS_LAB2,44,4,6,9,0,3
+Connection: MS_LAB1,MS_LAB4,19,2,27,32,3,1
+Connection: MS_LAB2,MS_LAB3,41,24,8,30,1,2
+Connection: MS_LAB3,MS_LAB6,28,2,28,32,3,1
+Connection: MS_LAB4,MS_LAB5,43,8,21,7,0,3
+Connection: MS_LAB4,MS_LAB8,43,3,35,32,0,0
+Connection: MS_LAB5,MS_LAB6,20,21,6,23,0,2
+Connection: MS_LAB5,MS_LAB9,9,2,5,32,3,1
+Connection: MS_LAB6,MS_LAB10,22,2,22,32,3,1
+Connection: MS_LAB7,MS_LAB8,42,6,6,8,3,2
+Connection: MS_LAB8,MS_LAB12,26,5,22,32,3,1
+Connection: MS_LAB9,MS_LAB10,42,32,2,30,1,2
+Connection: MS_LAB9,MS_LAB13,42,10,30,30,3,0
+Connection: MS_LAB12,MS_LAB13,44,9,3,4,0,2
+Connection: MS_LAB13,MS_LAB14,43,4,5,126,0,3
+Connection: MS_LAB14,MS_I12,21,6,20,30,3,1
+Connection: MS_I12,MS_I11,42,21,4,64,0,2
+Connection: MS_WILLSNAGGING01,MS_S07,44,14,29,27,0,2
+Connection: MS_WILLSNAGGING01,MS_aeriestart,34,8,31,18,3,1
+Connection: MS_aeriestart,MS_startsewers,161,11,36,11,0,2
+Connection: MS_startsewers,MS_splitsewers,210,12,4,58,0,2
+Connection: MS_splitsewers,MS_bitteraerie1,145,105,3,6,0,2
+Connection: MS_splitsewers,MS_bittervents,20,101,37,33,3,1
+Connection: MS_splitsewers,MS_pumps,96,58,7,21,0,2
+Connection: MS_splitsewers,MS_bitteraccess,10,34,34,49,1,3
+Connection: MS_splitsewers,MS_scavtrader,148,13,12,17,0,2
+Connection: MS_bitteraerie1,MS_bitteraerie4,18,152,25,7,1,3
+Connection: MS_bitteraerie1,MS_bitteraeriepipeu,33,89,16,87,0,2
+Connection: MS_bitteraerie2,MS_bitteraerie3,8,30,16,16,2,3
+Connection: MS_bitteraerie2,MS_bittershelter,12,20,19,8,2,0
+Connection: MS_bitteraerie2,MS_bitterunderground,34,5,24,61,3,2
+Connection: MS_bitteraerie3,MS_bitteraerie5,23,138,105,16,1,3
+Connection: MS_bitteraerie4,MS_bitteraerie5,8,53,13,6,2,3
+Connection: MS_bitteraerie4,MS_bittermironest,2,12,37,15,2,0
+Connection: MS_pumps,MS_bitterunderground,48,24,6,17,0,2
+Connection: MS_pumps,MS_Jtrap,48,11,11,111,0,2
+Connection: MS_sewerbridge,MS_bitteraccess,18,30,44,9,2,0
+Connection: MS_sewerbridge,MS_bitterpipe,59,7,8,32,3,1
+Connection: MS_bitteraerie6,MS_COMMS,16,20,38,52,3,0
+Connection: MS_bitteraerie6,MS_RL_01,130,20,8,15,3,2
+Connection: MS_bitteraerie6,MS_bitteraeriedown,84,20,18,97,3,3
+Connection: MS_bitterpipe,MS_Jtrap,32,17,3,28,0,2
+Connection: MS_bittervents,MS_bitteraccess,8,7,8,69,3,1
+Connection: MS_bitterunderground,MS_bitteredge,186,59,1,52,3,2
+Connection: MS_bitterunderground,MS_bitterentrance,147,11,166,24,0,3
+Connection: MS_bitteredge,MS_bitteraeriedown,27,67,39,11,2,0
+Connection: MS_bitteredge,MS_bitterentrance,2,37,175,50,2,0
+Connection: MS_bitteredge,MS_bittersafe,25,6,37,27,3,1
+Connection: MS_bitteraeriepipeu,MS_bitterentrance,59,21,23,68,3,3
+Connection: MS_Jtrap,MS_bitterentrance,45,102,14,11,0,2
+Connection: MS_bittersafe,MS_X02,3,7,45,11,2,0
+Connection: MS_bittersafe,MS_S10,43,7,17,13,0,2
+Connection: MS_X02,MS_bitterstart,2,12,90,28,2,0
+Connection: MS_RL_01,GATE_MS_RL,41,18,2,9,0,2

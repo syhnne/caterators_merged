@@ -1,0 +1,10 @@
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.5039332
+WaveLength: 0.9472584
+WaveAmplitude: 0.02606916
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+EffectColorA: 11
+Effects: DayNight-1-20-20, 
+PlacedObjects: SnowSource><133.9493><308.7339><Radial~311~-166~50~86.60254~0.7391304~0.3478261, SnowSource><781.8884><284.584><Radial~-270~-139~50~86.60254~0.7826087~0.3152174, DayNightSettings><225.7961><293.6946><5~8.660254~23~10, 

@@ -1,0 +1,14 @@
+Template: MS_SettingsTemplate_Sewers
+DangerType: Blizzard
+WaveSpeed: 0.4716657
+WaveLength: 0.7358328
+WaveAmplitude: 0.04999999
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0.75
+Palette: 68
+EffectColorA: 2
+EffectColorB: 7
+Effects: BrokenZeroG-0-25-138, 
+PlacedObjects: LightFixture><716.3643><459.8284><RedLight~17.32051~-10~64, LightFixture><242.4085><447.7266><RedLight~17.32051~-10~0, 
+FadePalette: 51, 0.9021739

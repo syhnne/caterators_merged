@@ -1,0 +1,16 @@
+Palette: 37
+waterColorOverride: 0.11, 0.51, 0.19
+batDepleteCyclesMin: 2
+batDepleteCyclesMax: 7
+batDepleteCyclesMaxIfLessThanTwoLeft: 3
+batDepleteCyclesMaxIfLessThanFiveLeft: 4
+overseersSpawnChance: 0.0
+overseersMin: 0
+overseersMax: 1
+playerGuideOverseerSpawnChance: 0.0
+earlyCycleChance: 0.02
+earlyCycleFloodChance: 0.0
+pupSpawnChance: 0.0
+Subregion: Frostveiled Relics
+Subregion: The Clock Tower
+Room Setting Templates: Snow, Aerie

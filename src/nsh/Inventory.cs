@@ -6,11 +6,15 @@ using UnityEngine;
 using RWCustom;
 using static System.Net.Mime.MediaTypeNames;
 using static MonoMod.InlineRT.MonoModRule;
+using static Caterators_by_syhnne.CustomSaveData;
+using System.Security.Permissions;
+using Fisobs.Core;
+using System.Text.RegularExpressions;
 
 namespace Caterators_by_syhnne.nsh;
 
 
-
+// TODO: 修复跨区域时背包内物品会消失的bug
 public class Inventory
 {
     /// <summary>
@@ -26,6 +30,8 @@ public class Inventory
     // 保证按一次下键只能添加一个物品，不会一股脑把东西全倒出来
     public int lastInputY;
     public int inputY;
+
+    public bool lastIsActive;
 
     public static readonly int capacity = 50;
     public int currCapacity;
@@ -65,10 +71,43 @@ public class Inventory
     }
 
 
+    public string SaveToString()
+    {
+        // 这波属于把fisobs用到极致了
+        // 别问我为啥要这么多字来存档，问就是怕我自己不认得
+        // 没事了，我发现fisobs似乎没有loadfromstring这种东西，还是使用我的传统异能，把变量甩到plugin实例里面暂存吧（。
+        string str = "<startNSHINVENTORY>";
+        foreach (AbstractPhysicalObject obj in Items)
+        {
+            str += obj.SaveToString();
+            // 这是分隔符（。
+            str += "<!>";
+        }
+        str += "<endNSHINVENTORY>";
+        return str;
+    }
+
+
+
+
     public void Update(bool eu)
     {
 
         itemsOnBack?.Update(eu);
+
+        // 和plugin实例存储对照检查
+        // 这真是个烂方法，除了我没人想得出来那种
+        if (IsActive != lastIsActive && player.room != null && Items.Count == 0)
+        {
+            if (Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] != null)
+            {
+                Plugin.Log("inventory empty check, player", player.abstractCreature.ID.number);
+                Items = Plugin.instance.nshInventoryList[player.abstractCreature.ID.number];
+                ReloadCapacity();
+                hud?.ResetObjects();
+                Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] = null;
+            }
+        }
        
         if (IsActive && inputY == 1 && lastInputY != 1)
         {
@@ -77,6 +116,7 @@ public class Inventory
                 if (player.grasps[i] != null && CanBePutIntoBag(player.grasps[i].grabbed.abstractPhysicalObject))
                 {
                     AddObject(player.grasps[i].grabbed);
+
                     break;
                 }
             }
@@ -87,6 +127,7 @@ public class Inventory
         }
 
         lastInputY = inputY;
+        lastIsActive = IsActive;
     }
 
 
@@ -106,7 +147,7 @@ public class Inventory
         // currCapacity += ItemVolume(obj);
 
         
-        if (obj is Spear && itemsOnBack.AddSpear(obj as Spear))
+        if ((obj is Spear) && itemsOnBack.AddItem(obj))
         {
         }
         else 
@@ -136,14 +177,14 @@ public class Inventory
         Items.Remove(obj);
         
         
-        if (obj.realizedObject != null && obj.realizedObject is Spear)
+        if (obj.realizedObject != null && (obj.realizedObject is Spear))
         {
             if (player.graphicsModule != null && player.FreeHand() > -1)
             {
-                (obj.realizedObject as Spear).firstChunk.MoveFromOutsideMyUpdate(eu, (player.graphicsModule as PlayerGraphics).hands[player.FreeHand()].pos);
+                (obj.realizedObject).firstChunk.MoveFromOutsideMyUpdate(eu, (player.graphicsModule as PlayerGraphics).hands[player.FreeHand()].pos);
             }
             // 别删这输出日志 他是代码而不是单纯的输出日志
-            Plugin.Log("retrieve spear from back:", itemsOnBack.RemoveSpear(obj.realizedObject as Spear));
+            Plugin.Log("retrieve item from back:", itemsOnBack.RemoveItem(obj.realizedObject));
         }
         else
         {
@@ -204,10 +245,10 @@ public class Inventory
         foreach (AbstractPhysicalObject obj in Items)
         {
             
-            if (obj.realizedObject != null && obj.realizedObject is Spear)
+            if (obj.realizedObject != null && (obj.realizedObject is Spear))
             {
                 // 别删这输出日志 他是代码而不是单纯的输出日志
-                Plugin.Log("retrieve spear from back:", itemsOnBack.RemoveSpear(obj.realizedObject as Spear));
+                Plugin.Log("retrieve item from back:", itemsOnBack.RemoveItem(obj.realizedObject));
             }
             else
             {
@@ -241,11 +282,12 @@ public class Inventory
 
     public bool CanBePutIntoBag(AbstractPhysicalObject obj)
     {
+        bool spear = true;
         if (obj is AbstractSpear)
         {
-            return (itemsOnBack.CanAddASpear() != null);
+            spear = (itemsOnBack.CanAddASpear() != null);
         }
-        return currCapacity + ItemVolumeFromAbstr(obj) <= capacity;
+        return spear && (currCapacity + ItemVolumeFromAbstr(obj) <= capacity);
     }
 
 
@@ -253,7 +295,36 @@ public class Inventory
     // TODO: 这玩意儿也有bug 点的快了他容易算不出来，最好是用abstractobj计算，每次加东西的时候reset一遍
     // AbstractPhysicalObject.AbstractObjectType
 
+
+    /*public int ItemVolume(PhysicalObject obj)
+    {
+        
+        if (unlimited) return 0;
+        if (obj is Spear) return 5;
+        if (player.CanBeSwallowed((PhysicalObject)obj) || obj is IPlayerEdible) return 10;
+        if (player.Grabability(obj) <= Player.ObjectGrabability.BigOneHand) return 15;
+        if (!player.HeavyCarry(obj)) return 25;
+        return 100;
+    }*/
+
+
     #pragma warning disable CS0162 // 检测到无法访问的代码
+    public int ItemVolumeFromAbstr(AbstractPhysicalObject obj)
+    {
+        if (unlimited) return 0;
+        if (obj is AbstractSpear) return 5;
+        if (obj.type == AbstractPhysicalObject.AbstractObjectType.Oracle
+            || obj.type == AbstractPhysicalObject.AbstractObjectType.Creature
+            || obj.type == AbstractPhysicalObject.AbstractObjectType.SeedCob
+            || obj.type == AbstractPhysicalObject.AbstractObjectType.CollisionField
+            || obj.type == MoreSlugcatsEnums.AbstractObjectType.HRGuard) return 100;
+        if (obj.type == MoreSlugcatsEnums.AbstractObjectType.EnergyCell
+            || obj.type == MoreSlugcatsEnums.AbstractObjectType.JokeRifle) return 30;
+        return 10;
+    }
+
+
+
     /*public int ItemVolume(PhysicalObject obj)
     {
         
@@ -267,43 +338,17 @@ public class Inventory
 
 
 
-    public int ItemVolumeFromAbstr(AbstractPhysicalObject obj)
-    {
-
-        if (unlimited) return 0;
-        if (obj is AbstractSpear) return 5;
-        if (obj.type == AbstractPhysicalObject.AbstractObjectType.Oracle
-            || obj.type == AbstractPhysicalObject.AbstractObjectType.Creature
-            || obj.type == AbstractPhysicalObject.AbstractObjectType.SeedCob
-            || obj.type == AbstractPhysicalObject.AbstractObjectType.CollisionField
-            || obj.type == MoreSlugcatsEnums.AbstractObjectType.HRGuard) return 100;
-        if (obj.type == MoreSlugcatsEnums.AbstractObjectType.EnergyCell
-            || obj.type == MoreSlugcatsEnums.AbstractObjectType.JokeRifle) return 30;
-        return 10;
-    }
-#pragma warning restore CS0162 // 检测到无法访问的代码
-
-
-
-    #pragma warning disable CS0162 // 检测到无法访问的代码
-    public int ItemVolume(PhysicalObject obj)
-    {
-        
-        if (unlimited) return 0;
-        if (obj is Spear) return 5;
-        if (player.CanBeSwallowed((PhysicalObject)obj) || obj is IPlayerEdible) return 10;
-        if (player.Grabability(obj) <= Player.ObjectGrabability.BigOneHand) return 15;
-        if (!player.HeavyCarry(obj)) return 25;
-        return 100;
-    }
-    #pragma warning restore CS0162 // 检测到无法访问的代码
-
     public void ReloadCapacity()
     {
+        itemsOnBack.lanternCount = 0;
         int result = 0;
         foreach (AbstractPhysicalObject obj in Items) 
         {
             result += ItemVolumeFromAbstr(obj);
+            if (obj.type == AbstractPhysicalObject.AbstractObjectType.Lantern) 
+            { 
+                itemsOnBack.lanternCount++; 
+            }
         }
         currCapacity = result;
     }

@@ -246,7 +246,7 @@ public class GravityController : UpdatableAndDeletable
     // 其实disable也要调用这个函数，是不是应该给他改个名
     public void Die()
     {
-        if (player.room == null || !enabled) return;
+        if (player.room == null || player.room.roomSettings == null || !enabled) return;
         if (player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG) != null || player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG) != null)
         {
             for (int i = 0; i < player.room.roomSettings.effects.Count; i++)

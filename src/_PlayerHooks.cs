@@ -49,7 +49,7 @@ public class PlayerHooks
         On.Player.NewRoom += Player_NewRoom;
 
 
-        // 重力控制
+        // PlayerModule
         On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
         On.Player.Die += Player_Die;
         On.Player.Destroy += Player_Destroy;
@@ -125,12 +125,6 @@ public class PlayerHooks
         {
             module.gravityController?.NewRoom(module.IsMyStory);
         }
-        
-
-        if (self.room != null && module.srsLightSource != null && module.srsLightSource.lightSources == null)
-        {
-            module.srsLightSource.AddModules();
-        }
 
         if (!newRoom.game.IsStorySession) { return; }
 
@@ -183,7 +177,7 @@ public class PlayerHooks
 
         Plugin.Log("--CustomSaveData:", mp.beaten_fp, mp.beaten_srs, mp.beaten_nsh, mp.beaten_moon);
 
-        string warmth = "--IProvideWarmth:";
+        string warmth = "--IProvideWarmth: ";
         foreach (IProvideWarmth obj in newRoom.blizzardHeatSources)
         {
             warmth += obj.GetType().Name + " ";
@@ -265,7 +259,7 @@ public class PlayerHooks
 
 
 
-    #region 重力控制
+    #region PlayerModule
 
     // 启用重力控制时阻止y轴输入
     private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
@@ -330,7 +324,6 @@ public class PlayerHooks
             self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
             if (module.nshInventory != null)
             {
-                Plugin.Log("inventory?");
                 InventoryHUD inventoryHUD = new InventoryHUD(self, self.fContainers[1], module.nshInventory);
                 self.AddPart(inventoryHUD);
                 module.nshInventory.hud = inventoryHUD;

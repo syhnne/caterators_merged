@@ -1,0 +1,16 @@
+Template: MS_SettingsTemplate_Aerie
+DangerType: Blizzard
+RainIntensity: 0.2826087
+RumbleIntensity: 1
+WaveSpeed: 0.4960479
+WaveLength: 0.9639062
+WaveAmplitude: 0.004802746
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0.01086957
+Grime: 0.1195652
+EffectColorA: 11
+EffectColorB: 8
+Effects: Contrast-0-20-20, Darkness-0.3695652-20-70, Coldness-1-20-125, Dustpuffs-1-275-20, 
+PlacedObjects: SnowSource><1522.09><1964.822><Radial~207~-215~-307~-133.3975~0.9347826~1, SnowSource><1146.559><2034.939><UnSnow~226~-43~50~86.60254~0.3913043~0, SnowSource><879.2755><1852.052><Radial~1~67~50~86.60254~1~0, SnowSource><799.0834><2146.818><Strip~4~90~119~-74.39746~1~0, SnowSource><706.1731><1859.15><Radial~0~100~50~86.60254~0.4565217~0, SnowSource><636.5829><2155.068><Radial~0~100~59~-115.3975~1~0, SnowSource><466.619><1596.589><Radial~202~-115~50~86.60254~0.7717391~0.3695652, SnowSource><1259.413><1396.115><Radial~-166~-190~-352~-99.39746~0.8478261~0.3586957, SnowSource><1125.923><880.8156><None~-739~-53~-610~-90.39746~0.5217391~1, SnowSource><278.5763><749.8491><None~220~-26~50~86.60254~0.423913~1, SteamPipe><543.8889><167.5837><131~101, SteamPipe><470.7021><266.3058><75~-50, CustomDecal><436.851><61.67267><-148~654~1129~674~1046~0~12~188~0.01086957~1~1~BlackRust1~0.2934783~1~0.2934783~1~0.2934783~1~0.2934783~1, SnowSource><1384.38><48.65179><Radial~410~-148~55~154.6025~1~1, SnowSource><1071.363><20.64575><UnSnow~222~36~50~86.60254~0.3478261~0, ScavengerTreasury><1584.603><2276.079><-2~123, LanternOnStick><1646.628><2324.904><18~-120, DevToken><1629.779><2288.839><19~-70~0~0~0~~White|Yellow|Red|Rivulet|Artificer|Saint|Spear|Gourmand~0~0~0~1~0~0~0~1, 
+FadePalette: 40, 0.4021739, 0.3369565, 0.2608696, 0.1521739, 0.2826087, 0.3695652

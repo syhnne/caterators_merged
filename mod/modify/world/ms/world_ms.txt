@@ -1,3 +1,7 @@
+[FINDLINESTART]MS_bitteraerie6 :
+[REPLACE_1]MS_bitteraerie6 : MS_COMMS, MS_RL_01, MS_bitteraeriedown
+
+
 [MERGE]
 CONDITIONAL LINKS
 SRSslugcat : MS_MEM06 : 1 : MS_ARTERY12
@@ -6,5 +10,17 @@ SRSslugcat : MS_CAPI04 : 1 : MS_bitteraccess
 SRSslugcat : MS_bitteraccess : 1 : MS_CAPI04
 SRSslugcat : EXCLUSIVEROOM : MS_ARTERY12
 SRSslugcat : EXCLUSIVEROOM : MS_CAPI04
+
+FPslugcat : REPLACEROOM : MS_bitteraerie6 : MS_bitteraerie6_RL
+SRSslugcat : REPLACEROOM : MS_bitteraerie6 : MS_bitteraerie6_RL
+NSHslugcat : REPLACEROOM : MS_bitteraerie6 : MS_bitteraerie6_RL
+Moonslugcat : REPLACEROOM : MS_bitteraerie6 : MS_bitteraerie6_RL
+
 END CONDITIONAL LINKS
+
+ROOMS
+MS_bitteraerie6_RL : MS_COMMS, MS_RL_01, MS_bitteraeriedown
+MS_RL_01 : GATE_MS_RL, MS_bitteraerie6
+GATE_MS_RL : RL_postgate, MS_RL_01 : GATE
+END ROOMS
 [ENDMERGE]

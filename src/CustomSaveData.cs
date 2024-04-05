@@ -114,7 +114,6 @@ public static class CustomSaveData
         public bool alt2ending_nsh { get; set; }
         public bool alt2ending_moon { get; set; }
 
-        public List<AbstractPhysicalObject>[] nshInventory { get; set; }
     }
 
 
