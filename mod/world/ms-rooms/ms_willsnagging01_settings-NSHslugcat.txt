@@ -1,10 +1,10 @@
 Template: NONE
-DangerType: AerieBlizzard
+DangerType: Blizzard
 CeilingDrips: 0.2826087
 RainIntensity: 0.2717391
-WaveSpeed: 0.5004707
-WaveLength: 0.9997647
-WaveAmplitude: 8.649492E-06
+WaveSpeed: 0.498288
+WaveLength: 0.9312093
+WaveAmplitude: 0.01358695
 SecondWaveLength: 0.1666667
 SecondWaveAmplitude: 0
 Clouds: 0.04347826

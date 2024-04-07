@@ -8,12 +8,8 @@ namespace Caterators_by_syhnne;
 // TODO: 显示啊！tnnd，为什么不显示！！
 internal class ConfigOptions : OptionInterface
 {
-    public static ConfigOptions Instance { get; } = new();
-    public static void RegisterOI()
-    {
-        if (MachineConnector.GetRegisteredOI(Plugin.MOD_ID) != Instance)
-            MachineConnector.SetRegisteredOI(Plugin.MOD_ID, Instance);
-    }
+    
+ 
 
 
     internal readonly int DefaultExplosionCapacity = 10;
@@ -25,7 +21,7 @@ internal class ConfigOptions : OptionInterface
 
     public ConfigOptions()
     {
-        ExplosionCapacity = config.Bind<int>("ExplosionCapacity", 10);
+        ExplosionCapacity = config.Bind<int>("ExplosionCapacity", DefaultExplosionCapacity);
         GravityControlKey = config.Bind<KeyCode>("GravityControlKey", KeyCode.G);
         CraftKey = config.Bind<KeyCode>("CraftKey", KeyCode.None);
         InventoryKey = config.Bind<KeyCode>("InventoryKey", KeyCode.D);

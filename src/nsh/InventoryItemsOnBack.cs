@@ -30,6 +30,9 @@ namespace Caterators_by_syhnne.nsh;
 
 // 卧槽 物品不能带进新区域啊
 
+/// <summary>
+/// 提供一些好看的视觉效果（但写得我cpu要烧了
+/// </summary>
 public class InventoryItemsOnBack
 {
     public Inventory inventory;
@@ -185,7 +188,7 @@ public class InventoryItemsOnBack
             {
                 this.lightSource.setPos = new Vector2?(player.firstChunk.pos);
                 this.lightSource.setRad = 250f * Mathf.Sqrt(lanternCount);
-                this.lightSource.setAlpha = lanternCount;
+                this.lightSource.setAlpha = Mathf.Sqrt(lanternCount);
                 if (this.lightSource.slatedForDeletetion || this.lightSource.room != player.room)
                 {
                     this.lightSource = null;
@@ -284,7 +287,6 @@ public class SpearOnBack : ItemsOnBack
         base.Add(obj);
         owner.player.room.PlaySound(SoundID.Slugcat_Stash_Spear_On_Back, owner.player.mainBodyChunk);
         spear.ChangeMode(Weapon.Mode.OnBack);
-        Plugin.Log("spearonback.add ???!!!!!!!!!!!!!!!!!!", spear.mode);
     }
 
 
@@ -295,7 +297,6 @@ public class SpearOnBack : ItemsOnBack
         spear.ChangeMode(Weapon.Mode.Free);
         owner.player.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, owner.player.mainBodyChunk);
         // spear.PlaceInRoom(owner.player.room);
-        Plugin.Log("spearonback.add ???!!!!!!!!!!!!!!!!!!", spear.mode);
         spear = null;
     }
         

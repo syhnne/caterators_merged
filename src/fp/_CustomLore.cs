@@ -21,6 +21,7 @@ namespace Caterators_by_syhnne.fp;
 
 
 // TODO: 你先别急，让我先急，我想改点东西，玩家时间结束了也可以玩，只不过画面很阴间，约等于没法玩
+// TODO: 用roomsettings把监视者投影那个补回来。其实我怀疑补不回来，这玩意儿不是我随便想加就能加的。实在不行的话我记得哪个模组有这个功能来着
 internal class CustomLore
 {
 

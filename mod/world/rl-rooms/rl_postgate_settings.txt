@@ -1,10 +1,11 @@
 Template: RL_SettingsTemplate_Aerie
-WaveSpeed: 0.5112515
-WaveLength: 0.9943742
-WaveAmplitude: 1.287724E-10
+WaveSpeed: 0.4997905
+WaveLength: 0.9998953
+WaveAmplitude: 1.503536E-12
 SecondWaveLength: 0.1666667
 SecondWaveAmplitude: 0
 Clouds: 0
 Grime: 0.09782609
-PlacedObjects: SnowSource><350.8753><343.5936><Radial~-147~226~50~86.60254~0.3152174~0.2282609, SnowSource><662.7502><362.05><Radial~-205~-187~50~86.60254~0.3695652~0.3695652, 
+PlacedObjects: SnowSource><337.8753><345.5936><Radial~-154~248~-368~121.6026~0.3152174~0.2282609, SnowSource><689.7502><374.05><Radial~-220~-248~-334~191.6025~0.4456522~0.3695652, Lantern><561.696><454.4604><0~0~3~6, LightSource><520.8444><349.6245><0.2826087~EffectColor1~-68~106~-366~-283.3975~1~1~None~0~0, 
+Triggers: Spot<tA>event<tB>MusicEvent<eA>songName<eB>RW_59 - Lost City<eA>vol<eB>0.3<eA>prio<eB>0.5<eA>mxThrt<eB>1<eA>loop<eB>0<eA>droneTol<eB>0<eA>rooms<eB>-1<eA>rest<eB>5<eA>fadeIn<eB>0<eA>oneSongPerCycle<eB>1<eA>stopAtDeath<eB>1<eA>stopAtGate<eB>1<tA>multiUse<tB>1<tA>toCycle<tB>-1<tA>fromCycle<tB>0<tA>delay<tB>0<tA>panPos<tB>642.3739<tB>439.8448<tA>fireChance<tB>1<tA>entrance<tB>2<tA>karma<tB>0<tA>slugcats<tB>White|Yellow|Red|Rivulet|Artificer|Saint|Spear|Gourmand<tA>pos<tB>496.3739<tB>346.8448<tA>handlePos<tB>-125.3553<tB>-162.3553, 
 FadePalette: 10, 0.1521739

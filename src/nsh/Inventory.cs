@@ -10,15 +10,25 @@ using static Caterators_by_syhnne.CustomSaveData;
 using System.Security.Permissions;
 using Fisobs.Core;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Caterators_by_syhnne.nsh;
 
 
-// TODO: 修复跨区域时背包内物品会消失的bug
+
+
+
+#pragma warning disable CS0162 // 检测到无法访问的代码
+
+
+// TODO: 加一个背包装满的动画效果
+// TODO: 修复背上的矛能被香菇吃掉的bug（？
+// 我比较好奇猎手有没有遇到过这个问题 呃 应该没有过罢 一般蛞蝓猫应该没有香菇都吃到自己背上来了还能生还的经历 要不就不修了
 public class Inventory
 {
     /// <summary>
     /// 让nsh可以把任何东西装进背包，包括大型生物的尸体，包括联机队友。如果装了moregrabs我不知道会发生什么。
+    /// 还是别给玩家启用这个了，我怕savetostring的时候崩游戏
     /// </summary>
     /// 等我抽空试试能不能把五卵石打包带走
     private const bool unlimited = false;
@@ -53,7 +63,7 @@ public class Inventory
         get
         {
             return (player.Consious && !player.dead && player.stun == 0
-            && Input.GetKey(Plugin.instance.option.InventoryKey.Value)
+            && Input.GetKey(Plugin.instance.configOptions.InventoryKey.Value)
             && player.animation != Player.AnimationIndex.ZeroGPoleGrab);
         }
     }
@@ -61,30 +71,60 @@ public class Inventory
 
     public void UpdateLog()
     {
-        string str = "--inventory:";
-        foreach (AbstractPhysicalObject item in Items)
-        {
-            str += item.GetType().Name + " ";
-        }
-        Plugin.Log(str);
-        Plugin.Log("--capacity:", currCapacity);
+        Plugin.Log("--inventory capacity:", currCapacity, "count:", Items.Count);
+        // Plugin.Log("--savetostring:", SaveToString());
     }
 
 
     public string SaveToString()
     {
-        // 这波属于把fisobs用到极致了
-        // 别问我为啥要这么多字来存档，问就是怕我自己不认得
-        // 没事了，我发现fisobs似乎没有loadfromstring这种东西，还是使用我的传统异能，把变量甩到plugin实例里面暂存吧（。
-        string str = "<startNSHINVENTORY>";
+        // 不按他的格式存了，反正这是我自己读取又不是他帮我读取（？
+        string str = "";
+        if (unlimited) { return str; }
         foreach (AbstractPhysicalObject obj in Items)
         {
-            str += obj.SaveToString();
+            str += obj.ToString();
             // 这是分隔符（。
             str += "<!>";
         }
-        str += "<endNSHINVENTORY>";
+        str += "";
         return str;
+    }
+
+
+    
+    public List<AbstractPhysicalObject> LoadFromString(World world, string str, bool keepSpears)
+    {
+
+        List<AbstractPhysicalObject> result = new();
+        string[] data = Regex.Split(str, "<!>");
+
+        foreach (string d in data)
+        {
+            if (d.Count() > 0)
+            {
+                result.Add(SaveState.AbstractPhysicalObjectFromString(world, d));
+            }
+        }
+        if (keepSpears)
+        {
+            if (result.Count() != Items.Count) { throw new Exception("items.count?"); }
+            List<AbstractPhysicalObject> result2 = new();
+
+            for (int i = 0; i < Items.Count; i++) 
+            { 
+                if (Items[i] is AbstractSpear)
+                {
+                    result2.Add(Items[i]);
+                }
+                else
+                {
+                    result2.Add(result[i]);
+                }
+            }
+            return result2;
+        }
+        return result;
     }
 
 
@@ -97,18 +137,18 @@ public class Inventory
 
         // 和plugin实例存储对照检查
         // 这真是个烂方法，除了我没人想得出来那种
-        if (IsActive != lastIsActive && player.room != null && Items.Count == 0)
+        // 他烂就烂在我该什么时候读这个数据。。我想不好。。
+        if (!unlimited && player.room != null && IsActive != lastIsActive && Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] != null)
         {
-            if (Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] != null)
-            {
-                Plugin.Log("inventory empty check, player", player.abstractCreature.ID.number);
-                Items = Plugin.instance.nshInventoryList[player.abstractCreature.ID.number];
-                ReloadCapacity();
-                hud?.ResetObjects();
-                Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] = null;
-            }
+            Items = LoadFromString(player.room.world, Plugin.instance.nshInventoryList[player.abstractCreature.ID.number], true);
+            Plugin.Log("inventory empty check for player", player.abstractCreature.ID.number, Items.Count);
+            UpdateLog();
+            ReloadCapacity();
+            hud?.ResetObjects();
+            Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] = null;
+            Plugin.Log("null?", Plugin.instance.nshInventoryList[player.abstractCreature.ID.number] == null);
         }
-       
+
         if (IsActive && inputY == 1 && lastInputY != 1)
         {
             for (int i = 0; i < 2; i++)
@@ -125,6 +165,7 @@ public class Inventory
         {
             RemoveObject(eu);
         }
+        
 
         lastInputY = inputY;
         lastIsActive = IsActive;
@@ -136,6 +177,7 @@ public class Inventory
 
     public void AddObject(PhysicalObject obj)
     {
+        ReloadCapacity();
         if (obj == null || obj.abstractPhysicalObject == null)
         { 
             throw new ArgumentNullException("null obj:" + nameof(obj));
@@ -171,7 +213,7 @@ public class Inventory
     public void RemoveObject(bool eu)
     {
         if (player.room == null || Items.Count <= 0) {  return; }
-
+        ReloadCapacity();
         AbstractPhysicalObject obj = Items[Items.Count - 1];
         
         Items.Remove(obj);
@@ -188,9 +230,9 @@ public class Inventory
         }
         else
         {
-            player.room.abstractRoom.AddEntity(obj);
+            
             obj.pos = player.abstractCreature.pos;
-            obj.RealizeInRoom();
+            obj.Spawn();
         }
         
         PhysicalObject realObj = obj.realizedObject;
@@ -239,6 +281,7 @@ public class Inventory
     }
 
 
+    // 爆装备（不是
     public void RemoveAllObjects()
     {
         if (player.room == null || Items.Count <= 0) { return; }
@@ -252,9 +295,8 @@ public class Inventory
             }
             else
             {
-                player.room.abstractRoom.AddEntity(obj);
                 obj.pos = player.abstractCreature.pos;
-                obj.RealizeInRoom();
+                obj.Spawn();
             }
             
         }
@@ -268,15 +310,33 @@ public class Inventory
     }
 
 
-    // 寄，我突然想起来这个事和玩家绑定的，而不是和游戏绑定的，多人游戏下不太好保存
-    // 有一个小阴招，就是在游戏存档的那一瞬间之前，把背包里所有东西吐出来，剩下的交给游戏自身机制
-    // 算了，先这样凑活一下
-    public void Save(RainWorldGame game)
+    // 全部移除，但不realize
+    public string CycleEndSave()
     {
-
- 
-    
+        string result = SaveToString();
+        foreach (AbstractPhysicalObject obj in Items)
+        {
+            if (obj.realizedObject != null && (obj.realizedObject is Spear))
+            {
+                // 别删这输出日志 他是代码而不是单纯的输出日志
+                Plugin.Log("retrieve item from back:", itemsOnBack.RemoveItem(obj.realizedObject));
+                obj.realizedObject.AllGraspsLetGoOfThisObject(true);
+                player.room.RemoveObject(obj.realizedObject);
+                obj.realizedObject = null;
+                player.room.abstractRoom.RemoveEntity(obj);
+                
+            }
+            else
+            {
+                obj.pos = player.abstractCreature.pos;
+            }
+        }
+        ReloadCapacity();
+        hud?.ResetObjects();
+        return result;
     }
+
+
 
 
 
@@ -308,7 +368,7 @@ public class Inventory
     }*/
 
 
-    #pragma warning disable CS0162 // 检测到无法访问的代码
+    
     public int ItemVolumeFromAbstr(AbstractPhysicalObject obj)
     {
         if (unlimited) return 0;

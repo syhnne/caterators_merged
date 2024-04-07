@@ -8,7 +8,7 @@ overseersSpawnChance: 0.0
 overseersMin: 0
 overseersMax: 1
 playerGuideOverseerSpawnChance: 0.0
-earlyCycleChance: 0.02
+earlyCycleChance: 0.0
 earlyCycleFloodChance: 0.0
 pupSpawnChance: 0.0
 Subregion: Frostveiled Relics

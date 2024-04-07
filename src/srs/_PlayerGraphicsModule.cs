@@ -18,7 +18,7 @@ public class PlayerGraphicsModule
     internal static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, };
 
 
-    public static void PlayerGraphics_Update(PlayerGraphics self, PlayerModule module)
+    public static void PlayerGraphics_Update(PlayerGraphics self, _public.PlayerModule module)
     {
 
     }

@@ -18,8 +18,8 @@ namespace Caterators_by_syhnne.nsh;
 // 而且他这是双重意义上的穿墙，他在物理上穿墙，在贴图上也穿墙，，
 // 他不仅能穿墙，还特么能瞬移，，我真的谢
 // 好了，修好了。看来我以前写的代码已经很好了，只是忘了先更新attachPos
-// TODO: 但联机队友被围巾遮挡这事我真没办法（汗）这可是连机猫都会遇到的bug啊，要不我就不修了罢（你
-public class Scarf
+// TODO: 但联机队友被围巾遮挡这事我真没办法（汗）因为它本来就在background上面了，我横不能给这个围巾另加一个图层罢
+public class Scarf : IDrawable
 {
 
     public PlayerGraphics owner;
@@ -43,7 +43,7 @@ public class Scarf
 
 
 
-    public void InitiateSprite(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+    public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
         // Plugin.Log("nshScarf initesprite");
         sLeaser.sprites[startSprite] = TriangleMesh.MakeLongMesh(this.rag.GetLength(0), false, false);
@@ -55,7 +55,7 @@ public class Scarf
 
 
     // 全复制的，一点也不敢动（。
-    public void DrawSprite(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+    public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
         // attach pos
         Vector2 vector = Vector2.Lerp(owner.player.firstChunk.lastPos, owner.player.firstChunk.pos, timeStacker);

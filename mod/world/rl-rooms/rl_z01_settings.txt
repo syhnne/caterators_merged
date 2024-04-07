@@ -1,11 +1,13 @@
-RainIntensity: 0.6086956
+RainIntensity: 0.1086956
 RumbleIntensity: 0.6739131
-WaveSpeed: 0.4888435
-WaveLength: 0.9944218
-WaveAmplitude: 1.096368E-09
+WaveSpeed: 0.4999243
+WaveLength: 0.9999622
+WaveAmplitude: 4.044044E-12
 SecondWaveLength: 0.1666667
 SecondWaveAmplitude: 0
-Effects: Dustpuffs-0.4021739-29-90, MyRoofTopView_syhnne-1-312-180-position:26.52177, SkyBloom-0.1086956-310-56, 
-PlacedObjects: SnowSource><680.1696><688.106><None~636~-661~-123~-209.3975~0.423913~0.423913, DayNightSettings><318.4462><534.7889><5~8.660254~23~10, LightBeam><319.1933><78.69882><185~577~204~577~259~-4~-235~192~0.5630437~0~0~1~None~0~1, 
+Effects: Dustpuffs-0.4021739-29-90, SkyBloom-0.1086956-310-56, 
+PlacedObjects: SnowSource><680.1696><688.106><None~636~-661~-123~-209.3975~0.423913~0.423913, DayNightSettings><318.4462><534.7889><5~8.660254~23~10, 
 AmbientSounds: OMNI><AM_WIN-HowlingWnd.ogg><805.55><229.7533><0.3369565><1, 
-FadePalette: 40, 0.1086956
+FadePalette: 40, 0.2065217
+BackgroundOffset: -2391.304,1630.435
+BackgroundType: rlrooftopview

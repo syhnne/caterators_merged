@@ -67,13 +67,10 @@ public class PlayerGraphicsModule
             }
             else
             {
-                if (sLeaser.sprites[i].element.name.StartsWith(sLeaser.sprites[i].element.name))
+                if (Futile.atlasManager.DoesContainElementWithName("fp_" + sLeaser.sprites[i].element.name))
                 {
-                    if (Futile.atlasManager.DoesContainElementWithName("fp_" + sLeaser.sprites[i].element.name))
-                    {
-                        // Plugin.Log("element:          ", sLeaser.sprites[i].element.name);
-                        sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "fp_" + sLeaser.sprites[i].element.name));
-                    }
+                    // Plugin.Log("element:          ", sLeaser.sprites[i].element.name);
+                    sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "fp_" + sLeaser.sprites[i].element.name));
                 }
 
             }

@@ -15,12 +15,12 @@ namespace Caterators_by_syhnne.effects;
 
 
 
-
+// 这东西自打写出以来，我只见他运行过一次，就是显示了一些满屏幕乱飘的贴图，然后我退了一下游戏，后来他再也没显示过
 public class MyRoofTopView : BackgroundScene
 {
     public bool isRL;
 
-    private float floorLevel = 5f;
+    private float floorLevel = 26f;
 
     public Color atmosphereColor = new Color(0.16078432f, 0.23137255f, 0.31764707f);
 
@@ -38,7 +38,7 @@ public class MyRoofTopView : BackgroundScene
     { 
         this.room = room;
         this.data = data;
-        floorLevel = data.GetFloat("floorLevel");
+        // floorLevel = data.GetFloat("floorLevel");
         isRL = (room.world.region != null && room.world.region.name == "RL") || room.abstractRoom.name.StartsWith("RL");
 
         if (isRL)
@@ -149,7 +149,7 @@ public class MyRoofTopView : BackgroundScene
     public override void Update(bool eu)
     {
         base.Update(eu);
-        floorLevel = data.GetFloat("floorLevel");
+        // floorLevel = data.GetFloat("floorLevel");
         if ((this.room.game.cameras[0].effect_dayNight > 0f && this.room.world.rainCycle.timer >= this.room.world.rainCycle.cycleLength) || (ModManager.Expedition && this.room.game.rainWorld.ExpeditionMode))
         {
             float num = 1320f;

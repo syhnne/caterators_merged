@@ -91,7 +91,7 @@ public class PlayerGraphicsModule
 
         self.gown.InitiateSprite(self.gownIndex, sLeaser, rCam);
 
-        module.nshScarf.InitiateSprite(sLeaser, rCam);
+        module.nshScarf.InitiateSprites(sLeaser, rCam);
 
         self.AddToContainer(sLeaser, rCam, null);
     }
@@ -159,7 +159,7 @@ public class PlayerGraphicsModule
                 sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "nsh_" + sLeaser.sprites[i].element.name));
             }
         }
-        module.nshScarf?.DrawSprite(sLeaser, rCam, timeStacker, camPos);
+        module.nshScarf?.DrawSprites(sLeaser, rCam, timeStacker, camPos);
     }
 
 

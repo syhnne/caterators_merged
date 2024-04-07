@@ -1,0 +1,5 @@
+SI_Landscape - 5 : 15
+SI_Landscape - 4 : 6
+SI_Landscape - 3 : 2.2
+SI_Landscape - 2 : 0.9 : LightEdges
+SI_Landscape - 1 : 0.4

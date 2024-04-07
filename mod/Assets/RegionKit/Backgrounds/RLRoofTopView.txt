@@ -1,0 +1,17 @@
+
+PROTECTED
+Parent: none
+Type: AboveCloudsView
+OffsetX: 0
+OffsetY: 750
+---------------
+
+startAltitude: -15000
+cloudsCount: 2
+atmosphereColor: 777777
+
+DistantBuilding: Rf_HoleFix, -316, -24, 600, -200
+DistantBuilding: RF_CityA_DM, -648, 0, 90, -200
+DistantBuilding: RF_CityB_DM, 156, 0, 100, -200
+DistantBuilding: RF_CityC_DM, -242, 0, 110, -200
+DistantBuilding: RL_city1, -302, 0, 320, -200

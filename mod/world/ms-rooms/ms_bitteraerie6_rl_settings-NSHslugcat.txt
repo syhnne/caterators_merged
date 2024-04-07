@@ -3,9 +3,9 @@ DangerType: Blizzard
 CeilingDrips: 0
 RainIntensity: 1
 RumbleIntensity: 1
-WaveSpeed: 0.4436405
-WaveLength: 0.7268202
-WaveAmplitude: 0.04999999
+WaveSpeed: 0.4323462
+WaveLength: 0.8008987
+WaveAmplitude: 0.0343801
 SecondWaveLength: 1
 SecondWaveAmplitude: 0.0001
 Clouds: 0.06521739
@@ -18,4 +18,3 @@ PlacedObjects: SnowSource><2200.808><441.5562><Strip~480~-16~-80~-160.3975~0.880
 AmbientSounds: OMNI><AM_WIN-MedWind.ogg><745.869><537.4011><0.6521739><1, OMNI><AM_WIN-HowlingWnd.ogg><741.3217><463.5906><0.5652174><0.7847826, OMNI><MSC-MetalVariety.ogg><744.6196><382.6603><0.2173913><0.6869565, 
 FadePalette: 40, 0.5652174, 0.5543478, 0.5760869
 WetTerrain: OFF
-

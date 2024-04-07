@@ -20,7 +20,7 @@ END CONDITIONAL LINKS
 
 ROOMS
 MS_bitteraerie6_RL : MS_COMMS, MS_RL_01, MS_bitteraeriedown
-MS_RL_01 : GATE_MS_RL, MS_bitteraerie6
+MS_RL_01 : MS_bitteraerie6, GATE_MS_RL
 GATE_MS_RL : RL_postgate, MS_RL_01 : GATE
 END ROOMS
 [ENDMERGE]

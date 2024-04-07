@@ -27,7 +27,7 @@
         "food_max": 9,
 
         "guide_overseer": 2,
-        "start_room": "LC_streets",
+        "start_room": "RL_S01",
         "world_state": [ "NSHslugcat", "Rivulet", "Yellow" ],
         "timeline_after": "Yellow",
         "cycle_length_min": 5,

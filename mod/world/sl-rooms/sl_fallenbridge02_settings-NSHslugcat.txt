@@ -1,0 +1,14 @@
+WaveSpeed: 0.5041301
+WaveLength: 0.9965544
+WaveAmplitude: 0.1960906
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0.4891304
+RandomItemDensity: 0.2834695
+RandomItemSpearChance: 0.09946773
+Palette: 13
+EffectColorA: 6
+Effects: Fog-0.2934783-20-20, Darkness-0.02173913-0-0, Flies-0.1086956-37-125, LightRain-0.4347826-325-228, 
+PlacedObjects: DeadSeedCob><235.6143><221.6031><, 
+FadePalette: 35, 0.5
+BackgroundType: rlrooftopview

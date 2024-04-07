@@ -24,6 +24,48 @@ internal class PlayerHooks
 {
 
 
+    // 我是sb
+    public static void Player_ctor(Player self, AbstractCreature abstractCreature, World world)
+    {
+        if (world.game.IsStorySession && world.game.StoryCharacter == Enums.FPname)
+        {
+            int cycle = (world.game.session as StoryGameSession).saveState.cycleNumber;
+            bool altEnding = (world.game.session as StoryGameSession).saveState.deathPersistentSaveData.altEnding;
+            bool ascended = (world.game.session as StoryGameSession).saveState.deathPersistentSaveData.ascended;
+
+            Plugin.Log("Player_ctor - cycle: ", cycle, " altEnding: ", altEnding, "ascended:", ascended);
+
+            Plugin.instance.MinFoodNow = Plugin.MinFood;
+            self.slugcatStats.maxFood = Plugin.MaxFood;
+            if (self.Malnourished)
+            {
+                Plugin.instance.MinFoodNow = Plugin.MaxFood;
+            }
+            else if (!altEnding && !ascended)
+            {
+                Plugin.instance.MinFoodNow = Math.Min(fp.PlayerHooks.CycleGetFood(cycle), Plugin.MaxFood);
+            }
+
+            if (!altEnding && !ascended && cycle > 5)
+            {
+                self.redsIllness = new RedsIllness(self, cycle - 5);
+            }
+            else if (altEnding && !ascended && world.game.GetDeathPersistent().CyclesFromLastEnterSSAI > 5)
+            {
+                self.redsIllness = new RedsIllness(self, world.game.GetDeathPersistent().CyclesFromLastEnterSSAI - 5);
+            }
+
+            if (!altEnding)
+            {
+                self.slugcatStats.foodToHibernate = Plugin.instance.MinFoodNow;
+                Plugin.Log("Player_ctor - minfoodnow: ", Plugin.instance.MinFoodNow, "food to hibernate(after): ", self.slugcatStats.foodToHibernate, " maxfood: ", Plugin.MaxFood);
+            }
+        }
+    }
+
+
+
+
     public static void Player_Update(Player self, bool eu, bool isMyStory)
     {
         self.redsIllness?.Update();

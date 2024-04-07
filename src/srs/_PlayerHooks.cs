@@ -42,13 +42,15 @@ internal class PlayerHooks
     {
         // 为了防止玩家发现虚空流体就是水这个事实（。
         WaterUpdate(self, self.room);
-        /*if (self.room != null && self.room.blizzard && self.Hypothermia > 0f)
+        // 体温高的话，热传递效率高，更容易被冻死，很合理吧（你
+        // 这个跟肚子里有多少吃的有关，众所周知饿着肚子更容易冷
+        if (self.room != null && self.room.blizzard)
         {
-            self.Hypothermia -= Mathf.Lerp((self.Malnourished? 1 : 3) * RainWorldGame.DefaultHeatSourceWarmth, 0f, self.HypothermiaExposure);
-        }*/
+            self.Hypothermia += Mathf.Lerp((Mathf.Lerp(self.Malnourished ? 1f : 2f, 0f, (self.FoodInStomach / self.MaxFoodInStomach))) * RainWorldGame.DefaultHeatSourceWarmth, 0f, self.HypothermiaExposure);
+        }
     }
 
-
+    
 
 
 
@@ -71,7 +73,7 @@ internal class PlayerHooks
             else if (player.grasps[i] != null && player.grasps[i].grabbed is BubbleGrass)
             {
                 BubbleGrass bubbleGrass = player.grasps[i].grabbed as BubbleGrass;
-                Plugin.Log("bubbleGrass oxygen left:", bubbleGrass.AbstrBubbleGrass.oxygenLeft);
+                // Plugin.Log("bubbleGrass oxygen left:", bubbleGrass.AbstrBubbleGrass.oxygenLeft);
                 if (player.animation == Player.AnimationIndex.SurfaceSwim)
                 {
                     bubbleGrass.AbstrBubbleGrass.oxygenLeft = Mathf.Max(0f, bubbleGrass.AbstrBubbleGrass.oxygenLeft - 0.0009090909f);
@@ -235,7 +237,7 @@ internal class PlayerHooks
         if (self.Spear_NeedleCanFeed() && result.obj is SeedCob
             && self.thrownBy is Player && (self.thrownBy as Player).slugcatStats.name == Enums.SRSname)
         {
-            (self.thrownBy as Player).AddFood(8);
+            (self.thrownBy as Player).AddFood(9);
         }
 
         bool res = orig(self, result, eu);

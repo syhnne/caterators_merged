@@ -1,7 +1,7 @@
 {
     "id": "SRSslugcat",
 	"name": "srs",
-	"description": "记得把出生点改回OE_S04",
+	"description": "overpowered",
 	"features": {
 
 
@@ -31,7 +31,7 @@
 		"loudness": [ 1.5, 1.2 ],
 
 		"guide_overseer": 3,
-		"start_room": "RL_postgate",
+		"start_room": "OE_S04",
 		"world_state": [ "SRSslugcat", "White" ],
 		"timeline_after": "White",
 		"cycle_length_min": 15,
@@ -45,8 +45,7 @@
 		},
 
 		"alignments": {
-			"Scavengers": { "like": 0 },
-			"lizards": { "like": 0 }
+
 		}
 	}
 }
