@@ -236,12 +236,14 @@ public class DeathPreventer
 {
     public Player player;
     public int justPreventedCounter;
+    // public moon.SwarmerManager? swarmerManager;
 
     public DeathPreventer(Player player) 
     { 
         this.player = player;
         justPreventedCounter = 0;
         Plugin.Log("new deathPreventer for player", player.abstractCreature.ID.number);
+        
     }
 
 
@@ -253,6 +255,7 @@ public class DeathPreventer
         player.drown = 0f;
         player.lungsExhausted = false;
         player.stun = 0;
+        player.Hypothermia -= 0.1f;
         player.abstractCreature.tentacleImmune = true;
         player.abstractCreature.lavaImmune = true;
         player.abstractCreature.HypothermiaImmune = true;
@@ -316,6 +319,7 @@ public class DeathPreventer
         get
         {
             if (player == null || player.slatedForDeletetion) return null;
+            // TODO: 这个目前有bug，抓在手上的时候不好使。而且这个的触发逻辑其实有点奇妙，有的时候我压根没看出来自己咋死的就爆绿光了。
             if (player.grasps != null)
             {
                 foreach (var grasp in player.grasps)
@@ -332,7 +336,10 @@ public class DeathPreventer
             }
             if (Plugin.playerModules.TryGetValue(player, out var module))
             {
-                // 反倒是这个，一点问题也没有……上面的东西全是bug
+                if (module.swarmerManager != null && module.swarmerManager.CanConsumeSwarmer)
+                {
+                    // TODO: 
+                }
                 if (module.nshInventory != null)
                 {
                     foreach (AbstractPhysicalObject obj in module.nshInventory.Items)
@@ -343,7 +350,7 @@ public class DeathPreventer
                         }
                     }
                 }
-                // else if (moon...)
+                
             }
 
             return null;
@@ -415,7 +422,7 @@ public class DeathPreventer
                     {
                         flag3 = true;
                     }
-                    if (player.room.physicalObjects[m][n] is Creature && player.room.physicalObjects[m][n] != player && flag3)
+                    if (player.room.physicalObjects[m][n] is Creature && player.room.physicalObjects[m][n] is not Player && flag3)
                     {
                         Creature creature = player.room.physicalObjects[m][n] as Creature;
                         if (Custom.Dist(pos2, creature.firstChunk.pos) < 200f && (Custom.Dist(pos2, creature.firstChunk.pos) < 60f || player.room.VisualContact(player.abstractCreature.pos, creature.abstractCreature.pos)))
@@ -561,7 +568,7 @@ public class DeathPreventHUD : HudPart
         lastPos = pos;
         fade = 0f;
         lastFade = 0f;
-        circle.scale = 8f;
+        circle.scale = 4f;
         fContainer.AddChild(circle);
     }
 
@@ -587,10 +594,11 @@ public class DeathPreventHUD : HudPart
         }
         pos = owner.player.mainBodyChunk.pos - camPos;
 
+        circle.SetPosition(pos);
         circle.isVisible = true;
-        fade = (owner.justPreventedCounter / 120);
+        fade =((float)owner.justPreventedCounter / 120f);
 
-        
+        Plugin.Log(fade);
 
 
     }
@@ -605,7 +613,6 @@ public class DeathPreventHUD : HudPart
     public override void Draw(float timeStacker)
     {
         if (hud.rainWorld.processManager.currentMainLoop is not RainWorldGame) return;
-
         circle.alpha = fade;
     }
 

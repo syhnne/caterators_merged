@@ -1,0 +1,16 @@
+DangerType: Blizzard
+CeilingDrips: 0
+RainIntensity: 0.8804348
+WaveSpeed: 0.4548969
+WaveLength: 0.7573398
+WaveAmplitude: 0.04527376
+SecondWaveLength: 1
+SecondWaveAmplitude: 0.0001
+Clouds: 0
+Palette: 13
+EffectColorA: 6
+EffectColorB: 0
+Effects: WaterDepth-0.07608695-257-228, SunBlock-1-328-315, Darkness-0.3043478-441-400, 
+PlacedObjects: SnowSource><968.8228><682.0928><Column~67~-37~-22.00006~-304.3975~0.8152174~0, SnowSource><1049.616><603.3987><Radial~126~-201~10~-97.39746~0.2934783~0.2173913, 
+FadePalette: 27, 0.2608696
+WetTerrain: OFF

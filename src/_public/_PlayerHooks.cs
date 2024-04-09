@@ -78,6 +78,7 @@ public class PlayerHooks
         fp.PlayerHooks.Apply();
         srs.PlayerHooks.Apply();
         nsh.PlayerHooks.Apply();
+        moon.PlayerHooks.Apply();
     }
 
 
@@ -119,7 +120,7 @@ public class PlayerHooks
         {
             // 谨记，挂在playermodule里面的东西，一律在playermodule那里进行update
             // 由于我刚搬运代码的时候乱写，我两周了才发现gravityController每帧update两次
-            bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && Enums.IsCaterator(module.playerName);
+            bool getModule = Plugin.playerModules.TryGetValue(self, out var module);
             if (getModule)
             {
                 module.Update(self, eu);
@@ -146,10 +147,9 @@ public class PlayerHooks
     private static void Player_NewRoom(On.Player.orig_NewRoom orig, Player self, Room newRoom)
     {
         orig(self, newRoom);
-        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
 
 
-        if (getModule && !self.dead && Enums.IsCaterator(self.SlugCatClass))
+        if (Plugin.playerModules.TryGetValue(self, out var module) && !self.dead)
         {
             module.gravityController?.NewRoom(module.IsMyStory);
         }
@@ -232,14 +232,11 @@ public class PlayerHooks
         {
             self.jumpBoost *= 1.2f;
         }
-        else if (self.SlugCatClass == Enums.SRSname)
+        else if (self.SlugCatClass == Enums.SRSname || self.SlugCatClass == Enums.Moonname)
         {
             self.jumpBoost *= 1.1f;
         }
-        else if (self.SlugCatClass == Enums.Moonname)
-        {
-            self.jumpBoost *= 1.3f;
-        }
+
 
     }
     #endregion
@@ -352,8 +349,7 @@ public class PlayerHooks
     // 启用重力控制时阻止y轴输入
     private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
     {
-        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
-        if (getModule)
+        if (Plugin.playerModules.TryGetValue(self, out var module))
         {
             if (module.gravityController != null && module.gravityController.isAbleToUse)
             {
@@ -374,8 +370,7 @@ public class PlayerHooks
     // 垃圾回收
     private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
     {
-        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
-        if (getModule)
+        if (Plugin.playerModules.TryGetValue(self, out var module))
         {
             module.gravityController?.Destroy();
             module.gravityController = null;
@@ -416,8 +411,7 @@ public class PlayerHooks
     private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
     {
         orig(self, cam);
-        bool getModule = Plugin.playerModules.TryGetValue(self.owner as Player, out var module) && module.isCaterator;
-        if (getModule)
+        if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module))
         {
             Plugin.Log("HUD added");
             if (module.gravityController != null)

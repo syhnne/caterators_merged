@@ -1,0 +1,19 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+RainIntensity: 0.8152174
+RumbleIntensity: 0.5760869
+WaveSpeed: 0.474731
+WaveLength: 0.7835612
+WaveAmplitude: 0.04076085
+SecondWaveLength: 1
+SecondWaveAmplitude: 0.0001
+Clouds: 0.5108696
+Grime: 0.5234604
+Palette: 0
+EffectColorA: 6
+EffectColorB: 6
+Effects: Fog-0.5-20-20, Darkness-0-28-67, BorderPushBack-0.1029444-197-132, 
+PlacedObjects: InsectGroup><274.1682><325.6055><33.43852~158.3396~0~0~TinyDragonFly~0.2989363, SnowSource><638.3727><413.908><Radial~636~244~96~-128.3974~0.4021102~0.173913, SnowSource><1690.748><457.05><Radial~613~235~50~86.60254~0.4891304~0.25, SnowSource><2723.517><378.4492><Radial~672~359~50~86.60254~0.5434783~0.1413043, 
+FadePalette: 40, 0.3043478, 0.3043478, 0.3043478
+WetTerrain: OFF

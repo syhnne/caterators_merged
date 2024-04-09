@@ -16,6 +16,7 @@ using MonoMod.Cil;
 using Menu.Remix.MixedUI;
 using System.ComponentModel;
 using System.Linq;
+using System.Xml.Schema;
 
 namespace Caterators_by_syhnne._public;
 
@@ -47,6 +48,7 @@ public class PlayerGraphicsModule
 
 
     // 防止联机背背时图层出问题
+    // 淦 联机那是因为所有东西都在background上了 所以防不住 拉倒罢
     private static void Player_SlugOnBack_ChangeOverlap(On.Player.SlugOnBack.orig_ChangeOverlap orig, Player.SlugOnBack self, bool newOverlap)
     {
         orig(self, newOverlap);
@@ -85,6 +87,10 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.PlayerGraphics_ctor(self, ow);
         }
+        else if (self.player.SlugCatClass == Enums.Moonname)
+        {
+            moon.PlayerGraphicsModule.PlayerGraphics_ctor(self, ow);
+        }
     }
 
 
@@ -122,6 +128,10 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
         }
+        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
+        {
+            moon.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
+        }
     }
 
 
@@ -136,6 +146,10 @@ public class PlayerGraphicsModule
         else if (self.player.SlugCatClass == Enums.NSHname)
         {
             nsh.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
+        }
+        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
+        {
+            moon.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
         }
     }
 
@@ -155,6 +169,10 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
         }
+        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
+        {
+            moon.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
+        }
     }
 
 
@@ -173,5 +191,6 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
         }
+        
     }
 }

@@ -63,60 +63,66 @@ class Plugin : BaseUnityPlugin
 
     public void OnEnable()
     {
-        Logger = base.Logger;
-        instance = this;
-        configOptions = new ConfigOptions();
-        On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-        MachineConnector.SetRegisteredOI(Plugin.MOD_ID, configOptions);
-        MachineConnector._RefreshOIs();
-        
-
-        Content.Register(new OxygenMaskModules.OxygenMaskFisob());
-        Content.Register(new ReviveSwarmerModules.ReviveSwarmerFisob());
-
-
-        On.RainWorldGame.Update += RainWorldGame_Update;
-        On.World.GetNode += World_GetNode;
-        // On.SaveState.AbstractPhysicalObjectFromString += SaveState_AbstractPhysicalObjectFromString;
-
-
-        _public.PlayerHooks.Apply();
-        _public.PlayerGraphicsModule.Apply();
-        _public.CustomLore.Apply();
-        _public.SLOracleHooks.Apply();
-        _public.SSRoomEffects.Apply();
-        _public.DeathPreventHooks.Apply();
-        CustomSaveData.Apply();
-        fp.ShelterSS_AI.Apply();
-        /*new EffectDefinitionBuilder("MyRoofTopView_syhnne")
-            .AddFloatField("position", 0f, 100f, 1f, 26f, "floorLevel")
-            .SetUADFactory((room, data, firstTimeRealized) => new MyRoofTopView(room, data))
-            .SetCategory("POMEffectsExamples")
-            .Register();*/
-
-        // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
-        _public.SSOracleHooks.Apply();
-
-        /*try
+        try
         {
-            
+            Logger = base.Logger;
+            instance = this;
+            configOptions = new ConfigOptions();
+            On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+            MachineConnector.SetRegisteredOI(Plugin.MOD_ID, configOptions);
+            MachineConnector._RefreshOIs();
+
+
+            Content.Register(new OxygenMaskModules.OxygenMaskFisob());
+            Content.Register(new ReviveSwarmerModules.ReviveSwarmerFisob());
+
+
+            On.RainWorldGame.Update += RainWorldGame_Update;
+            On.World.GetNode += World_GetNode;
+            // On.SaveState.AbstractPhysicalObjectFromString += SaveState_AbstractPhysicalObjectFromString;
+
+
+            _public.PlayerHooks.Apply();
+            _public.PlayerGraphicsModule.Apply();
+            _public.CustomLore.Apply();
+            _public.SLOracleHooks.Apply();
+            _public.SSRoomEffects.Apply();
+            _public.DeathPreventHooks.Apply();
+            CustomSaveData.Apply();
+            fp.ShelterSS_AI.Apply();
+            /*new EffectDefinitionBuilder("MyRoofTopView_syhnne")
+                .AddFloatField("position", 0f, 100f, 1f, 26f, "floorLevel")
+                .SetUADFactory((room, data, firstTimeRealized) => new MyRoofTopView(room, data))
+                .SetCategory("POMEffectsExamples")
+                .Register();*/
+
+            // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
+            _public.SSOracleHooks.Apply();
         }
-        catch (Exception ex) 
-        { 
+        catch (Exception ex)
+        {
             Logger.LogError(ex);
             throw;
-        }*/
+        }
     }
     
     private void LoadResources(RainWorld rainWorld)
     {
-        Futile.atlasManager.LoadAtlas("atlases/fp_tail");
-        Futile.atlasManager.LoadAtlas("atlases/fp_head");
-        Futile.atlasManager.LoadAtlas("atlases/fp_arm");
-        Futile.atlasManager.LoadImage("overseerHolograms/fpslugcatHologram");
-        Futile.atlasManager.LoadAtlas("atlases/srs_head");
-        Futile.atlasManager.LoadAtlas("atlases/srs_tail");
-        Futile.atlasManager.LoadAtlas("atlases/nsh_head");
+        try
+        {
+            Futile.atlasManager.LoadAtlas("atlases/fp_tail");
+            Futile.atlasManager.LoadAtlas("atlases/fp_head");
+            Futile.atlasManager.LoadAtlas("atlases/fp_arm");
+            Futile.atlasManager.LoadImage("overseerHolograms/PebblesSlugHologram");
+            Futile.atlasManager.LoadAtlas("atlases/srs_head");
+            Futile.atlasManager.LoadAtlas("atlases/srs_tail");
+            Futile.atlasManager.LoadAtlas("atlases/nsh_head");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex);
+            throw;
+        }
     }
 
 
@@ -139,19 +145,14 @@ class Plugin : BaseUnityPlugin
 
 
 
-
-
-
-
-
-
+    // 一些我的开发者模式专用按键
     private void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
     {
         orig(self);
 
+        // 按Y生成一个复活用的神经元
         if (DevMode && Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
         {
-            
             AbstractPhysicalObject abstr = new ReviveSwarmerModules.ReviveSwarmerAbstract(self.world, self.Players[0].pos, self.GetNewID(), true);
             abstr.destroyOnAbstraction = true;
             self.Players[0].Room.AddEntity(abstr);
@@ -159,7 +160,18 @@ class Plugin : BaseUnityPlugin
             abstr.realizedObject.firstChunk.pos = self.Players[0].realizedObject.firstChunk.pos;
             Plugin.Log("spawn ReviveSwarmer");
         }
+
+        // 按U时停，用于修改roomSettings
+        if (DevMode && Input.GetKeyDown(KeyCode.U))
+        {
+            self.rivuletEpilogueRainPause = !self.rivuletEpilogueRainPause;
+            Plugin.Log("ZA WARUDO");
+        }
     }
+
+
+
+
 
 
 

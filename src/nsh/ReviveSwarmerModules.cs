@@ -57,7 +57,7 @@ public class ReviveSwarmerModules
             this.bodyChunkConnections = new PhysicalObject.BodyChunkConnection[0];
             base.airFriction = 0.999f;
             base.gravity = 0.9f;
-            this.bounce = 0.4f;
+            this.bounce = 0.2f;
             this.surfaceFriction = 0.4f;
             base.waterFriction = 0.94f;
             base.buoyancy = 1.1f;
@@ -76,7 +76,7 @@ public class ReviveSwarmerModules
             this.lastLazyDirection = this.lazyDirection;
             this.lastRotation = this.rotation;
 
-            if (this.lightsource != null)
+            if (this.lightsource != null && Abstr.isActive)
             {
                 this.lightsource.setPos = new Vector2?(base.firstChunk.pos);
                 if (this.roomDarkness < 0.2f || this.lightsource.room != this.room)
@@ -89,7 +89,7 @@ public class ReviveSwarmerModules
                     this.lightsource = null;
                 }
             }
-            else if (this.roomDarkness >= 0.2f)
+            else if (this.roomDarkness >= 0.2f && Abstr.isActive)
             {
                 this.lightsource = new LightSource(base.firstChunk.pos, false, NSHswarmerColor, this);
                 this.room.AddObject(this.lightsource);
@@ -128,7 +128,7 @@ public class ReviveSwarmerModules
             if (!Abstr.isActive || selectedCreature == null || grabbedBy.Count <= 0 || grabbedBy[0].grabber is not Player
                  || grabbedBy[0].grabber.room == null || selectedCreature.room != grabbedBy[0].grabber.room) 
             { return; }
-            Plugin.Log("NSHswarmer use:", selectedCreature?.GetType().Name);
+            Plugin.Log("reviveSwarmer use:", selectedCreature.GetType().Name, selectedCreature.abstractCreature.ID.number);
             AllGraspsLetGoOfThisObject(true);
 
             Destroy();
@@ -188,22 +188,6 @@ public class ReviveSwarmerModules
 
         public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            /*Vector2 pos = Vector2.Lerp(firstChunk.lastPos, firstChunk.pos, timeStacker);
-            float num = Mathf.InverseLerp(305f, 380f, timeStacker);
-            pos.y -= 20f * Mathf.Pow(num, 3f);
-
-            sLeaser.sprites[0].isVisible = true;
-            sLeaser.sprites[0].color = Color.green;
-            sLeaser.sprites[0].scale = 1f;
-            sLeaser.sprites[0].x = pos.x - camPos.x;
-            sLeaser.sprites[0].y = pos.y - camPos.y;
-
-            if (slatedForDeletetion || room != rCam.room)
-            {
-                sLeaser.CleanSpritesAndRemove();
-            }*/
-
-
             Vector2 vector = Vector2.Lerp(base.firstChunk.lastPos, base.firstChunk.pos, timeStacker);
             Vector2 vector2 = Vector3.Slerp(this.lastDirection, this.direction, timeStacker);
             Vector2 vector3 = Vector3.Slerp(this.lastLazyDirection, this.lazyDirection, timeStacker);

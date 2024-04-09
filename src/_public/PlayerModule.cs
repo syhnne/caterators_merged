@@ -15,6 +15,7 @@ public class PlayerModule
     public nsh.Inventory nshInventory;
     public srs.LightSourceModule srsLightSource;
     public _public.DeathPreventer deathPreventer;
+    public moon.SwarmerManager swarmerManager;
 
 
     public PlayerModule(Player player)
@@ -47,12 +48,18 @@ public class PlayerModule
         {
             srsLightSource = new srs.LightSourceModule(player);
         }
+        if (playerName == Enums.Moonname)
+        {
+            swarmerManager = new moon.SwarmerManager(player);
+            // deathPreventer.swarmerManager = swarmerManager;
+        }
 
     }
 
     public void Update(Player player, bool eu)
     {
         deathPreventer?.Update();
+        swarmerManager?.Update();
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
         srsLightSource?.Update();
         if (player.room == null || player.dead) return;

@@ -787,6 +787,11 @@ internal class PlayerHooks
 
     #region 香菇病，雨循环倒计时，饱食度
 
+    /*
+     * 有时间的话我希望能重写一下这堆东西，用miscWorld或者miscprogression来存这个饱食度（前提是menu界面读得到这个
+     * 很难想象我刚学会c#的第一个月里是咋想出用循环数当场计算饱食度这种阴间小技巧的
+     */
+
     private delegate float orig_SlowFadeIn(SaveState self);
     private static float SaveState_SlowFadeIn(orig_SlowFadeIn orig, SaveState self)
     {

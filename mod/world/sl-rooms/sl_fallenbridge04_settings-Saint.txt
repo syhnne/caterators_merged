@@ -1,0 +1,15 @@
+DangerType: Blizzard
+CeilingDrips: 0
+RainIntensity: 0.8043478
+RumbleIntensity: 0.5543478
+WaveSpeed: 0.5265684
+WaveLength: 0.7856289
+WaveAmplitude: 0.04017215
+SecondWaveLength: 1
+SecondWaveAmplitude: 0.0001
+Palette: 0
+Effects: SilenceWater-0.9047894-271.1447-197.8646, Fog-0.8221353-285.374-264.0302, Bloom-0.07304117-20-20, 
+PlacedObjects: DataPearl><275.1195><184.4598><58.33957~146.5604~0~0~Misc~0, SnowSource><1631.635><344.6637><Radial~705~363~50~86.60254~0.4891304~0.2391304, SnowSource><557.687><637.5709><Radial~741~685~50~86.60254~0.5543478~0.2065217, 
+AmbientSounds: OMNI><AM_WAT-Sea01.ogg><654.1245><638.5935><0.09013831><1, 
+FadePalette: 40, 0.2397305, 0.2344092, 0.3177086, 0.3394477
+WetTerrain: OFF

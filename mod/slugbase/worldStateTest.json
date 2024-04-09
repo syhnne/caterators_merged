@@ -6,7 +6,7 @@
 		"color": "ffffff",
 		"custom_colors": [
 			{ "name": "Body", "story": "ffffff" },
-			{ "name": "Eyes", "story": "ffffff" }
+			{ "name": "Eyes", "story": "111111" }
 		],
 
 		"select_menu_scene": "Slugcat_fp",
@@ -17,7 +17,7 @@
 		"auto_grab_batflies": false,
 		"back_spear": false,
 		"weight": [ 1.1, 0.9 ],
-		"lung_capacity": [ 0.6, 0.3 ],
+		"lung_capacity": 1.0,
 		"walk_speed": 1.4,
 		"climb_speed": 1.4,
 		"tunnel_speed": 1.5,
@@ -33,7 +33,7 @@
 		"cycle_length_min": 9,
 
 		"guide_overseer": 1,
-		"start_room": "GW_TOWER01",
+		"start_room": "SU_A02",
 		"timeline_after": "Spear",
 		"world_state": [ "Spear" ],
 		"diet": {

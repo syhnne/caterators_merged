@@ -153,11 +153,20 @@ public class Inventory
         {
             for (int i = 0; i < 2; i++)
             {
-                if (player.grasps[i] != null && CanBePutIntoBag(player.grasps[i].grabbed.abstractPhysicalObject))
+                if (player.grasps[i] != null)
                 {
-                    AddObjectToTop(player.grasps[i].grabbed);
+                    if (CanBePutIntoBag(player.grasps[i].grabbed.abstractPhysicalObject))
+                    {
+                        AddObjectToTop(player.grasps[i].grabbed);
+                        break;
+                    }
+                    else
+                    {
+                        hud.refuseCounter = 50;
+                    }
+                    
 
-                    break;
+                    
                 }
             }
         }
@@ -449,7 +458,7 @@ public class InventoryHUD : HudPart
     public float fade;
     public float lastFade;
     public List<InventoryIcon> icons;
-    public int showHUDcounter;
+    public int refuseCounter;
     public List<float> rowsWidth;
 
     public HUDCircle test;
@@ -461,7 +470,7 @@ public class InventoryHUD : HudPart
         lastPos = pos;
         fade = 0f;
         lastFade = 0f;
-        showHUDcounter = 0;
+        refuseCounter = 0;
         icons = new List<InventoryIcon>();
         rowsWidth = new List<float>();
 
@@ -508,6 +517,11 @@ public class InventoryHUD : HudPart
             fade = Mathf.Max(0f, fade - 0.033333335f);
         }
 
+        if (refuseCounter > 0)
+        {
+            refuseCounter--;
+        }
+
 
         
         test.Update();
@@ -534,9 +548,13 @@ public class InventoryHUD : HudPart
         {
             foreach (InventoryIcon icon in icons)
             {
-                icon.Draw(fade, DrawPos(timeStacker), timeStacker);
+                icon.Draw(refuseCounter, fade, DrawPos(timeStacker), timeStacker);
+                
             }
+            
         }
+
+
         
 
         
@@ -564,6 +582,11 @@ public class InventoryHUD : HudPart
             {
                 data = new IconSymbol.IconSymbolData(CreatureTemplate.Type.StandardGroundCreature, AbstractPhysicalObject.AbstractObjectType.Creature, 0);
                 icon = new(this, hud.fContainers[0], (IconSymbol.IconSymbolData)data);
+            }
+            if (Plugin.DevMode)
+            {
+                string s = icon.symbol.spriteName.ToString();
+                Plugin.Log(s);
             }
             icons.Add(icon);
         }
@@ -701,12 +724,19 @@ public class InventoryHUD : HudPart
         }
 
 
-        public void Draw(float fade, Vector2 drawPos, float timeStacker)
+        public void Draw(int refuseCounter, float fade, Vector2 drawPos, float timeStacker)
         {
             symbol.Draw(timeStacker, drawPos + offset);
 
-            symbol.symbolSprite.alpha = fade * 0.8f;
-
+            if (refuseCounter == 0)
+            {
+                symbol.symbolSprite.alpha = fade * 0.8f;
+            }
+            else
+            {
+                symbol.symbolSprite.alpha = fade * 0.8f + Mathf.Sin(refuseCounter) * 0.1f;
+            }
+            
         }
 
         public void RemoveSprites()

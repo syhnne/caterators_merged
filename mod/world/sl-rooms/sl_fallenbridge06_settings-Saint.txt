@@ -1,0 +1,14 @@
+DangerType: Blizzard
+CeilingDrips: 0
+RainIntensity: 0.8043478
+RumbleIntensity: 0.7391304
+WaveSpeed: 0.4854792
+WaveLength: 0.7916527
+WaveAmplitude: 0.04021738
+SecondWaveLength: 1
+SecondWaveAmplitude: 0.0001
+Palette: 0
+Effects: BorderPushBack-0-274.7021-200.7104, Darkness-0.04639966-2.924988-69.09062, SilenceWater-0.3586957-20-20, 
+PlacedObjects: SnowSource><494.7915><488.3044><Radial~797~-174~50~86.60254~0.4673913~0.2608696, SnowSource><1576.267><476.0507><Radial~684~-416~50~86.60254~0.6195652~0.3152174, SnowSource><2229.448><307.2784><Radial~-222~227~-208~118.6025~0.4891304~0.2391304, 
+FadePalette: 40, 0.1314651, 0.1314651
+WetTerrain: OFF

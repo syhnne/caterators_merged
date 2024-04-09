@@ -1,0 +1,11 @@
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.4991041
+WaveLength: 0.9982908
+WaveAmplitude: 0.004194457
+SecondWaveLength: 1
+SecondWaveAmplitude: 0.0001
+Effects: Fog-0.5722603--1000--1000, SunBlock-1-20-20, Darkness-0.1701312-315.2948-267.6271, 
+PlacedObjects: SnowSource><715.9167><453.3896><Radial~73~132~50~86.60254~0.3043478~0, 
+FadePalette: 29, 0.2384851
+WetTerrain: OFF
