@@ -155,7 +155,7 @@ public class Inventory
             {
                 if (player.grasps[i] != null && CanBePutIntoBag(player.grasps[i].grabbed.abstractPhysicalObject))
                 {
-                    AddObject(player.grasps[i].grabbed);
+                    AddObjectToTop(player.grasps[i].grabbed);
 
                     break;
                 }
@@ -163,7 +163,7 @@ public class Inventory
         }
         if (IsActive && inputY == -1 && lastInputY != -1)
         {
-            RemoveObject(eu);
+            RemoveAndRealizeObjectFromTop(eu);
         }
         
 
@@ -175,7 +175,7 @@ public class Inventory
 
 
 
-    public void AddObject(PhysicalObject obj)
+    public void AddObjectToTop(PhysicalObject obj)
     {
         ReloadCapacity();
         if (obj == null || obj.abstractPhysicalObject == null)
@@ -210,13 +210,13 @@ public class Inventory
 
 
 
-    public void RemoveObject(bool eu)
+    public void RemoveAndRealizeObjectFromTop(bool eu)
     {
         if (player.room == null || Items.Count <= 0) {  return; }
         ReloadCapacity();
         AbstractPhysicalObject obj = Items[Items.Count - 1];
-        
-        Items.Remove(obj);
+
+        if (!RemoveSpecificObj(obj)) { Plugin.Log("inventory error: null object"); return; }
         
         
         if (obj.realizedObject != null && (obj.realizedObject is Spear))
@@ -249,14 +249,6 @@ public class Inventory
             }
         }
 
-        hud?.ResetObjects();
-        ReloadCapacity();
-
-        Plugin.Log("inventory remove obj:", realObj.GetType().Name);
-        UpdateLog();
-
-
-
 
         if (player.FreeHand() > -1)
         {
@@ -281,8 +273,28 @@ public class Inventory
     }
 
 
+
+
+    public bool RemoveSpecificObj(AbstractPhysicalObject obj)
+    {
+        if (Items.Contains(obj))
+        {
+            Items.Remove(obj);
+            hud?.ResetObjects();
+            ReloadCapacity();
+            Plugin.Log("inventory remove obj:", obj.type.ToString());
+            UpdateLog();
+            return true;
+        }
+        return false;
+    }
+
+
+
+
+
     // 爆装备（不是
-    public void RemoveAllObjects()
+    public void RemoveAndRealizeAllObjects()
     {
         if (player.room == null || Items.Count <= 0) { return; }
         foreach (AbstractPhysicalObject obj in Items)

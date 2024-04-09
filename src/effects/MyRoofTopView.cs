@@ -68,7 +68,7 @@ public class MyRoofTopView : BackgroundScene
 
 
         /*this.sceneOrigo = base.RoomToWorldPos(room.abstractRoom.size.ToVector2() * 10f);
-        room.AddObject(new RoofTopView.DustpuffSpawner());
+        room.AddObjectToTop(new RoofTopView.DustpuffSpawner());
         this.daySky = new BackgroundScene.Simple2DBackgroundIllustration(this, "Rf_Sky", new Vector2(683f, 384f));
         this.duskSky = new BackgroundScene.Simple2DBackgroundIllustration(this, "Rf_DuskSky", new Vector2(683f, 384f));
         this.nightSky = new BackgroundScene.Simple2DBackgroundIllustration(this, "Rf_NightSky", new Vector2(683f, 384f));

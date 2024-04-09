@@ -12,9 +12,10 @@ namespace Caterators_by_syhnne._public;
 
 public class SSOracleHooks
 {
-    public static SSOracleBehavior.Action ActionID = new("PebblesSlug_Action", false);
-    public static SSOracleBehavior.SubBehavior.SubBehavID SubBehavID = new("PebblesSlug_SubBehavior", false);
-    public static Conversation.ID ConversationID = new("PebblesSlug_Conversation", false);
+    public static SSOracleBehavior.Action ActionID = new("fpslugcat_Action", false);
+    public static SSOracleBehavior.Action ReviveSwarmerAction = new("reviveSwarmerAction", false);
+    public static SSOracleBehavior.SubBehavior.SubBehavID SubBehavID = new("fpslugcat_SubBehavior", false);
+    public static Conversation.ID ConversationID = new("fpslugcat_Conversation", false);
 
     public static void Apply()
     {
@@ -167,6 +168,10 @@ public class SSOracleHooks
 
             // 防止一切洗脑失败的情况（。）直接给你堵死。乐
             nextAction = ActionID;
+
+        }
+        else if (nextAction == ReviveSwarmerAction)
+        {
 
         }
         orig(self, nextAction);

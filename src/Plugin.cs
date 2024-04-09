@@ -17,6 +17,8 @@ using Caterators_by_syhnne.nsh;
 using EffExt;
 using System.Net.Configuration;
 using Caterators_by_syhnne.effects;
+using static Caterators_by_syhnne.srs.OxygenMaskModules;
+using DevInterface;
 
 // 淦 我找不到怎么让vs自动生成我这个新的命名空间 拿这个来检查有没有忘改命名空间的罢
 // using Caterators_merged;
@@ -37,7 +39,7 @@ class Plugin : BaseUnityPlugin
     // 破案了，registerOI挂不上是因为我modinfo里面写的跟这个不一样（汗
     // 啊，为什么一样了还是不行？？
     public const string MOD_ID = "syhnne.caterators";
-    public const string MOD_NAME = "_Caterators (alpha ver.)";
+    public const string MOD_NAME = "Caterators (alpha ver.)";
     public const string MOD_VERSION = "0.1.0";
 
     public static new ManualLogSource Logger { get; internal set; }
@@ -64,15 +66,16 @@ class Plugin : BaseUnityPlugin
         Logger = base.Logger;
         instance = this;
         configOptions = new ConfigOptions();
+        On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
         MachineConnector.SetRegisteredOI(Plugin.MOD_ID, configOptions);
         MachineConnector._RefreshOIs();
-        On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
+        
 
         Content.Register(new OxygenMaskModules.OxygenMaskFisob());
         Content.Register(new ReviveSwarmerModules.ReviveSwarmerFisob());
 
 
-
+        On.RainWorldGame.Update += RainWorldGame_Update;
         On.World.GetNode += World_GetNode;
         // On.SaveState.AbstractPhysicalObjectFromString += SaveState_AbstractPhysicalObjectFromString;
 
@@ -82,6 +85,7 @@ class Plugin : BaseUnityPlugin
         _public.CustomLore.Apply();
         _public.SLOracleHooks.Apply();
         _public.SSRoomEffects.Apply();
+        _public.DeathPreventHooks.Apply();
         CustomSaveData.Apply();
         fp.ShelterSS_AI.Apply();
         /*new EffectDefinitionBuilder("MyRoofTopView_syhnne")
@@ -109,7 +113,7 @@ class Plugin : BaseUnityPlugin
         Futile.atlasManager.LoadAtlas("atlases/fp_tail");
         Futile.atlasManager.LoadAtlas("atlases/fp_head");
         Futile.atlasManager.LoadAtlas("atlases/fp_arm");
-        Futile.atlasManager.LoadImage("overseerHolograms/PebblesSlugHologram");
+        Futile.atlasManager.LoadImage("overseerHolograms/fpslugcatHologram");
         Futile.atlasManager.LoadAtlas("atlases/srs_head");
         Futile.atlasManager.LoadAtlas("atlases/srs_tail");
         Futile.atlasManager.LoadAtlas("atlases/nsh_head");
@@ -141,8 +145,22 @@ class Plugin : BaseUnityPlugin
 
 
 
+    private void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
+    {
+        orig(self);
 
- 
+        if (DevMode && Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
+        {
+            
+            AbstractPhysicalObject abstr = new ReviveSwarmerModules.ReviveSwarmerAbstract(self.world, self.Players[0].pos, self.GetNewID(), true);
+            abstr.destroyOnAbstraction = true;
+            self.Players[0].Room.AddEntity(abstr);
+            abstr.RealizeInRoom();
+            abstr.realizedObject.firstChunk.pos = self.Players[0].realizedObject.firstChunk.pos;
+            Plugin.Log("spawn ReviveSwarmer");
+        }
+    }
+
 
 
     // 绷不住了，直到最后我也不知道到底是谁在给这个函数传非法参数。

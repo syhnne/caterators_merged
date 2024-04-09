@@ -36,6 +36,9 @@ public class PlayerHooks
 
     public static void Apply()
     {
+        
+
+
         // nshInventory
         On.OverWorld.GateRequestsSwitchInitiation += OverWorld_GateRequestsSwitchInitiation;
         On.RainWorldGame.ContinuePaused += RainWorldGame_ContinuePaused;
@@ -78,6 +81,11 @@ public class PlayerHooks
     }
 
 
+    
+
+
+
+
 
 
 
@@ -89,10 +97,7 @@ public class PlayerHooks
     private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
     {
         orig(self, abstractCreature, world);
-        if (Enums.IsCaterator(self.SlugCatClass))
-        {
-            Plugin.playerModules.Add(self, new _public.PlayerModule(self));
-        }
+        Plugin.playerModules.Add(self, new _public.PlayerModule(self));
 
         if (self.SlugCatClass == Enums.FPname)
         {
@@ -303,7 +308,7 @@ public class PlayerHooks
         {
             if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null)
             {
-                module.nshInventory.RemoveAllObjects();
+                module.nshInventory.RemoveAndRealizeAllObjects();
             }
         }
         orig(self);
@@ -384,12 +389,23 @@ public class PlayerHooks
     // 防止你那倒霉的联机队友在你死了之后顶着3倍重力艰难行走。我知道队友有可能也会控制重力，但是我懒得加判断
     private static void Player_Die(On.Player.orig_Die orig, Player self)
     {
+        bool getModule = Plugin.playerModules.TryGetValue(self, out var module);
+        if (getModule && module.deathPreventer != null)
+        {
+            if (module.deathPreventer.TryPreventDeath(PlayerDeathReason.Unknown))
+            {
+                return;
+            }
+            else if (module.deathPreventer.justPreventedCounter > 0)
+            { return; }
+        }
         orig(self);
-        bool getModule = Plugin.playerModules.TryGetValue(self, out var module) && module.isCaterator;
+        
         if (getModule)
         {
-            module.gravityController.Die();
-            module.nshInventory?.RemoveAllObjects();
+            module.gravityController?.Die();
+            module.nshInventory?.RemoveAndRealizeAllObjects();
+            if (self.dead) { module.deathPreventer = null; }
         }
     }
 
@@ -404,12 +420,19 @@ public class PlayerHooks
         if (getModule)
         {
             Plugin.Log("HUD added");
-            self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
+            if (module.gravityController != null)
+            {
+                self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
+            }
             if (module.nshInventory != null)
             {
                 InventoryHUD inventoryHUD = new InventoryHUD(self, self.fContainers[1], module.nshInventory);
                 self.AddPart(inventoryHUD);
                 module.nshInventory.hud = inventoryHUD;
+            }
+            if (module.deathPreventer != null)
+            {
+                self.AddPart(new DeathPreventHUD(self, self.fContainers[1], module.deathPreventer));
             }
         }
 
@@ -618,9 +641,9 @@ public class PlayerHooks
     {
         if (Enums.IsCaterator(self.slugcatStats.name))
         {
-            return (!ModManager.MSC || !(self.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Spear)) && (testObj is Rock || testObj is DataPearl || testObj is FlareBomb || testObj is Lantern || testObj is FirecrackerPlant || testObj is VultureGrub && !(testObj as VultureGrub).dead || testObj is Hazer && !(testObj as Hazer).dead && !(testObj as Hazer).hasSprayed || testObj is FlyLure || testObj is ScavengerBomb || testObj is PuffBall || testObj is SporePlant || testObj is BubbleGrass || testObj is OracleSwarmer || testObj is NSHSwarmer || testObj is OverseerCarcass || ModManager.MSC && testObj is FireEgg && self.FoodInStomach >= self.MaxFoodInStomach || ModManager.MSC && testObj is SingularityBomb && !(testObj as SingularityBomb).activateSingularity && !(testObj as SingularityBomb).activateSucktion);
+            return (testObj is Rock || testObj is DataPearl || testObj is FlareBomb || testObj is Lantern || testObj is FirecrackerPlant || testObj is VultureGrub && !(testObj as VultureGrub).dead || testObj is Hazer && !(testObj as Hazer).dead && !(testObj as Hazer).hasSprayed || testObj is FlyLure || testObj is ScavengerBomb || testObj is PuffBall || testObj is SporePlant || testObj is BubbleGrass || testObj is OracleSwarmer || testObj is NSHSwarmer || testObj is OverseerCarcass || ModManager.MSC && testObj is FireEgg && self.FoodInStomach >= self.MaxFoodInStomach || ModManager.MSC && testObj is SingularityBomb && !(testObj as SingularityBomb).activateSingularity && !(testObj as SingularityBomb).activateSucktion || testObj is nsh.ReviveSwarmerModules.ReviveSwarmer);
         }
-        else { return orig(self, testObj); }
+        else { return (orig(self, testObj) || testObj is nsh.ReviveSwarmerModules.ReviveSwarmer); }
     }
 
 

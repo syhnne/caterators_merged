@@ -1,0 +1,49 @@
+{
+	"id": "worldStateTest",
+	"name": "test",
+	"description": "a",
+	"features": {
+		"color": "ffffff",
+		"custom_colors": [
+			{ "name": "Body", "story": "ffffff" },
+			{ "name": "Eyes", "story": "ffffff" }
+		],
+
+		"select_menu_scene": "Slugcat_fp",
+		"select_menu_scene_ascended": "Ghost_fp",
+		"sleep_scene": "Sleep_fp",
+
+
+		"auto_grab_batflies": false,
+		"back_spear": false,
+		"weight": [ 1.1, 0.9 ],
+		"lung_capacity": [ 0.6, 0.3 ],
+		"walk_speed": 1.4,
+		"climb_speed": 1.4,
+		"tunnel_speed": 1.5,
+		"throw_skill": [ 1.0, 0.7 ],
+		"crouch_stealth": [ 1.0, 0.7 ],
+
+
+
+		"karma": 9,
+		"karma_cap": 9,
+		"the_mark": true,
+		"the_glow": true,
+		"cycle_length_min": 9,
+
+		"guide_overseer": 1,
+		"start_room": "GW_TOWER01",
+		"timeline_after": "Spear",
+		"world_state": [ "Spear" ],
+		"diet": {
+			"base": "Gourmand",
+			"meat": 0.25,
+			"corpses": 0.5,
+			"plants": 0.25,
+			"overrides": {
+			}
+		}
+
+	}
+}

@@ -14,6 +14,7 @@ public class PlayerModule
     public nsh.Scarf nshScarf;
     public nsh.Inventory nshInventory;
     public srs.LightSourceModule srsLightSource;
+    public _public.DeathPreventer deathPreventer;
 
 
     public PlayerModule(Player player)
@@ -32,6 +33,8 @@ public class PlayerModule
 
         if (playerName == storyName) { IsMyStory = true; }
 
+
+        deathPreventer = new DeathPreventer(player);
         if (isCaterator && storyName != null)
         {
             gravityController = new GravityController(player);
@@ -49,6 +52,7 @@ public class PlayerModule
 
     public void Update(Player player, bool eu)
     {
+        deathPreventer?.Update();
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
         srsLightSource?.Update();
         if (player.room == null || player.dead) return;

@@ -468,7 +468,7 @@ internal class SS_PebblesAltEnding : UpdatableAndDeletable
         }
         if (fadeOut != null && fadeOut.IsDoneFading() && !doneFinalSave)
         {
-            Plugin.Log("PebblesSlug Alt Ending !!!");
+            Plugin.Log("fpslugcat Alt Ending !!!");
             // 这句话对我来说没用吧
             room.game.GetStorySession.saveState.miscWorldSaveData.SSaiThrowOuts = 0;
             // 好吧我想到了。在这里挂altending，还是在那个函数里判断吧

@@ -130,8 +130,6 @@ internal class PlayerHooks
 
 
 
-
-
     public static void Apply()
     {
         try
@@ -146,9 +144,8 @@ internal class PlayerHooks
 
             // 其他
             On.RegionGate.customKarmaGateRequirements += RegionGate_customKarmaGateRequirements;
-            On.Creature.Violence += Creature_Violence;
-            IL.ZapCoil.Update += IL_ZapCoil_Update;
-            IL.Centipede.Shock += IL_Centipede_Shock;
+            
+            
 
             // 香菇病，雨循环倒计时，饱食度
             On.HUD.FoodMeter.SleepUpdate += HUD_FoodMeter_SleepUpdate;
@@ -218,6 +215,9 @@ internal class PlayerHooks
     // 我大概应该用原版方法，然后做ilhooking。但是，说真的，想想那个工作量吧（汗）我都不太清楚自己究竟改了些什么
     private static void Player_ClassMechanicsArtificer(On.Player.orig_ClassMechanicsArtificer orig, Player self)
     {
+        // 卧槽 这代码啥时候写的
+        // 这要是没写origself 以前玩炸猫的时候不卡bug吗
+        orig(self);
         if (self.SlugCatClass == Enums.FPname)
         {
             Room room = self.room;
@@ -225,8 +225,6 @@ internal class PlayerHooks
             bool flag2 = self.eatMeat >= 20 || self.maulTimer >= 15;
             int explosionCapacity = ConfigOptions.ExplosionCapacity.Value;
             int num = Mathf.Max(1, explosionCapacity - 5);
-            // 这是怎么回事？
-            orig(self);
             if (self.pyroJumpCounter > 0 && (self.Consious || self.dead))
             {
                 self.pyroJumpCooldown -= 1f;
@@ -757,6 +755,14 @@ internal class PlayerHooks
     }
 
 
+    
+
+
+
+
+
+
+    
 
 
 
@@ -764,45 +770,7 @@ internal class PlayerHooks
 
 
 
-    // 被电不仅不会死，还会吃饱（？
-    // 错误的，线圈全断电了，其实没啥用（。
-    private static void IL_ZapCoil_Update(ILContext il)
-    {
-        ILCursor c = new ILCursor(il);
-        // 182，还是那个劫持判定
-        if (c.TryGotoNext(MoveType.After,
-            (i) => i.Match(OpCodes.Stfld),
-            (i) => i.MatchLdarg(0),
-            (i) => i.Match(OpCodes.Ldfld),
-            (i) => i.Match(OpCodes.Ldfld),
-            (i) => i.Match(OpCodes.Ldloc_1),
-            (i) => i.Match(OpCodes.Ldelem_Ref),
-            (i) => i.Match(OpCodes.Ldloc_2),
-            (i) => i.Match(OpCodes.Callvirt)
-            ))
-        {
-            c.EmitDelegate<Func<PhysicalObject, PhysicalObject>>((physicalObj) =>
-            {
-                if (physicalObj is Player && (physicalObj as Player).SlugCatClass == Enums.FPname)
-                {
-                    // 抄的蜈蚣代码
-                    (physicalObj as Player).Stun(200);
-                    physicalObj.room.AddObject(new CreatureSpasmer(physicalObj as Player, false, (physicalObj as Player).stun));
-                    (physicalObj as Player).LoseAllGrasps();
-                    if (Plugin.DevMode)
-                    {
-                        int maxfood = (physicalObj as Player).MaxFoodInStomach;
-                        int food = (physicalObj as Player).FoodInStomach;
-                        Plugin.Log("Zapcoil - food:" + food + " maxfood: " + maxfood);
-                        CustomAddFood(physicalObj as Player, maxfood - food);
-                        (physicalObj as Player).AddFood(maxfood - food);
-                    }
-                    return null;
-                }
-                else { return physicalObj; }
-            });
-        }
-    }
+    
 
 
 
@@ -810,51 +778,7 @@ internal class PlayerHooks
 
 
 
-    private static void IL_Centipede_Shock(ILContext il)
-    {
-        ILCursor c = new ILCursor(il);
-        // 226，还是那个劫持判定，修改蜈蚣的体重让他无论如何都会小于玩家体重
-        if (c.TryGotoNext(MoveType.After,
-            (i) => i.Match(OpCodes.Br),
-            (i) => i.Match(OpCodes.Ldarg_1),
-            (i) => i.Match(OpCodes.Callvirt),
-            (i) => i.Match(OpCodes.Ldarg_0),
-            (i) => i.Match(OpCodes.Call)
-            ))
-        {
-            c.Emit(OpCodes.Ldarg_1);
-            c.EmitDelegate<Func<float, PhysicalObject, float>>((centipedeMass, physicalObj) =>
-            {
-                if (physicalObj is Player && (physicalObj as Player).SlugCatClass == Enums.FPname)
-                {
-                    CustomAddFood(physicalObj as Player, 1);
-                    return 0;
-                }
-                else { return centipedeMass; }
-            });
-        }
-    }
-
-
-
-
-
-
-
-    private static void Creature_Violence(On.Creature.orig_Violence orig, Creature self, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
-    {
-        if (self is Player && (self as Player).SlugCatClass == Enums.FPname)
-        {
-            if (type == Creature.DamageType.Electric)
-            {
-
-                damage = Mathf.Lerp(1f, 0.1f, self.room.world.rainCycle.RainApproaching) * damage;
-                stunBonus = Mathf.Lerp(1f, 0.1f, self.room.world.rainCycle.RainApproaching) * stunBonus;
-
-            }
-        }
-        orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
-    }
+    
     #endregion
 
 

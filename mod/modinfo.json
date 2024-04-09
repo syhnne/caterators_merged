@@ -1,9 +1,9 @@
 ﻿{
 	"id": "syhnne.caterators",
-	"name": "_Caterators (alpha ver.)",
+	"name": "Caterators (alpha ver.)",
 	"version": "0.1.0",
 	"authors": "syhnne",
-	"description": "我依赖项也不多啊，区区五个而已",
+	"description": "所以我的自定义设置界面呢，为什么不显示，他奶奶的！！给我显示啊岂可修",
 	"requirements": [ "slime-cubed.slugbase", "moreslugcats", "fisobs", "crs", "pom", "regionkit" ],
 	"requirements_names": [ "SlugBase", "More Slugcats Expansion", "Fisobs", "Custom Regions Support", "POM", "RegionKit" ],
 	"tags": [ "Custom Slugcat" ]

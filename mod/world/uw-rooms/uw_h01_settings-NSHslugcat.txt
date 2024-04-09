@@ -1,11 +1,11 @@
 Template: NONE
 DangerType: Blizzard
 CeilingDrips: 0
-RainIntensity: 0.2826087
+RainIntensity: 0.1086956
 RumbleIntensity: 0.2934783
-WaveSpeed: 0.4988411
-WaveLength: 0.9994205
-WaveAmplitude: 0.0001363694
+WaveSpeed: 0.4996781
+WaveLength: 0.9726651
+WaveAmplitude: 0.00545969
 SecondWaveLength: 0.1666667
 SecondWaveAmplitude: 0
 Grime: 0.2391304
@@ -14,7 +14,7 @@ Palette: 6
 EffectColorA: 13
 EffectColorB: 2
 Effects: PixelShift-0.5-30-30, RoofTopView-1-20-131, DayNight-0.7282609-22-77, Darkness-0.2065217-276-22, SkyAndLightBloom-0.0326087-275-150, Contrast-0.04347826-280-213, Desaturation-0.7065217-538-26, FairyParticles-0-252-275, 
-PlacedObjects: DataPearl><3408.718><86.06303><66~292~0~0~Misc~0, NoSpearStickZone><-33.07202><280.8413><-138~97, DayNightSettings><20.09833><592.4242><5~8.660254~35~10, DevToken><1402.695><168.8079><0~-72~0~0~0~~~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1, FairyParticleSettings><2029.26><320.4497><5~8.660254~0~1~1~0~1.716524~4.224423~461.9565~500~1000~1000~5~22.17399~160.4348~180~0.5~0.7~0~0~1~1~1~0.2282609~6.791306~Dandelion~SIN_IO~SIN_IO~0~0~2.391304, SnowSource><1203.207><496.8041><None~1558~-38~50~86.60254~0.6086956~0.3152174, SnowSource><3740.517><583.8008><None~1491~-57~50~86.60254~0.6521739~0.8260869, SnowSource><6764.507><516.8002><None~1261~170~50~86.60254~0.6630435~0.7717391, SnowSource><5325.104><201.8636><Radial~407~413~50~86.60254~0.7282609~0.3913043, 
+PlacedObjects: DataPearl><3408.718><86.06303><66~292~0~0~Misc~0, NoSpearStickZone><-33.07202><280.8413><-138~97, DayNightSettings><20.09833><592.4242><5~8.660254~35~10, DevToken><1402.695><168.8079><0~-72~0~0~0~~~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1~0~0~0~1, FairyParticleSettings><2029.26><320.4497><5~8.660254~0~1~1~0~1.716524~4.224423~461.9565~500~1000~1000~5~22.17399~160.4348~180~0.5~0.7~0~0~1~1~1~0.2282609~6.791306~Dandelion~SIN_IO~SIN_IO~0~0~2.391304, SnowSource><1203.207><496.8041><None~1558~-38~50~86.60254~0.6086956~0.3152174, SnowSource><3740.517><583.8008><None~1491~-57~50~86.60254~0.6521739~0.8260869, SnowSource><6764.507><516.8002><None~1261~170~50~86.60254~0.6630435~0.7717391, SnowSource><5325.104><201.8636><Radial~407~413~50~86.60254~0.7282609~0.3913043, 
 AmbientSounds: OMNI><AM_ENV-NatWind.ogg><833.3021><652.5293><0.5><1, OMNI><AM_ENV-LightWind.ogg><647.051><654.0204><0.5217391><0.9021739, SPOT><AM_ENV-WallHum.ogg><44.60425><480.4207><0.3152174><1><57.60425><26.42065><-213.3553><272.6447><0><0.4260871, 
 Triggers: Spot<tA>event<tB>MusicEvent<eA>songName<eB>NA_28 - Stargazer<eA>vol<eB>0.3434786<eA>prio<eB>0.5<eA>mxThrt<eB>1<eA>loop<eB>0<eA>droneTol<eB>0<eA>rooms<eB>2<eA>rest<eB>7<eA>fadeIn<eB>163.0435<eA>oneSongPerCycle<eB>0<eA>stopAtDeath<eB>0<eA>stopAtGate<eB>0<tA>multiUse<tB>0<tA>toCycle<tB>-1<tA>fromCycle<tB>0<tA>delay<tB>0<tA>panPos<tB>635.1751<tB>558.6854<tA>fireChance<tB>1<tA>entrance<tB>0<tA>karma<tB>0<tA>slugcats<tB><tA>pos<tB>7539.175<tB>261.6855<tA>handlePos<tB>-364.3553<tB>-2.355347, 
 FadePalette: 0, 0.2391304, 0.25, 0.2608696, 0.2826087, 0.2826087, 0.2934783, 0.326087, 0.3478261

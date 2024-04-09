@@ -8,16 +8,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Caterators_by_syhnne.srs.OxygenMaskModules;
 using System.Security.Permissions;
+using RWCustom;
 
 namespace Caterators_by_syhnne.nsh;
 
 
-// 还是这个写的爽 复制粘贴就完事了（。
+// 是我想多了 死的从来都不是猫崽而是我。。
 public class ReviveSwarmerModules
 {
-    
+    public static Color NSHswarmerColor = new Color(0f, 1f, 0.3f);
 
     public class ReviveSwarmerCreatureSelector : UpdatableAndDeletable
     {
@@ -39,6 +39,13 @@ public class ReviveSwarmerModules
         public float rotation;
         public float lastRotation;
         public Creature selectedCreature;
+
+        public LightSource lightsource;
+        public float roomDarkness;
+        public Vector2 direction;
+        public Vector2 lastDirection;
+        public Vector2 lazyDirection;
+        public Vector2 lastLazyDirection;
 
 
         public ReviveSwarmer(ReviveSwarmerAbstract abstr) : base(abstr)
@@ -65,6 +72,28 @@ public class ReviveSwarmerModules
             firstChunk.collideWithTerrain = grabbedBy.Count == 0;
             firstChunk.collideWithSlopes = grabbedBy.Count == 0;
 
+            this.lastDirection = this.direction;
+            this.lastLazyDirection = this.lazyDirection;
+            this.lastRotation = this.rotation;
+
+            if (this.lightsource != null)
+            {
+                this.lightsource.setPos = new Vector2?(base.firstChunk.pos);
+                if (this.roomDarkness < 0.2f || this.lightsource.room != this.room)
+                {
+                    this.room.RemoveObject(this.lightsource);
+                    this.lightsource = null;
+                }
+                else if (this.lightsource.slatedForDeletetion)
+                {
+                    this.lightsource = null;
+                }
+            }
+            else if (this.roomDarkness >= 0.2f)
+            {
+                this.lightsource = new LightSource(base.firstChunk.pos, false, NSHswarmerColor, this);
+                this.room.AddObject(this.lightsource);
+            }
 
             return;
 
@@ -109,30 +138,62 @@ public class ReviveSwarmerModules
 
         public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            sLeaser.sprites = new FSprite[1];
+            sLeaser.sprites = new FSprite[6];
             sLeaser.sprites[0] = new FSprite("Futile_White", true);
-            
+            sLeaser.sprites[0].shader = rCam.game.rainWorld.Shaders["FlatLightBehindTerrain"];
+            sLeaser.sprites[0].scale = 1.5f;
+            sLeaser.sprites[0].alpha = 0.2f;
+            sLeaser.sprites[1] = new FSprite("JetFishEyeA", true);
+            sLeaser.sprites[1].scaleY = 1.2f;
+            sLeaser.sprites[1].scaleX = 0.75f;
+            for (int i = 0; i < 2; i++)
+            {
+                sLeaser.sprites[2 + i] = new FSprite("deerEyeA2", true);
+                sLeaser.sprites[2 + i].anchorX = 0f;
+            }
+            sLeaser.sprites[4] = new FSprite("JetFishEyeB", true);
+            sLeaser.sprites[5] = new FSprite("Futile_White", true);
+            sLeaser.sprites[5].shader = rCam.game.rainWorld.Shaders["FlatLightBehindTerrain"];
+
+            for (int k = 0; k < sLeaser.sprites.Length; k++)
+            {
+                sLeaser.sprites[k].color = NSHswarmerColor;
+            }
+            sLeaser.sprites[4].color = Color.Lerp(NSHswarmerColor, new Color(1f, 1f, 1f), 0.5f);
             AddToContainer(sLeaser, rCam, null);
         }
 
 
         public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer? newContainer)
         {
+ 
+            
+
+
             newContainer ??= rCam.ReturnFContainer("Items");
-            foreach (FSprite fsprite in sLeaser.sprites)
+            FContainer fcontainer = rCam.ReturnFContainer("Water");
+            for (int i = 0; i < sLeaser.sprites.Length; i++)
             {
-                fsprite.RemoveFromContainer();
-                newContainer.AddChild(fsprite);
+                sLeaser.sprites[i].RemoveFromContainer();
+                if (i == 0 || i > 4)
+                {
+                    fcontainer.AddChild(sLeaser.sprites[i]);
+                }
+                else
+                {
+                    newContainer.AddChild(sLeaser.sprites[i]);
+                }
             }
         }
 
         public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            Vector2 pos = Vector2.Lerp(firstChunk.lastPos, firstChunk.pos, timeStacker);
+            /*Vector2 pos = Vector2.Lerp(firstChunk.lastPos, firstChunk.pos, timeStacker);
             float num = Mathf.InverseLerp(305f, 380f, timeStacker);
             pos.y -= 20f * Mathf.Pow(num, 3f);
 
             sLeaser.sprites[0].isVisible = true;
+            sLeaser.sprites[0].color = Color.green;
             sLeaser.sprites[0].scale = 1f;
             sLeaser.sprites[0].x = pos.x - camPos.x;
             sLeaser.sprites[0].y = pos.y - camPos.y;
@@ -140,12 +201,56 @@ public class ReviveSwarmerModules
             if (slatedForDeletetion || room != rCam.room)
             {
                 sLeaser.CleanSpritesAndRemove();
+            }*/
+
+
+            Vector2 vector = Vector2.Lerp(base.firstChunk.lastPos, base.firstChunk.pos, timeStacker);
+            Vector2 vector2 = Vector3.Slerp(this.lastDirection, this.direction, timeStacker);
+            Vector2 vector3 = Vector3.Slerp(this.lastLazyDirection, this.lazyDirection, timeStacker);
+            Vector3 vector4 = Custom.PerpendicularVector(vector2);
+            float num = Mathf.Sin(Mathf.Lerp(this.lastRotation, this.rotation, timeStacker) * 3.1415927f * 2f);
+            float num2 = Mathf.Cos(Mathf.Lerp(this.lastRotation, this.rotation, timeStacker) * 3.1415927f * 2f);
+            sLeaser.sprites[0].x = vector.x - camPos.x;
+            sLeaser.sprites[0].y = vector.y - camPos.y;
+            sLeaser.sprites[1].x = vector.x - camPos.x;
+            sLeaser.sprites[1].y = vector.y - camPos.y;
+            sLeaser.sprites[4].x = vector.x + vector4.x * 2f * num2 * Mathf.Sign(num) - camPos.x;
+            sLeaser.sprites[4].y = vector.y + vector4.y * 2f * num2 * Mathf.Sign(num) - camPos.y;
+            sLeaser.sprites[1].rotation = Custom.VecToDeg(vector2);
+            sLeaser.sprites[4].rotation = Custom.VecToDeg(vector2);
+            sLeaser.sprites[4].scaleX = 1f - Mathf.Abs(num2);
+            sLeaser.sprites[1].isVisible = true;
+            for (int i = 0; i < 2; i++)
+            {
+                sLeaser.sprites[2 + i].x = vector.x - vector2.x * 4f - camPos.x;
+                sLeaser.sprites[2 + i].y = vector.y - vector2.y * 4f - camPos.y;
+                sLeaser.sprites[2 + i].rotation = Custom.VecToDeg(vector3) + 90f + ((i == 0) ? -1f : 1f) * Custom.LerpMap(Vector2.Distance(vector2, vector3), 0.06f, 0.7f, 10f, 45f, 2f) * num;
+            }
+            sLeaser.sprites[2].scaleY = -1f * num;
+            sLeaser.sprites[3].scaleY = num;
+            float num3 = 1f;
+            Vector2 vector5 = vector;
+            float num4 = 1f;
+            sLeaser.sprites[5].isVisible = false;
+            for (int j = 6; j < sLeaser.sprites.Length; j++)
+            {
+                sLeaser.sprites[j].isVisible = false;
+            }
+            if (this.lightsource != null)
+            {
+                this.lightsource.HardSetAlpha((0.3f + 0.7f * Custom.SCurve(Mathf.Pow(Mathf.InverseLerp(15f, 400f, num3), 0.5f), 0.8f) * Mathf.Pow(1f, 0.4f)) * Custom.LerpMap(this.roomDarkness, 0.2f, 0.7f, 0f, 0.5f));
+                this.lightsource.HardSetPos(vector5);
+                this.lightsource.HardSetRad(Custom.LerpMap(num3, 2f, 15f, 65f, 160f) + Mathf.Lerp(Custom.SCurve(Mathf.InverseLerp(5f, 300f, num3), 0.8f) * 120f, num4, 0.5f) * (0.5f + 0.5f * Mathf.Pow(1f, 0.4f)) * 2f);
+            }
+            if (base.slatedForDeletetion || this.room != rCam.room)
+            {
+                sLeaser.CleanSpritesAndRemove();
             }
         }
 
         public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
-            sLeaser.sprites[0].color = new Color(0f, 1f, 0.3f);
+            this.roomDarkness = palette.darkness;
         }
 
 
