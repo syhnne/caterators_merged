@@ -3,11 +3,11 @@
     "name": "moon",
     "description": "world state test",
     "features": {
-        "color": "2aa0a4",
+        "color": "3ab0b4",
         "custom_colors": [
             {
                 "name": "Body",
-                "story": "2aa0a4"
+                "story": "3ab0b4"
             },
             {
                 "name": "Eyes",

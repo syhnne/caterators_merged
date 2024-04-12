@@ -296,7 +296,7 @@ public class SpearOnBack : ItemsOnBack
         base.Remove();
         spear.ChangeMode(Weapon.Mode.Free);
         owner.player.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, owner.player.mainBodyChunk);
-        // spear.PlaceInRoom(owner.player.room);
+        // spear.PlaceInRoom(swarmer.player.room);
         spear = null;
     }
         

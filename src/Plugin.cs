@@ -20,8 +20,8 @@ using Caterators_by_syhnne.effects;
 using static Caterators_by_syhnne.srs.OxygenMaskModules;
 using DevInterface;
 
-// 淦 我找不到怎么让vs自动生成我这个新的命名空间 拿这个来检查有没有忘改命名空间的罢
-// using Caterators_merged;
+// TODO: 阿西吧 我还得检查探险模式有没有bug 太难顶了
+// 这个mod的大部分工程量都在于防止有人在酒吧里点炒饭。。。（
 
 namespace Caterators_by_syhnne;
 
@@ -75,6 +75,7 @@ class Plugin : BaseUnityPlugin
 
             Content.Register(new OxygenMaskModules.OxygenMaskFisob());
             Content.Register(new ReviveSwarmerModules.ReviveSwarmerFisob());
+            Content.Register(new moon.MoonSwarmer.MoonSwarmerCritob());
 
 
             On.RainWorldGame.Update += RainWorldGame_Update;
@@ -150,8 +151,10 @@ class Plugin : BaseUnityPlugin
     {
         orig(self);
 
+        if (!DevMode || !self.devToolsActive) return;
+
         // 按Y生成一个复活用的神经元
-        if (DevMode && Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
+        if (Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
         {
             AbstractPhysicalObject abstr = new ReviveSwarmerModules.ReviveSwarmerAbstract(self.world, self.Players[0].pos, self.GetNewID(), true);
             abstr.destroyOnAbstraction = true;
@@ -162,10 +165,23 @@ class Plugin : BaseUnityPlugin
         }
 
         // 按U时停，用于修改roomSettings
-        if (DevMode && Input.GetKeyDown(KeyCode.U))
+        if (Input.GetKeyDown(KeyCode.U))
         {
             self.rivuletEpilogueRainPause = !self.rivuletEpilogueRainPause;
             Plugin.Log("ZA WARUDO");
+        }
+
+        // 按T生成一个月姐的神经元 
+        // 求你了 别卡bug了
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            foreach (AbstractCreature p in self.Players)
+            {
+                if (p.realizedObject != null && p.realizedCreature.room != null && Plugin.playerModules.TryGetValue(p.realizedCreature as Player, out var module) && module.swarmerManager != null)
+                {
+                    module.swarmerManager.AddSwarmer();
+                }
+            }
         }
     }
 

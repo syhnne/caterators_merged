@@ -31,6 +31,7 @@ using UnityEngine.LowLevel;
 using System.Security.Policy;
 using System.Security.Cryptography.X509Certificates;
 using HUD;
+using Caterators_by_syhnne.moon.MoonSwarmer;
 
 namespace Caterators_by_syhnne._public;
 
@@ -236,14 +237,15 @@ public class DeathPreventer
 {
     public Player player;
     public int justPreventedCounter;
-    // public moon.SwarmerManager? swarmerManager;
+    public moon.MoonSwarmer.SwarmerManager swarmerManager;
+    public Color effectColor;
 
     public DeathPreventer(Player player) 
     { 
         this.player = player;
         justPreventedCounter = 0;
         Plugin.Log("new deathPreventer for player", player.abstractCreature.ID.number);
-        
+        effectColor = nsh.ReviveSwarmerModules.NSHswarmerColor;
     }
 
 
@@ -319,6 +321,13 @@ public class DeathPreventer
         get
         {
             if (player == null || player.slatedForDeletetion) return null;
+            bool getModule = Plugin.playerModules.TryGetValue(player, out var module);
+            if (getModule && module.swarmerManager != null && module.swarmerManager.CanConsumeSwarmer)
+            {
+                return module.swarmerManager.LastAliveSwarmer.abstractCreature;
+            }
+
+
             // TODO: 这个目前有bug，抓在手上的时候不好使。而且这个的触发逻辑其实有点奇妙，有的时候我压根没看出来自己咋死的就爆绿光了。
             if (player.grasps != null)
             {
@@ -334,23 +343,15 @@ public class DeathPreventer
             {
                 return player.objectInStomach;
             }
-            if (Plugin.playerModules.TryGetValue(player, out var module))
+            if (getModule && module.nshInventory != null)
             {
-                if (module.swarmerManager != null && module.swarmerManager.CanConsumeSwarmer)
+                foreach (AbstractPhysicalObject obj in module.nshInventory.Items)
                 {
-                    // TODO: 
-                }
-                if (module.nshInventory != null)
-                {
-                    foreach (AbstractPhysicalObject obj in module.nshInventory.Items)
+                    if (obj is ReviveSwarmerAbstract)
                     {
-                        if (obj is ReviveSwarmerAbstract)
-                        {
-                            return obj;
-                        }
+                        return obj;
                     }
                 }
-                
             }
 
             return null;
@@ -364,11 +365,13 @@ public class DeathPreventer
     {
         Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString());
         AbstractPhysicalObject reviveSwarmer = DeathPreventObject;
-        if (player.room == null || reviveSwarmer == null || (reviveSwarmer is not nsh.ReviveSwarmerModules.ReviveSwarmerAbstract ))
+        if (player.room == null || reviveSwarmer == null)
         {
-            Plugin.Log("player", player.abstractCreature.ID.number, "death NOT prevented, reason:", deathReason.ToString(), DeathPreventObject == null);
+            Plugin.Log("player", player.abstractCreature.ID.number, "death NOT prevented, reason:", deathReason.ToString(), reviveSwarmer == null);
             return false;
         }
+
+        effectColor = reviveSwarmer is AbstractCreature ? Color.white : nsh.ReviveSwarmerModules.NSHswarmerColor;
 
         bool deathExplode = true;
         if (deathReason == PlayerDeathReason.DangerGrasp || deathReason == PlayerDeathReason.Violence)
@@ -383,7 +386,7 @@ public class DeathPreventer
         {
             // 有空再细改，现在抄的fp那边的代码
             Vector2 pos2 = player.firstChunk.pos;
-            Color effectColor = new Color(0.6f, 1f, 0.6f);
+
             player.room.AddObject(new Explosion.ExplosionLight(pos2, 200f, 1f, 4, effectColor));
             for (int l = 0; l < 8; l++)
             {
@@ -391,7 +394,10 @@ public class DeathPreventer
                 player.room.AddObject(new Spark(pos2 + vector2 * Random.value * 40f, vector2 * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
             }
             player.room.AddObject(new ShockWave(pos2, 200f, 0.2f, 6, false));
-            player.room.AddObject(new ElectricDeath.SparkFlash(pos2, 10f));
+            if (reviveSwarmer is not AbstractCreature)
+            {
+                player.room.AddObject(new ElectricDeath.SparkFlash(pos2, 10f));
+            }
             player.room.PlaySound(SoundID.Centipede_Shock, pos2, 1f, 1f + 0.25f * Random.value);
             player.room.InGameNoise(new InGameNoise(pos2, 8000f, player, 1f));
             if (player.room.Darkness(pos2) > 0f)
@@ -469,32 +475,12 @@ public class DeathPreventer
         player.killTagCounter = 0;
         AbstractCreatureAI abstractAI = player.abstractCreature.abstractAI;
         abstractAI?.SetDestination(player.abstractCreature.pos);
-        
-
-        
 
 
-        if (justPreventedCounter == 0)
-        {
-            // 移除复活用的神经元（月姐那个估计要单独的函数，回头再写）
-            if (reviveSwarmer.realizedObject != null)
-            {
-                reviveSwarmer.realizedObject.AllGraspsLetGoOfThisObject(true);
-                player.room.RemoveObject(reviveSwarmer.realizedObject);
-                reviveSwarmer.realizedObject = null;
-            }
-            if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null && module.nshInventory.RemoveSpecificObj(reviveSwarmer))
-            {
-            }
-            else if (player.objectInStomach == reviveSwarmer)
-            {
-                player.objectInStomach = null;
-            }
-            else
-            {
-                player.room.abstractRoom.RemoveEntity(reviveSwarmer);
-            }
-        }
+        // 移除复活用的神经元
+        RemoveSwarmer(reviveSwarmer);
+
+
 
         // 复活后有短暂的无敌（但如果是队友把你复活的，那就不会有）
         justPreventedCounter = 120;
@@ -505,8 +491,34 @@ public class DeathPreventer
 
 
 
-    public void Destroy()
+    public void RemoveSwarmer(AbstractPhysicalObject reviveSwarmer)
     {
+        
+        if (justPreventedCounter > 0) { return; }
+
+        if (swarmerManager != null && reviveSwarmer is AbstractCreature && reviveSwarmer.realizedObject != null)
+        {
+            swarmerManager.KillSwarmer(reviveSwarmer.realizedObject as MoonSwarmer);
+            return;
+        }
+
+        if (reviveSwarmer.realizedObject != null)
+        {
+            reviveSwarmer.realizedObject.AllGraspsLetGoOfThisObject(true);
+            player.room.RemoveObject(reviveSwarmer.realizedObject);
+            reviveSwarmer.realizedObject = null;
+        }
+        if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null && module.nshInventory.RemoveSpecificObj(reviveSwarmer))
+        {
+        }
+        else if (player.objectInStomach == reviveSwarmer)
+        {
+            player.objectInStomach = null;
+        }
+        else
+        {
+            player.room.abstractRoom.RemoveEntity(reviveSwarmer);
+        }
 
     }
 
@@ -594,11 +606,11 @@ public class DeathPreventHUD : HudPart
         }
         pos = owner.player.mainBodyChunk.pos - camPos;
 
-        circle.SetPosition(pos);
         circle.isVisible = true;
+        circle.color = owner.effectColor;
         fade =((float)owner.justPreventedCounter / 120f);
 
-        Plugin.Log(fade);
+        
 
 
     }
@@ -614,6 +626,7 @@ public class DeathPreventHUD : HudPart
     {
         if (hud.rainWorld.processManager.currentMainLoop is not RainWorldGame) return;
         circle.alpha = fade;
+        circle.SetPosition(DrawPos(timeStacker));
     }
 
 

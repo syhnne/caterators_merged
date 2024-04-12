@@ -300,6 +300,39 @@ internal class PlayerHooks
             return;
         }
 
+        if (!Plugin.playerModules.TryGetValue(self, out var module)) return;
+
+        // Plugin.Log("srs aerobiclevel", self.aerobicLevel);
+        if (self.aerobicLevel > 0.95f && module.spearExhaustCounter > 0)
+        {
+            self.exhausted = true;
+        }
+        else if (self.aerobicLevel < 0.4f)
+        {
+            self.exhausted = false;
+        }
+
+        if (self.exhausted)
+        {
+            self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
+            if (self.aerobicLevel > 0.9f && Random.value < 0.05f)
+            {
+                self.Stun(7);
+            }
+            if (self.aerobicLevel > 0.9f && Random.value < 0.1f)
+            {
+                self.standing = false;
+            }
+            if (!self.lungsExhausted || !(self.animation != Player.AnimationIndex.SurfaceSwim))
+            {
+                self.swimCycle += 0.05f;
+            }
+        }
+        else
+        {
+            self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 1f, 0.4f, 2f, 0f, 2f));
+        }
+
         // 20
         if (!self.input[0].pckp || self.input[0].y != 1)
         {
@@ -369,8 +402,18 @@ internal class PlayerHooks
             {
                 tailSpecks.setSpearProgress(1f);
             }
+
+            // 加一些体力限制（
+            if (tailSpecks.spearProg > 0.1f && tailSpecks.spearProg < 0.95f)
+            {
+                self.AerobicIncrease(0.07f);
+            }
+
             if (tailSpecks.spearProg == 1f)
             {
+                // 防止其他原因导致力竭
+                module.spearExhaustCounter = 400;
+
                 self.room.PlaySound(MoreSlugcatsEnums.MSCSoundID.SM_Spear_Grab, 0f, 1f, 0.5f + Random.value * 1.5f);
                 self.smSpearSoundReady = false;
                 Vector2 pos = (self.graphicsModule as PlayerGraphics).tail[(int)((float)(self.graphicsModule as PlayerGraphics).tail.Length / 2f)].pos;

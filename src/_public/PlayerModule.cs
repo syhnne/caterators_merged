@@ -1,5 +1,6 @@
 ﻿using System;
 
+
 namespace Caterators_by_syhnne._public;
 
 public class PlayerModule
@@ -15,7 +16,8 @@ public class PlayerModule
     public nsh.Inventory nshInventory;
     public srs.LightSourceModule srsLightSource;
     public _public.DeathPreventer deathPreventer;
-    public moon.SwarmerManager swarmerManager;
+    public moon.MoonSwarmer.SwarmerManager swarmerManager;
+    public int spearExhaustCounter;
 
 
     public PlayerModule(Player player)
@@ -50,14 +52,18 @@ public class PlayerModule
         }
         if (playerName == Enums.Moonname)
         {
-            swarmerManager = new moon.SwarmerManager(player);
-            // deathPreventer.swarmerManager = swarmerManager;
+            swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
+            deathPreventer.swarmerManager = swarmerManager;
         }
 
     }
 
     public void Update(Player player, bool eu)
     {
+        if (spearExhaustCounter > 0)
+        {
+            spearExhaustCounter--;
+        }
         deathPreventer?.Update();
         swarmerManager?.Update();
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }

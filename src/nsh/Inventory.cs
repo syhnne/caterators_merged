@@ -586,7 +586,7 @@ public class InventoryHUD : HudPart
             if (Plugin.DevMode)
             {
                 string s = icon.symbol.spriteName.ToString();
-                Plugin.Log(s);
+                Plugin.Log("iconspritename:", s);
             }
             icons.Add(icon);
         }
