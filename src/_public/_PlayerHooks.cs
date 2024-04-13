@@ -104,6 +104,10 @@ public class PlayerHooks
         {
             fp.PlayerHooks.Player_ctor(self, abstractCreature, world);
         }
+        else if (self.SlugCatClass == Enums.NSHname)
+        {
+            nsh.PlayerHooks.Player_ctor(self, abstractCreature, world);
+        }
 
 
 
@@ -427,6 +431,10 @@ public class PlayerHooks
             if (module.deathPreventer != null)
             {
                 self.AddPart(new DeathPreventHUD(self, self.fContainers[1], module.deathPreventer));
+            }
+            if (module.pearlReader != null)
+            {
+                self.AddPart(new fp.PearlReaderHUD(self, self.fContainers[1], module.pearlReader));
             }
         }
 

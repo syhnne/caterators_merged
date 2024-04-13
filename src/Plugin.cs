@@ -80,6 +80,7 @@ class Plugin : BaseUnityPlugin
 
             On.RainWorldGame.Update += RainWorldGame_Update;
             On.World.GetNode += World_GetNode;
+            On.MoreSlugcats.ChatlogData.getChatlog_ChatlogID += ChatlogData_getChatlog_ChatlogID;
             // On.SaveState.AbstractPhysicalObjectFromString += SaveState_AbstractPhysicalObjectFromString;
 
 
@@ -187,7 +188,17 @@ class Plugin : BaseUnityPlugin
 
 
 
-
+    private string[] ChatlogData_getChatlog_ChatlogID(On.MoreSlugcats.ChatlogData.orig_getChatlog_ChatlogID orig, ChatlogData.ChatlogID id)
+    {
+        string[] result = orig(id);
+        string str = "ChatlogID:" + id.ToString() + " - ";
+        foreach (string s in result)
+        {
+            str += s + " ";
+        }
+        Plugin.Log(str);
+        return result;
+    }
 
 
 

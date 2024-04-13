@@ -360,7 +360,7 @@ public class DeathPreventer
 
 
 
-
+    // TODO: 修复玩家被蜥蜴叼走然后复活的时候，蜥蜴钻管道导致玩家图像消失的问题
     public bool TryPreventDeath(PlayerDeathReason deathReason)
     {
         Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString());
@@ -376,7 +376,19 @@ public class DeathPreventer
         bool deathExplode = true;
         if (deathReason == PlayerDeathReason.DangerGrasp || deathReason == PlayerDeathReason.Violence)
         {
-            
+            foreach (var grabber in player.grabbedBy)
+            {
+                if (grabber.grabber != null)
+                {
+                    for(int i = 0; i < grabber.grabber.grasps.Count(); i++)
+                    {
+                        if (grabber.grabber.grasps[i] != null && grabber.grabber.grasps[i].grabbed == player)
+                        {
+                            grabber.grabber.ReleaseGrasp(i);
+                        }
+                    }
+                }
+            }
             player.AllGraspsLetGoOfThisObject(true);
         }
 
@@ -473,6 +485,7 @@ public class DeathPreventer
         player.dead = false;
         player.killTag = null;
         player.killTagCounter = 0;
+        player.slatedForDeletetion = false;
         AbstractCreatureAI abstractAI = player.abstractCreature.abstractAI;
         abstractAI?.SetDestination(player.abstractCreature.pos);
 

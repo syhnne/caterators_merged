@@ -3,6 +3,7 @@
 
 namespace Caterators_by_syhnne._public;
 
+// 一家人就要整整齐齐，这就是合并代码的好处（强迫症狂喜
 public class PlayerModule
 {
     public readonly WeakReference<Player> playerRef;
@@ -18,6 +19,7 @@ public class PlayerModule
     public _public.DeathPreventer deathPreventer;
     public moon.MoonSwarmer.SwarmerManager swarmerManager;
     public int spearExhaustCounter;
+    public fp.PearlReader pearlReader;
 
 
     public PlayerModule(Player player)
@@ -55,6 +57,10 @@ public class PlayerModule
             swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
             deathPreventer.swarmerManager = swarmerManager;
         }
+        if (playerName == Enums.FPname)
+        {
+            pearlReader = new fp.PearlReader(player);
+        }
 
     }
 
@@ -64,6 +70,7 @@ public class PlayerModule
         {
             spearExhaustCounter--;
         }
+        pearlReader?.Update(eu);
         deathPreventer?.Update();
         swarmerManager?.Update();
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }

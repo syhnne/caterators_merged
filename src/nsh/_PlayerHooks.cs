@@ -17,7 +17,15 @@ public class PlayerHooks
 {
 
 
-
+    public static void Player_ctor(Player self, AbstractCreature abstractCreature, World world)
+    {
+        if (abstractCreature.Room.world.game.IsStorySession)
+        {
+            AbstractPhysicalObject abstractPhysicalObject = new nsh.ReviveSwarmerModules.ReviveSwarmerAbstract(world, self.room.GetWorldCoordinate(self.mainBodyChunk.pos), world.game.GetNewID(), true);
+            abstractCreature.Room.AddEntity(abstractPhysicalObject);
+            abstractPhysicalObject.RealizeInRoom();
+        }
+    }
 
 
 
