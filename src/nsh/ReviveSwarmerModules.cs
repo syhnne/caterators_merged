@@ -389,7 +389,7 @@ public class ReviveSwarmerModules
 
         public override Color SpriteColor(int data)
         {
-            return Color.white;
+            return nsh.ReviveSwarmerModules.NSHswarmerColor;
         }
 
         public override string SpriteName(int data)

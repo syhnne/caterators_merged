@@ -35,17 +35,21 @@ public class MoonSwarmerCritob : Critob
             Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.Fly),
             TileResistances = new()
             {
-                Air = new(1, Allowed),
-
+                Air = new(0.9f, Allowed),
+                Floor = new(2, Allowed),
+                Wall = new(1.5f, Allowed),
+                Corridor = new(1.5f, Allowed),
+                Ceiling = new(2, Allowed),
+                OffScreen = new(1, Allowed)
             },
             ConnectionResistances = new()
             {
-                Standard = new(1, Allowed),
-                OpenDiagonal = new(1, Allowed),
-                ShortCut = new(1, Allowed),
+                Standard = new(0.8f, Allowed),
+                OpenDiagonal = new(0.3f, Allowed),
+                ShortCut = new(1.2f, Allowed),
                 NPCTransportation = new(0, Unallowed),
                 OffScreenMovement = new(0, IllegalTile),
-                BetweenRooms = new(1, Allowed),
+                BetweenRooms = new(0.5f, Allowed),
             },
             DamageResistances = new()
             {

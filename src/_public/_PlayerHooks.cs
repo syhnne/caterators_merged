@@ -28,6 +28,7 @@ using static MonoMod.Cil.RuntimeILReferenceBag;
 using System.Security.Cryptography;
 using Caterators_by_syhnne.srs;
 using Caterators_by_syhnne.nsh;
+using Caterators_by_syhnne.moon.MoonSwarmer;
 
 namespace Caterators_by_syhnne._public;
 
@@ -98,7 +99,8 @@ public class PlayerHooks
     private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
     {
         orig(self, abstractCreature, world);
-        Plugin.playerModules.Add(self, new _public.PlayerModule(self));
+        Plugin.playerModules.Add(self, new _public.PlayerModule(self, abstractCreature, world));
+
 
         if (self.SlugCatClass == Enums.FPname)
         {
@@ -108,6 +110,7 @@ public class PlayerHooks
         {
             nsh.PlayerHooks.Player_ctor(self, abstractCreature, world);
         }
+
 
 
 
@@ -405,13 +408,17 @@ public class PlayerHooks
             module.gravityController?.Die();
             module.nshInventory?.RemoveAndRealizeAllObjects();
             if (self.dead) { module.deathPreventer = null; }
+            if (module.swarmerManager != null && module.swarmerManager.LastAliveSwarmer != null)
+            {
+                module.swarmerManager.KillSwarmer(module.swarmerManager.LastAliveSwarmer, false);
+            }
         }
     }
 
 
 
 
-    // 重力显示
+    // 已经变成工业生产流程了
     private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
     {
         orig(self, cam);
@@ -435,6 +442,13 @@ public class PlayerHooks
             if (module.pearlReader != null)
             {
                 self.AddPart(new fp.PearlReaderHUD(self, self.fContainers[1], module.pearlReader));
+            }
+            if (module.swarmerManager != null)
+            {
+                moon.MoonSwarmer.SwarmerHUD swarmerHUD = new moon.MoonSwarmer.SwarmerHUD(self, self.fContainers[1], module.swarmerManager);
+                self.AddPart(swarmerHUD);
+                module.swarmerManager.hud = swarmerHUD;
+                swarmerHUD.UpdateIcons();
             }
         }
 

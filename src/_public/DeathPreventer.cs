@@ -240,6 +240,9 @@ public class DeathPreventer
     public moon.MoonSwarmer.SwarmerManager swarmerManager;
     public Color effectColor;
 
+    // 给swarmermanager提供的防止连锁反应的手段
+    public bool dontRevive = false;
+
     public DeathPreventer(Player player) 
     { 
         this.player = player;
@@ -363,11 +366,13 @@ public class DeathPreventer
     // TODO: 修复玩家被蜥蜴叼走然后复活的时候，蜥蜴钻管道导致玩家图像消失的问题
     public bool TryPreventDeath(PlayerDeathReason deathReason)
     {
-        Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString());
+        if (dontRevive || justPreventedCounter > 0) { return false; }
+
+        // Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString());
         AbstractPhysicalObject reviveSwarmer = DeathPreventObject;
         if (player.room == null || reviveSwarmer == null)
         {
-            Plugin.Log("player", player.abstractCreature.ID.number, "death NOT prevented, reason:", deathReason.ToString(), reviveSwarmer == null);
+            // Plugin.Log("player", player.abstractCreature.ID.number, "death NOT prevented, reason:", deathReason.ToString(), reviveSwarmer == null);
             return false;
         }
 
@@ -511,7 +516,7 @@ public class DeathPreventer
 
         if (swarmerManager != null && reviveSwarmer is AbstractCreature && reviveSwarmer.realizedObject != null)
         {
-            swarmerManager.KillSwarmer(reviveSwarmer.realizedObject as MoonSwarmer);
+            swarmerManager.KillSwarmer(reviveSwarmer.realizedObject as MoonSwarmer, true);
             return;
         }
 
@@ -559,7 +564,7 @@ public enum PlayerDeathReason
     ArtiPyroDeath, // 啊。。这个只包括炸多了去世的，不包括泡水里，那个算在Drown里面
     Leech, // 不翻代码不知道，原来水蛭能直接吸死猫啊 Leech.Attached()
     BigJellyFish, // MoreSlugcats.BigJellyFish.Collide()
-    Singularity, // MoreSlugcats.EnergyCell.Explode() MoreSlugcats.SingularityBomb.Explode()
+    Singularity, // MoreSlugcats.EnergyCell.Kill() MoreSlugcats.SingularityBomb.Kill()
     SaintAscention, // 妈的不翻代码真的想不到这个 Player.ClassMechanicsSaint()
     GourmandSmash, // ...痛击我的队友 Player.Collide()
     // room.game.setupValues.invincibility 这是什么 他是我需要的那个吗
@@ -601,7 +606,7 @@ public class DeathPreventHUD : HudPart
     {
         get
         {
-            return owner != null && owner.player.room != null && owner.justPreventedCounter > 0;
+            return owner != null && owner.player.room != null && owner.justPreventedCounter > 0 && !owner.dontRevive;
         }
     }
 

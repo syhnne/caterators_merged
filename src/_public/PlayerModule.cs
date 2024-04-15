@@ -22,7 +22,7 @@ public class PlayerModule
     public fp.PearlReader pearlReader;
 
 
-    public PlayerModule(Player player)
+    public PlayerModule(Player player, AbstractCreature abstractCreature, World world)
     {
         playerRef = new WeakReference<Player>(player);
         playerName = player.slugcatStats.name;
@@ -54,8 +54,29 @@ public class PlayerModule
         }
         if (playerName == Enums.Moonname)
         {
+            // 最费劲的一集
             swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
             deathPreventer.swarmerManager = swarmerManager;
+            swarmerManager.deathPreventer = deathPreventer;
+            // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
+            try
+            {
+                Plugin.Log("spawn swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
+                swarmerManager.SpawnSwarmer(world.game.GetDeathPersistent().MoonHasSwarmers);
+                /*if (world.game.GetMiscProgression().IsNewSave)
+                {
+                    Plugin.Log("new save, spawn 5");
+                    swarmerManager.SpawnSwarmer(moon.MoonSwarmer.SwarmerManager.maxSwarmer);
+                }
+                else
+                {
+                    
+                }*/
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.LogError(e);
+            }
         }
         if (playerName == Enums.FPname)
         {

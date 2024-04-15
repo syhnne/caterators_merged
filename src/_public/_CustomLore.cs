@@ -146,11 +146,18 @@ public class CustomLore
         if (self.manager.upcomingProcess != null) return;
         foreach (AbstractCreature player in self.Players)
         {
-            if (player.realizedCreature != null && Plugin.playerModules.TryGetValue(player.realizedCreature as Player, out var module) && module.nshInventory != null)
+            if (player.realizedCreature != null && Plugin.playerModules.TryGetValue(player.realizedCreature as Player, out var module))
             {
-                self.GetDeathPersistent().NSHInventoryStrings = new string[4];
-                self.GetDeathPersistent().NSHInventoryStrings[player.ID.number] = module.nshInventory.CycleEndSave();
-                Plugin.Log("inventory save:", self.GetDeathPersistent().NSHInventoryStrings[player.ID.number]);
+                if (module.nshInventory != null)
+                {
+                    self.GetDeathPersistent().NSHInventoryStrings = new string[4];
+                    self.GetDeathPersistent().NSHInventoryStrings[player.ID.number] = module.nshInventory.CycleEndSave();
+                    Plugin.Log("inventory save:", self.GetDeathPersistent().NSHInventoryStrings[player.ID.number]);
+                }
+                if (module.swarmerManager != null)
+                {
+                    module.swarmerManager.CycleEndSave();
+                }
             }
         }
 

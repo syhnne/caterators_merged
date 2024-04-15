@@ -18,6 +18,7 @@ public static class CustomSaveData
 
     public static void Apply()
     {
+        On.SaveState.SaveToString += SaveState_SaveToString;
         On.PlayerProgression.SaveToDisk += PlayerProgression_SaveToDisk;
         On.SaveState.LoadGame += SaveState_LoadGame;
     }
@@ -61,6 +62,7 @@ public static class CustomSaveData
     private static string SaveState_SaveToString(On.SaveState.orig_SaveToString orig, SaveState self)
     {
         var miscProg = self.progression.miscProgressionData?.GetMiscProgression();
+        miscProg.IsNewSave = false;
         return orig(self);
     }
 
@@ -81,6 +83,10 @@ public static class CustomSaveData
     // 呃啊。。彻底明白了劝学里面那句“君子生非异也，善假于物也”是什么意思。。
     public class SaveMiscProgression
     {
+        public SaveMiscProgression()
+        {
+            IsNewSave = true;
+        }
         public SlugcatStats.Name StoryCharacter {  get; set; }
         public bool IsNewSave {  get; set; }
         public bool beaten_fp { get; set; }
@@ -107,6 +113,10 @@ public static class CustomSaveData
 
     public class SaveDeathPersistent
     {
+        public SaveDeathPersistent() 
+        {
+            MoonHasSwarmers = moon.MoonSwarmer.SwarmerManager.maxSwarmer;
+        }
         public int CyclesFromLastEnterSSAI {  get; set; }
         public bool OxygenMaskTaken {  get; set; }
         public bool alt2ending_fp { get; set; }
@@ -115,6 +125,8 @@ public static class CustomSaveData
         public bool alt2ending_moon { get; set; }
 
         public string[] NSHInventoryStrings { get; set; }
+
+        public int MoonHasSwarmers { get; set; }
 
     }
 

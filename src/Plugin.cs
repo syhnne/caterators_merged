@@ -150,39 +150,53 @@ class Plugin : BaseUnityPlugin
     // 一些我的开发者模式专用按键
     private void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
     {
-        orig(self);
-
-        if (!DevMode || !self.devToolsActive) return;
-
-        // 按Y生成一个复活用的神经元
-        if (Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
+        if (DevMode && self.devToolsActive)
         {
-            AbstractPhysicalObject abstr = new ReviveSwarmerModules.ReviveSwarmerAbstract(self.world, self.Players[0].pos, self.GetNewID(), true);
-            abstr.destroyOnAbstraction = true;
-            self.Players[0].Room.AddEntity(abstr);
-            abstr.RealizeInRoom();
-            abstr.realizedObject.firstChunk.pos = self.Players[0].realizedObject.firstChunk.pos;
-            Plugin.Log("spawn ReviveSwarmer");
-        }
-
-        // 按U时停，用于修改roomSettings
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            self.rivuletEpilogueRainPause = !self.rivuletEpilogueRainPause;
-            Plugin.Log("ZA WARUDO");
-        }
-
-        // 按T生成一个月姐的神经元 
-        // 求你了 别卡bug了
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            foreach (AbstractCreature p in self.Players)
+            // 按Y生成一个复活用的神经元
+            if (Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
             {
-                if (p.realizedObject != null && p.realizedCreature.room != null && Plugin.playerModules.TryGetValue(p.realizedCreature as Player, out var module) && module.swarmerManager != null)
+                AbstractPhysicalObject abstr = new ReviveSwarmerModules.ReviveSwarmerAbstract(self.world, self.Players[0].pos, self.GetNewID(), true);
+                abstr.destroyOnAbstraction = true;
+                self.Players[0].Room.AddEntity(abstr);
+                abstr.RealizeInRoom();
+                abstr.realizedObject.firstChunk.pos = self.Players[0].realizedObject.firstChunk.pos;
+                Plugin.Log("spawn ReviveSwarmer");
+            }
+
+            // 按U时停，用于修改roomSettings
+            if (Input.GetKeyDown(KeyCode.U))
+            {
+                self.rivuletEpilogueRainPause = !self.rivuletEpilogueRainPause;
+                Plugin.Log("ZA WARUDO");
+            }
+
+            // 按T生成一个月姐的神经元 
+            // 求你了 别卡bug了
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                foreach (AbstractCreature p in self.Players)
                 {
-                    module.swarmerManager.AddSwarmer();
+                    if (p.realizedObject != null && p.realizedCreature.room != null && Plugin.playerModules.TryGetValue(p.realizedCreature as Player, out var module) && module.swarmerManager != null)
+                    {
+                        module.swarmerManager.SpawnSwarmer();
+                    }
                 }
             }
+        }
+
+        try
+        {
+            orig(self);
+        }
+        catch (Exception e)
+        {
+            Plugin.Logger.LogError(e);
+            throw;
+        }
+        finally
+        {
+
+            
         }
     }
 

@@ -28,6 +28,8 @@ public class MoonSwarmer : Creature
 
     public SwarmerManager manager;
     public MoonSwarmerAI AI = null;
+    // 但是这东西会把玩家绑架在管道里 算了 还是老老实实写tp吧
+    // public Player.AbstractOnBackStick stickToPlayer;
     public bool isActive;
 
     public float rotation;
@@ -39,9 +41,16 @@ public class MoonSwarmer : Creature
     public float revolveSpeed;
     public bool lastVisible;
 
-
+    public bool callBack = false;
+    /*{
+        get
+        {
+            return manager != null && manager.player.room != null && manager.player.room.abstractRoom.shelterIndex != -1;
+        }
+    }*/
+    public bool notInSameRoom => manager != null && room != manager.player.room && !inShortcut && !manager.player.inShortcut;
     public float affectedByGravity = 1f;
-
+    public MovementConnection currentConnection;
 
     public MoonSwarmer(AbstractCreature abstr) : base(abstr, abstr.world)
     {
@@ -72,77 +81,92 @@ public class MoonSwarmer : Creature
     public override void Update(bool eu)
     {
         base.Update(eu);
-        ChangeCollisionLayer(grabbedBy.Count == 0 ? 2 : 1);
-        firstChunk.collideWithTerrain = grabbedBy.Count == 0;
-        firstChunk.collideWithSlopes = grabbedBy.Count == 0;
-
-
-
-
-        firstChunk.vel.y = firstChunk.vel.y - this.room.gravity * this.affectedByGravity;
-        this.lastDirection = this.direction;
-        this.lastLazyDirection = this.lazyDirection;
-        this.lazyDirection = Vector3.Slerp(this.lazyDirection, this.direction, 0.06f);
-        this.lastRotation = this.rotation;
-        this.rotation += this.revolveSpeed;
-        if (this.room.gravity * this.affectedByGravity > 0.5f)
+        if (room != null && firstChunk != null)
         {
-            if (base.firstChunk.ContactPoint.y < 0)
+            ChangeCollisionLayer(grabbedBy.Count == 0 ? 2 : 1);
+            firstChunk.collideWithTerrain = grabbedBy.Count == 0;
+            firstChunk.collideWithSlopes = grabbedBy.Count == 0;
+
+
+
+
+            firstChunk.vel.y = firstChunk.vel.y - this.room.gravity * this.affectedByGravity;
+            this.lastDirection = this.direction;
+            this.lastLazyDirection = this.lazyDirection;
+            this.lazyDirection = Vector3.Slerp(this.lazyDirection, this.direction, 0.06f);
+            this.lastRotation = this.rotation;
+            this.rotation += this.revolveSpeed;
+            if (this.room.gravity * this.affectedByGravity > 0.5f)
             {
-                this.direction = Vector3.Slerp(this.direction, new Vector2(Mathf.Sign(this.direction.x), 0f), 0.4f);
-                this.revolveSpeed *= 0.8f;
+                if (base.firstChunk.ContactPoint.y < 0)
+                {
+                    this.direction = Vector3.Slerp(this.direction, new Vector2(Mathf.Sign(this.direction.x), 0f), 0.4f);
+                    this.revolveSpeed *= 0.8f;
+                }
+                else if (this.grabbedBy.Count > 0)
+                {
+                    this.direction = Custom.PerpendicularVector(base.firstChunk.pos, this.grabbedBy[0].grabber.mainBodyChunk.pos) * (float)((this.grabbedBy[0].graspUsed == 0) ? -1 : 1);
+                }
+                else
+                {
+                    this.direction = Vector3.Slerp(this.direction, Custom.DirVec(base.firstChunk.lastLastPos, base.firstChunk.pos), 0.4f);
+                }
+                this.revolveSpeed *= 0.5f;
+                this.rotation = Mathf.Lerp(this.rotation, Mathf.Floor(this.rotation) + 0.25f, Mathf.InverseLerp(0.5f, 1f, this.room.gravity * this.affectedByGravity) * 0.1f);
             }
-            else if (this.grabbedBy.Count > 0)
-            {
-                this.direction = Custom.PerpendicularVector(base.firstChunk.pos, this.grabbedBy[0].grabber.mainBodyChunk.pos) * (float)((this.grabbedBy[0].graspUsed == 0) ? -1 : 1);
-            }
-            else
-            {
-                this.direction = Vector3.Slerp(this.direction, Custom.DirVec(base.firstChunk.lastLastPos, base.firstChunk.pos), 0.4f);
-            }
-            this.revolveSpeed *= 0.5f;
-            this.rotation = Mathf.Lerp(this.rotation, Mathf.Floor(this.rotation) + 0.25f, Mathf.InverseLerp(0.5f, 1f, this.room.gravity * this.affectedByGravity) * 0.1f);
+        }
+
+
+        if (isActive && State.alive && graphicsModule == null)
+        {
+            graphicsModule = new MoonSwarmerGraphics(this);
+        }
+        AI?.Update();
+
+        mainBodyChunk.vel *= 0.9f;
+
+        // 可以被b键拖拽
+        // 所以他为什么那么喜欢卡在管道里。。
+        if (room != null && room.game.devToolsActive && Input.GetKey("b") && room.game.cameras[0].room == room)
+        {
+            base.bodyChunks[0].vel += Custom.DirVec(base.bodyChunks[0].pos, new Vector2(Futile.mousePosition.x, Futile.mousePosition.y) + this.room.game.cameras[0].pos) * 14f;
+        }
+
+        if (manager != null)
+        {
+            affectedByGravity = Mathf.Lerp(affectedByGravity, (manager.player.dead || dead) ? 1f : 0f, 0.1f);
+            Plugin.Log("swarmer affectedbyG", affectedByGravity);
         }
 
 
 
-        
-        try
+        /*if (room != null && room.gravity * affectedByGravity > 0.5f)
         {
-            if (isActive && State.alive && graphicsModule == null)
+            return;
+        }*/
+        /*if (callBack && !notInSameRoom)
+        {
+            TryMoveTowards(manager.player.DangerPos, manager.player.DangerPos);
+            if (Custom.DistLess(DangerPos, manager.player.DangerPos, 5f))
             {
-                graphicsModule = new MoonSwarmerGraphics(this);
+                manager.callBackCounter++;
+                Destroy();
             }
-            AI?.Update();
-            // 可以被b键拖拽
-            // 所以他为什么那么喜欢卡在管道里。。
-            if (room != null && room.game.devToolsActive && Input.GetKey("b") && room.game.cameras[0].room == room)
-            {
-                base.bodyChunks[0].vel += Custom.DirVec(base.bodyChunks[0].pos, new Vector2(Futile.mousePosition.x, Futile.mousePosition.y) + this.room.game.cameras[0].pos) * 14f;
-            }
+        }*/
+        if (!dead && !inShortcut)
+        {
+            Act();
+        }
 
-            if (manager != null)
-            {
-                affectedByGravity = Mathf.Lerp(affectedByGravity, (manager.player.dead || dead) ? 1f : 0f, 0.1f);
-                Plugin.Log("swarmer affectedbyG", affectedByGravity);
-            }
 
+        /*try
+        {
             
-
-            if (room != null && room.gravity * affectedByGravity > 0.5f)
-            {
-                return;
-            }
-
-            if (!dead)
-            {
-                Act();
-            }
         }
         catch (Exception ex)
         {
             Plugin.Logger.LogError(ex);
-        }
+        }*/
         
 
         
@@ -150,32 +174,86 @@ public class MoonSwarmer : Creature
 
     public void Act()
     {
-        if (grabbedBy != null && grabbedBy.Count == 0 &&  AI.pathFinder != null && AI.pathFinder.destination != null)
+        try
         {
-            MovementConnection connection = (AI.pathFinder as StandardPather).FollowPath(abstractCreature.pos, true);
-            if (connection != null && connection.type == MovementConnection.MovementType.ShortCut)
+            
+            if (grabbedBy.Count == 0 && manager != null && manager.player.room != null && room != null)
             {
-                if ((room.GetTile(connection.StartTile).Terrain == Room.Tile.TerrainType.ShortcutEntrance))
+                float distance = Custom.Dist(manager.player.mainBodyChunk.pos, firstChunk.pos);
+                Plugin.Log("player distance:", distance);
+                if (distance < 50f) AI.SwitchBehavior(MoonSwarmerAI.Behavior.Idle);
+            }
+            else if (grabbedBy.Count == 0)
+            {
+                AI.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
+            }
+
+            if (grabbedBy.Count == 0 && AI.pathFinder != null && AI.pathFinder.destination != null && AI.pathFinder.DoneMappingAccessibility)
+            {
+                MovementConnection connection = (AI.pathFinder as StandardPather).FollowPath(abstractCreature.pos, true);
+                currentConnection = connection;
+                if (connection != null && connection.type == MovementConnection.MovementType.ShortCut)
                 {
-                    enteringShortCut = new IntVector2?(connection.StartTile);
+                    if ((room.GetTile(connection.StartTile).Terrain == Room.Tile.TerrainType.ShortcutEntrance))
+                    {
+                        enteringShortCut = new IntVector2?(connection.StartTile);
+                    }
+                }
+                else if (connection != null)
+                {
+                    TryMoveTowards(room.MiddleOfTile(connection.DestTile), room.MiddleOfTile(AI.pathFinder.destination));
                 }
             }
-            else if (connection != null)
-            {
-                MoveTowards(room.MiddleOfTile(connection.DestTile));
-            }
         }
+        catch (Exception ex)
+        {
+            Plugin.Logger.LogError(ex);
+        }
+
     }
 
-    public void MoveTowards(Vector2 dest)
+    public void TryMoveTowards(Vector2 connectionEnd, Vector2 dest)
     {
         // Plugin.Log("swarmer movetowards:", dest.x, dest.y);
-        Vector2 dir = Custom.DirVec(firstChunk.pos, dest);
-        float vel = 4f;
-        bodyChunks[0].vel = dir * vel;
+
+        // 如果距离小于30f就不移动
+        /*if (!Custom.DistLess(firstChunk.pos, dest, 30f))
+        {
+            
+        }*/
+
+        if (AI.pathFinder.destination == null || Vector2.Distance(firstChunk.pos, dest) <= 35f)
+        {
+            bodyChunks[0].vel = Vector2.Lerp(bodyChunks[0].vel, Vector2.zero, 0.05f);
+        }
+        else
+        {
+            Vector2 dir = Custom.DirVec(firstChunk.pos, connectionEnd);
+            float vel = 5f;
+            bodyChunks[0].vel = dir * vel;
+        }
+
+        
+
+        /*Vector2 dir = Custom.DirVec(firstChunk.pos, dest);
+        Vector2 accelereation = Vector2.Distance(firstChunk.pos, dest) / 4f;
+        accelereation = Mathf.Clamp(accelereation, 0f, maxAcceleration);
+
+        bodyChunks[0].vel += accelereation * dir;
+        bodyChunks[0].vel = Vector2.ClampMagnitude(bodyChunks[0].vel, MaxVelocity);*/
+
     }
 
 
+
+
+
+
+    public override void InitiateGraphicsModule()
+    {
+        graphicsModule ??= new MoonSwarmerGraphics(this);
+        graphicsModule.Reset();
+    }
 
 
     public override Color ShortCutColor()
@@ -187,14 +265,13 @@ public class MoonSwarmer : Creature
     {
         isActive = false;
         base.Die();
-        
         manager?.swarmers.Remove(this);
-        // AllGraspsLetGoOfThisObject(true);
+
+        /*stickToPlayer?.Deactivate();
+        stickToPlayer = null;*/
         Room r = room;
         if (r != null)
         {
-            Explode();
-            
             r.RemoveObject(this);
             r.abstractRoom.RemoveEntity(abstractPhysicalObject);
         }
@@ -202,19 +279,30 @@ public class MoonSwarmer : Creature
     }
 
     // TODO: 有没有一种可能，如果玩家趁着神经元在钻管道的时候去世，他就会卡bug
-    private void Explode()
+    public void Kill(bool explode)
     {
-        room.AddObject(new Explosion.ExplosionLight(firstChunk.pos, 200f, 3f, 4, Color.white));
-        for (int l = 0; l < 8; l++)
+        if (explode && room != null)
         {
-            Vector2 vector2 = Custom.RNV();
-            room.AddObject(new Spark(firstChunk.pos + vector2 * Random.value * 40f, vector2 * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
+            room.AddObject(new Explosion.ExplosionLight(firstChunk.pos, 200f, 3f, 4, Color.white));
+            for (int l = 0; l < 8; l++)
+            {
+                Vector2 vector2 = Custom.RNV();
+                room.AddObject(new Spark(firstChunk.pos + vector2 * Random.value * 40f, vector2 * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
+            }
+            if (room.Darkness(firstChunk.pos) > 0f)
+            {
+                room.AddObject(new LightSource(firstChunk.pos, false, Color.white, this));
+            }
         }
-        if (room.Darkness(firstChunk.pos) > 0f)
-        {
-            room.AddObject(new LightSource(firstChunk.pos, false, Color.white, this));
-        }
-        
+
+        Die();
+    }
+
+
+    public override void SpitOutOfShortCut(IntVector2 pos, Room newRoom, bool spitOutAllSticks)
+    {
+        base.SpitOutOfShortCut(pos, newRoom, spitOutAllSticks);
+        firstChunk.vel *= 3;
     }
 
     public override bool CanBeGrabbed(Creature grabber)

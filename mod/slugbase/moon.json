@@ -22,7 +22,7 @@
         "climb_speed": 1.5,
         "tunnel_speed": 1.5,
         "lung_capacity": 5,
-        "auto_grab_batflies": false,
+        "auto_grab_batflies": true,
         "karma": 9,
         "karma_cap": 9,
         "the_mark": true,
@@ -33,7 +33,7 @@
         "food_max": 8,
 
         "guide_overseer": 1,
-        "start_room": "CC_A02",
+        "start_room": "CC_S01",
         "world_state": [ "Moonslugcat", "Saint", "Yellow" ],
         "timeline_after": "Rivulet",
         "cycle_length_min": 5,

@@ -373,10 +373,6 @@ public class Inventory
 
 
 
-    // TODO: 这玩意儿也有bug 点的快了他容易算不出来，最好是用abstractobj计算，每次加东西的时候reset一遍
-    // AbstractPhysicalObject.AbstractObjectType
-
-
     /*public int ItemVolume(PhysicalObject obj)
     {
         
@@ -403,19 +399,6 @@ public class Inventory
             || obj.type == MoreSlugcatsEnums.AbstractObjectType.JokeRifle) return 30;
         return 10;
     }
-
-
-
-    /*public int ItemVolume(PhysicalObject obj)
-    {
-        
-        if (unlimited) return 0;
-        if (obj is Spear) return 5;
-        if (player.CanBeSwallowed((PhysicalObject)obj) || obj is IPlayerEdible) return 10;
-        if (player.Grabability(obj) <= Player.ObjectGrabability.BigOneHand) return 15;
-        if (!player.HeavyCarry(obj)) return 25;
-        return 100;
-    }*/
 
 
 
@@ -583,11 +566,11 @@ public class InventoryHUD : HudPart
                 data = new IconSymbol.IconSymbolData(CreatureTemplate.Type.StandardGroundCreature, AbstractPhysicalObject.AbstractObjectType.Creature, 0);
                 icon = new(this, hud.fContainers[0], (IconSymbol.IconSymbolData)data);
             }
-            if (Plugin.DevMode)
+            /*if (Plugin.DevMode)
             {
                 string s = icon.symbol.spriteName.ToString();
                 Plugin.Log("iconspritename:", s);
-            }
+            }*/
             icons.Add(icon);
         }
 

@@ -12,6 +12,9 @@ namespace Caterators_by_syhnne.moon;
 public class PlayerHooks
 {
 
+
+
+
     public static void Apply()
     {
         new Hook(
@@ -25,7 +28,7 @@ public class PlayerHooks
     private static bool get_Player_isRivulet(Player_isRivulet orig, Player self)
     {
         var result = orig(self);
-        if (self.SlugCatClass == Enums.Moonname)
+        if (self.SlugCatClass == Enums.Moonname && Plugin.playerModules.TryGetValue(self, out var module) && module.swarmerManager != null && module.swarmerManager.agility)
         {
             result = true;
         }
