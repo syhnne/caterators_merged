@@ -30,7 +30,16 @@ public class SwarmerManager
     public bool weakMode;
     public bool agility;
 
-    public int callBackCounter = 0;
+    /// <summary>
+    /// 离得太远的时候把这个值设置为true，下次玩家钻管道的时候会直接重生一波新的
+    /// </summary>
+    public bool needCallBack = false;
+    public int? callBackSwarmers;
+
+    public int hasSwarmers
+    {
+        get { return callBackSwarmers != null ? (int)callBackSwarmers : swarmers.Count; }
+    }
 
     /// <summary>
     /// 剩余的神经元数量是否多于1
@@ -55,6 +64,7 @@ public class SwarmerManager
     {
         get
         {
+            if (swarmers == null) return null;
             for (int i = swarmers.Count - 1; i >= 0; i--)
             {
                 if (swarmers[i].State.alive)
@@ -136,43 +146,55 @@ public class SwarmerManager
 
     /// <summary>
     /// callback(x) 重开（v)
+    /// 不要在这里updateswarmers，经测试这会使神经元数量变成-1并引发deathpreventer
     /// </summary>
     public void CallBack()
     {
-        callBackCounter = 0;
-        // 防止玩家在此时损失神经元（？
-        deathPreventer?.SetInvuln();
+        callBackSwarmers = 0;
+        deathPreventer.forceRevive = true;
+        Plugin.Log("CallBack():", swarmers.Count);
         foreach (var swarmer in swarmers)
         {
-            callBackCounter++;
+            Plugin.Log("CallBack(): callback swarmer");
+            callBackSwarmers++;
             swarmer.Kill(false);
         }
-        swarmers = null;
+        swarmers.Clear();
+        Plugin.Log("CallBack(): call back swarmers:", callBackSwarmers);
     }
 
 
 
 
-    public void Respawn()
+    public bool Respawn()
     {
-        deathPreventer?.DisableInvuln();
-        if (callBackCounter == 0)
+        
+        if (callBackSwarmers == null || callBackSwarmers == 0)
         {
-            Plugin.Log("Warning: respawn count = 0");
-            return;
+            Plugin.Log("Respawn(): null callBackSwarmers");
+            return false;
         }
-        SpawnSwarmer(callBackCounter);
+        SpawnSwarmer((int)callBackSwarmers);
+        callBackSwarmers = null;
+        SwarmersUpdate();
+        return true;
     }
 
 
 
     public void SwarmersUpdate()
     {
-        switch (swarmers.Count())
+        switch (hasSwarmers)
         {
             case 0:
                 if (player.stillInStartShelter) break; // 不加这句的下场就是，一点开游戏就看到已经死了（（（
-                if (deathPreventer != null) { deathPreventer.dontRevive = true; } // 防止deathpreventer再消耗神经元复活玩家（。
+                try
+                {
+                    player.Die();
+                }
+                catch (Exception e) 
+                { Plugin.Logger.LogError(e); }
+                // if (deathPreventer != null) { deathPreventer.dontRevive = true; } // 防止deathpreventer再消耗神经元复活玩家（。
                 break;
             case 1:
             case 2: 
@@ -187,12 +209,15 @@ public class SwarmerManager
                 break;
         }
         hud?.UpdateIcons();
-        Plugin.Log("has swarmers:", swarmers.Count(), "weak:", weakMode, "agility:", agility);
+        Plugin.Log("has swarmers:", hasSwarmers, "weak:", weakMode, "agility:", agility);
     }
 
 
 
-
+    /// <summary>
+    /// 一般来说不要直接调用这个，最好给callBackSwarmers赋值然后使用Respawn()
+    /// </summary>
+    /// <param name="number"></param>
     public void SpawnSwarmer(int number = 1)
     {
         Plugin.Log("spawn MoonSwarmer");
@@ -203,6 +228,7 @@ public class SwarmerManager
             abstr.RealizeInRoom();
             // (abstr.realizedCreature as MoonSwarmer).stickToPlayer = new Player.AbstractOnBackStick(player.abstractCreature, abstr);
             abstr.realizedObject.firstChunk.pos = player.firstChunk.pos;
+            (abstr.realizedCreature as MoonSwarmer).manager = this;
             (abstr.realizedCreature as MoonSwarmer).AI.manager = this;
             swarmers.Add(abstr.realizedCreature as MoonSwarmer);
             
@@ -221,7 +247,7 @@ public class SwarmerManager
             s.killTag = null;
             s.Kill(explode);
             swarmers.Remove(s);
-            Plugin.Log("killed, moon has swarmer:", swarmers.Count);
+            Plugin.Log("killed, moon has swarmer:", hasSwarmers);
             result = true;
         }
         SwarmersUpdate();
@@ -231,21 +257,74 @@ public class SwarmerManager
 
     public void CycleEndSave()
     {
+        if (callBackSwarmers != null) { return; }
         CallBack();
         if (player.room == null)
         {
-            Plugin.Log("Warning: Null player.room, neurons not saved");
+            Plugin.Log("CycleEndSave(): Null player.room, neurons not saved");
             return;
         }
-        if (callBackCounter == 0)
+        if (callBackSwarmers == null || callBackSwarmers == 0)
         {
-            Plugin.Log("Warning: callback count = 0");
-            callBackCounter = swarmers.Count;
+            Plugin.Log("CycleEndSave(): null callBackSwarmers");
+            callBackSwarmers = swarmers.Count;
         }
-        player.room.game.GetDeathPersistent().MoonHasSwarmers = callBackCounter;
-       
+        player.room.game.GetDeathPersistent().MoonHasSwarmers = (int)callBackSwarmers;
+        callBackSwarmers = null;
     }
 
+
+
+    public void Player_SpitOutOfShortCut(bool stillInStartShelter)
+    {
+        // 好好好 没想到这个逻辑还挺简单的
+        if (player.room == null) return;
+
+        
+        if (callBackSwarmers != null)
+        {
+            Respawn();
+        }
+        
+
+        /*if (player.room.abstractRoom.gate || player.room.abstractRoom.shelter)
+        {
+            CallBack();
+        }
+        else if (callBackSwarmers != null)
+        {
+            Respawn();
+        }
+        else if (needCallBack)
+        {
+            // 非常的简单粗暴，直接重生一波新的，连tp都免了
+            // 不过要是有人按着visible ID一直看的话，我就要露馅了（（
+            CallBack();
+            Respawn();
+        }*/
+        
+
+    }
+
+
+
+
+    public void LogAllSwarmersData()
+    {
+        Plugin.Log(" ~ swarmers ~ ");
+        if (callBackSwarmers != null)
+        {
+            Plugin.Log(" ~ not realized, has swarmers:" + callBackSwarmers.ToString());
+        }
+        else
+        {
+            foreach (var swarmer in swarmers)
+            {
+                Plugin.Log(" ~ ", swarmer.abstractCreature.ID.number + " - pos: " + swarmer.abstractCreature.pos.ToString() + " behavior: " + swarmer.AI.currentBehavior.ToString());
+            }
+        }
+        
+    }
 
 
 
@@ -330,17 +409,17 @@ public class SwarmerHUD : HudPart
         }
         icons.Clear();
 
-        lineSprite.isVisible = owner.swarmers != null && owner.swarmers.Count >= SwarmerManager.maxSwarmer;
+        lineSprite.isVisible = owner.hasSwarmers > SwarmerManager.maxSwarmer;
 
-
-        for (int i = 0; i < (owner.swarmers != null? owner.swarmers.Count : owner.callBackCounter); i++)
+        
+        for (int i = 0; i < owner.hasSwarmers; i++)
         {
             icons.Add(new FSprite("Symbol_Neuron", false) { color = Color.white });
         }
 
         if (icons.Count < SwarmerManager.maxSwarmer)
         {
-            for (int i = (owner.swarmers != null ? owner.swarmers.Count : owner.callBackCounter) - 1; i < SwarmerManager.maxSwarmer - 1; i++)
+            for (int i = owner.hasSwarmers - 1; i < SwarmerManager.maxSwarmer - 1; i++)
             {
                 icons.Add(new FSprite("Symbol_Neuron", false) { color = new Color(0.3f, 0.3f, 0.3f) });
             }

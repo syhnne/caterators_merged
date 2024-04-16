@@ -22,6 +22,7 @@ public class MoonSwarmerCritob : Critob
         ShelterDanger = ShelterDanger.Safe;
         // 是叫这个吗（思考
         CreatureName = "Neuron Fly";
+        Icon = new MoonSwarmerIcon();
     }
 
     public override CreatureTemplate CreateTemplate()
@@ -35,21 +36,17 @@ public class MoonSwarmerCritob : Critob
             Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.Fly),
             TileResistances = new()
             {
-                Air = new(0.9f, Allowed),
-                Floor = new(2, Allowed),
-                Wall = new(1.5f, Allowed),
-                Corridor = new(1.5f, Allowed),
-                Ceiling = new(2, Allowed),
-                OffScreen = new(1, Allowed)
+                Air = new(0.8f, Allowed),
+                Floor = new(1.2f, Allowed),
             },
             ConnectionResistances = new()
             {
-                Standard = new(0.8f, Allowed),
-                OpenDiagonal = new(0.3f, Allowed),
-                ShortCut = new(1.2f, Allowed),
-                NPCTransportation = new(0, Unallowed),
-                OffScreenMovement = new(0, IllegalTile),
-                BetweenRooms = new(0.5f, Allowed),
+                Standard = new(1, Allowed),
+                OpenDiagonal = new(0.5f, Allowed),
+                ShortCut = new(1, Allowed),
+                NPCTransportation = new(1, Allowed),
+                OffScreenMovement = new(1, Allowed),
+                BetweenRooms = new(1, Allowed),
             },
             DamageResistances = new()
             {
@@ -61,21 +58,23 @@ public class MoonSwarmerCritob : Critob
             }
         }.IntoTemplate();
 
-        t.offScreenSpeed = 2f;
-        t.abstractedLaziness = 10;
+        t.offScreenSpeed = 10f;
+        t.abstractedLaziness = 30;
         t.roamBetweenRoomsChance = 1f;
-        t.bodySize = 0.2f;
+        t.bodySize = 0.1f;
         t.stowFoodInDen = false;
         t.shortcutSegments = 1;
         t.grasps = 1;
-        t.visualRadius = 800f;
-        t.movementBasedVision = 1f;
+        t.visualRadius = 1000f;
+        t.movementBasedVision = 0.5f;
         t.communityInfluence = 0f;
         t.waterRelationship = CreatureTemplate.WaterRelationship.AirAndSurface;
-        t.waterPathingResistance = 2f;
+        t.waterPathingResistance = 1f;
         t.canFly = true;
         t.meatPoints = 0;
         t.dangerousToPlayer = 0f;
+
+        t.saveCreature = false;
         return t;
     }
 
@@ -93,9 +92,11 @@ public class MoonSwarmerCritob : Critob
             }
         }
         self.IsInPack(MoonSwarmer, 1f);
-        self.Intimidates(CreatureTemplate.Type.Spider, 0.2f);
-        self.Intimidates(CreatureTemplate.Type.SpitterSpider, 0.2f);
-        self.Intimidates(CreatureTemplate.Type.BigSpider, 0.2f);
+        // 为了让它跟着玩家走。。这有用吗（
+        self.PlaysWith(CreatureType.Slugcat, 0.5f);
+        self.Intimidates(CreatureTemplate.Type.Spider, 0.1f);
+        self.Intimidates(CreatureTemplate.Type.SpitterSpider, 0.1f);
+        self.Intimidates(CreatureTemplate.Type.BigSpider, 0.1f);
     }
 
     public override ArtificialIntelligence CreateRealizedAI(AbstractCreature acrit)

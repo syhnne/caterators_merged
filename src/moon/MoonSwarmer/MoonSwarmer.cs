@@ -25,8 +25,8 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
     奶奶的。。这玩意儿真的难写。。*/
 public class MoonSwarmer : Creature
 {
-
-    public SwarmerManager manager;
+    // 好好好 这个manager被引用了14次 我特么测了三天才发现自己从来没给它赋过值
+    public SwarmerManager manager = null;
     public MoonSwarmerAI AI = null;
     // 但是这东西会把玩家绑架在管道里 算了 还是老老实实写tp吧
     // public Player.AbstractOnBackStick stickToPlayer;
@@ -41,6 +41,8 @@ public class MoonSwarmer : Creature
     public float revolveSpeed;
     public bool lastVisible;
 
+    public float moveSpeed;
+
     public bool callBack = false;
     /*{
         get
@@ -48,7 +50,8 @@ public class MoonSwarmer : Creature
             return manager != null && manager.player.room != null && manager.player.room.abstractRoom.shelterIndex != -1;
         }
     }*/
-    public bool notInSameRoom => manager != null && room != manager.player.room && !inShortcut && !manager.player.inShortcut;
+    public int notInSameRoomCounter = 0;
+    public bool notInSameRoom => room != null && manager != null && manager.player.room != null && room.abstractRoom.index != manager.player.room.abstractRoom.index;
     public float affectedByGravity = 1f;
     public MovementConnection currentConnection;
 
@@ -71,6 +74,7 @@ public class MoonSwarmer : Creature
         base.buoyancy = 1.1f;
         this.rotation = 0.25f;
         this.lastRotation = this.rotation;
+        moveSpeed = 1f;
 
         affectedByGravity = 0f;
     }
@@ -116,6 +120,25 @@ public class MoonSwarmer : Creature
             }
         }
 
+        // 太长时间不在一个房间就全部重生（
+        /*Plugin.Log("swarmer", abstractCreature.ID.number, "notinsameroomCounter:", notInSameRoomCounter);
+        if (room != null) Plugin.Log("--swarmer:", room.abstractRoom.index);
+        Plugin.Log("player??", manager == null);
+        if (manager != null && manager.player.room != null) Plugin.Log("--player:", manager.player.room.abstractRoom.index); */
+
+        /*if (notInSameRoom)
+        {
+            notInSameRoomCounter++;
+        }
+        else
+        {
+            notInSameRoomCounter = 0;
+        }
+        if (notInSameRoomCounter > 200)
+        {
+            Plugin.Log("swarmer", abstractCreature.ID.number, "not in same room, try respawn");
+            manager.needCallBack = true;
+        }*/
 
         if (isActive && State.alive && graphicsModule == null)
         {
@@ -123,7 +146,7 @@ public class MoonSwarmer : Creature
         }
         AI?.Update();
 
-        mainBodyChunk.vel *= 0.9f;
+        // mainBodyChunk.vel *= 0.9f;
 
         // 可以被b键拖拽
         // 所以他为什么那么喜欢卡在管道里。。
@@ -132,11 +155,11 @@ public class MoonSwarmer : Creature
             base.bodyChunks[0].vel += Custom.DirVec(base.bodyChunks[0].pos, new Vector2(Futile.mousePosition.x, Futile.mousePosition.y) + this.room.game.cameras[0].pos) * 14f;
         }
 
-        if (manager != null)
+        /*if (manager != null)
         {
             affectedByGravity = Mathf.Lerp(affectedByGravity, (manager.player.dead || dead) ? 1f : 0f, 0.1f);
             Plugin.Log("swarmer affectedbyG", affectedByGravity);
-        }
+        }*/
 
 
 
@@ -149,7 +172,7 @@ public class MoonSwarmer : Creature
             TryMoveTowards(manager.player.DangerPos, manager.player.DangerPos);
             if (Custom.DistLess(DangerPos, manager.player.DangerPos, 5f))
             {
-                manager.callBackCounter++;
+                manager.callBackSwarmers++;
                 Destroy();
             }
         }*/
@@ -176,14 +199,12 @@ public class MoonSwarmer : Creature
     {
         try
         {
-            
-            if (grabbedBy.Count == 0 && manager != null && manager.player.room != null && room != null)
+
+            if (grabbedBy.Count == 0 && !notInSameRoom && Custom.DistLess(manager.player.mainBodyChunk.pos, firstChunk.pos, 20f))
             {
-                float distance = Custom.Dist(manager.player.mainBodyChunk.pos, firstChunk.pos);
-                Plugin.Log("player distance:", distance);
-                if (distance < 50f) AI.SwitchBehavior(MoonSwarmerAI.Behavior.Idle);
+                AI.SwitchBehavior(MoonSwarmerAI.Behavior.Idle);
             }
-            else if (grabbedBy.Count == 0)
+            else
             {
                 AI.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
             }
@@ -216,11 +237,11 @@ public class MoonSwarmer : Creature
     {
         // Plugin.Log("swarmer movetowards:", dest.x, dest.y);
 
-        // 如果距离小于30f就不移动
-        /*if (!Custom.DistLess(firstChunk.pos, dest, 30f))
+        // 如果距离小于3f就不移动
+        if (Custom.DistLess(firstChunk.pos, dest, 10f))
         {
-            
-        }*/
+            return;
+        }
 
         if (AI.pathFinder.destination == null || Vector2.Distance(firstChunk.pos, dest) <= 35f)
         {
@@ -228,18 +249,20 @@ public class MoonSwarmer : Creature
         }
         else
         {
-            Vector2 dir = Custom.DirVec(firstChunk.pos, connectionEnd);
-            float vel = 5f;
-            bodyChunks[0].vel = dir * vel;
+            Vector2 dir1 = Custom.DirVec(firstChunk.pos, connectionEnd);
+            // Vector2 dir2 = Custom.DirVec(firstChunk.pos, dest);
+            float vel = Mathf.Lerp(moveSpeed, 5f, Custom.Dist(firstChunk.pos, connectionEnd) * 0.5f);
+            bodyChunks[0].vel = dir1 * vel;
+            bodyChunks[0].vel = Vector2.Lerp(bodyChunks[0].vel, dir1 * vel, 0.02f);
         }
 
         
 
-        /*Vector2 dir = Custom.DirVec(firstChunk.pos, dest);
+        /*Vector2 dir1 = Custom.DirVec(firstChunk.pos, dest);
         Vector2 accelereation = Vector2.Distance(firstChunk.pos, dest) / 4f;
         accelereation = Mathf.Clamp(accelereation, 0f, maxAcceleration);
 
-        bodyChunks[0].vel += accelereation * dir;
+        bodyChunks[0].vel += accelereation * dir1;
         bodyChunks[0].vel = Vector2.ClampMagnitude(bodyChunks[0].vel, MaxVelocity);*/
 
     }
@@ -258,7 +281,7 @@ public class MoonSwarmer : Creature
 
     public override Color ShortCutColor()
     {
-        return Color.white;
+        return manager != null? manager.player.ShortCutColor() : Color.white;
     }
 
     public override void Die()
@@ -302,7 +325,6 @@ public class MoonSwarmer : Creature
     public override void SpitOutOfShortCut(IntVector2 pos, Room newRoom, bool spitOutAllSticks)
     {
         base.SpitOutOfShortCut(pos, newRoom, spitOutAllSticks);
-        firstChunk.vel *= 3;
     }
 
     public override bool CanBeGrabbed(Creature grabber)

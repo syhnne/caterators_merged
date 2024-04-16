@@ -17,7 +17,7 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 public class MoonSwarmerAI : ArtificialIntelligence
 {
 
-    public SwarmerManager manager = null;
+    public SwarmerManager manager;
     public Behavior currentBehavior;
     public int destCounter;
     public WorldCoordinate lastIdlePos;
@@ -58,11 +58,12 @@ public class MoonSwarmerAI : ArtificialIntelligence
         // 这个看字面意思肯定得整一个罢 用来寻路找到玩家在哪
         AddModule(new StandardPather(this, abstr.world, abstr));
         // 这个我猜就是用来追踪其他生物的 加一个逝逝先
-        AddModule(new Tracker(this, 10, 2, 200, 0.5f, 5, 5, 10));
+        // AddModule(new Tracker(this, 10, 2, 200, 0.5f, 5, 5, 10));
         swarmer.AI = this;
         currentBehavior = Behavior.FollowPlayer;
         destCounter = 0;
         pathFinder.stepsPerFrame = 20;
+        manager = swarmer.manager;
     }
 
 
@@ -72,7 +73,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
         destCounter--;
 
         
-
+        // if (creature.Room != null && creature.Room.shelter) { return; }
         switch (currentBehavior)
         {
             case Behavior.FollowPlayer:
@@ -97,7 +98,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
         {
             // Plugin.Log("swarmer", creature.ID.number, "findPlayer:", playerPos.ToString());
             WorldCoordinate c = (WorldCoordinate)playerPos;
-            c.y += 5;
+            c.y += 4;
             this.creature.abstractAI.SetDestination(c);
         }
     }
@@ -117,18 +118,18 @@ public class MoonSwarmerAI : ArtificialIntelligence
 
     public float IdleCoordScore(WorldCoordinate coord)
     {
-        if (coord == null || coord.room != creature.pos.room || swarmer.room.GetTile(coord).Solid) return float.MaxValue;
+        if (coord == null || coord.room != creature.pos.room || (swarmer.room != null && swarmer.room.GetTile(coord).Solid)) return float.MaxValue;
         float result = 10000f;
 
         if (playerPos != null && coord.room != ((WorldCoordinate)playerPos).room) result += 5000f;
 
-        if (swarmer.room.aimap.getAItile(coord).narrowSpace) result += 1000f;
+        if (swarmer.room != null && swarmer.room.aimap.getAItile(coord).narrowSpace) result += 1000f;
         // 尽量呆在高的地方
-        result -= coord.y * 12f;
+        result -= coord.y * 2f;
         // 靠近玩家
-        if (playerPos != null && coord.room == ((WorldCoordinate)playerPos).room)
+        if (swarmer.manager.player.room != null && playerPos != null && coord.room == ((WorldCoordinate)playerPos).room)
         {
-            result -=  15f * Custom.Dist(swarmer.manager.player.room.MiddleOfTile(coord), swarmer.manager.player.DangerPos);
+            result -=  30f * Custom.Dist(swarmer.manager.player.room.MiddleOfTile(coord), swarmer.manager.player.DangerPos);
         }
         return result;
 

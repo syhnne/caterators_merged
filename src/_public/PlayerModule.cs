@@ -59,24 +59,8 @@ public class PlayerModule
             deathPreventer.swarmerManager = swarmerManager;
             swarmerManager.deathPreventer = deathPreventer;
             // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
-            try
-            {
-                Plugin.Log("spawn swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
-                swarmerManager.SpawnSwarmer(world.game.GetDeathPersistent().MoonHasSwarmers);
-                /*if (world.game.GetMiscProgression().IsNewSave)
-                {
-                    Plugin.Log("new save, spawn 5");
-                    swarmerManager.SpawnSwarmer(moon.MoonSwarmer.SwarmerManager.maxSwarmer);
-                }
-                else
-                {
-                    
-                }*/
-            }
-            catch (Exception e)
-            {
-                Plugin.Logger.LogError(e);
-            }
+            swarmerManager.callBackSwarmers = Math.Min(world.game.GetDeathPersistent().MoonHasSwarmers + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer);
+            Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers);
         }
         if (playerName == Enums.FPname)
         {

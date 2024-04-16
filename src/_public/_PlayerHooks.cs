@@ -56,6 +56,7 @@ public class PlayerHooks
 
 
         // PlayerModule
+        On.Player.SpitOutOfShortCut += Player_SpitOutOfShortCut;
         On.HUD.HUD.InitSinglePlayerHud += HUD_InitSinglePlayerHud;
         On.Player.Die += Player_Die;
         On.Player.Destroy += Player_Destroy;
@@ -352,6 +353,28 @@ public class PlayerHooks
 
 
     #region PlayerModule
+
+
+    private static void Player_SpitOutOfShortCut(On.Player.orig_SpitOutOfShortCut orig, Player self, IntVector2 pos, Room newRoom, bool spitOutAllSticks)
+    {
+        bool stillInShelter = self.stillInStartShelter;
+
+        orig(self, pos, newRoom, spitOutAllSticks);
+
+        bool getModule = Plugin.playerModules.TryGetValue(self, out var module);
+        if (getModule && module.srsLightSource != null)
+        {
+            module.srsLightSource.AddModules();
+        }
+        if (getModule && module.swarmerManager != null)
+        {
+            module.swarmerManager.Player_SpitOutOfShortCut(stillInShelter);
+        }
+    }
+
+
+
+
 
     // 启用重力控制时阻止y轴输入
     private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)

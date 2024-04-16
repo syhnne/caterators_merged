@@ -242,6 +242,7 @@ public class DeathPreventer
 
     // 给swarmermanager提供的防止连锁反应的手段
     public bool dontRevive = false;
+    public bool forceRevive = false;
 
     public DeathPreventer(Player player) 
     { 
@@ -367,16 +368,20 @@ public class DeathPreventer
     public bool TryPreventDeath(PlayerDeathReason deathReason)
     {
         if (dontRevive || justPreventedCounter > 0) { return false; }
-
-        // Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString());
         AbstractPhysicalObject reviveSwarmer = DeathPreventObject;
-        if (player.room == null || reviveSwarmer == null)
+        Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "object:", reviveSwarmer == null);
+        
+        if (player.room == null || (reviveSwarmer == null && !forceRevive))
         {
             // Plugin.Log("player", player.abstractCreature.ID.number, "death NOT prevented, reason:", deathReason.ToString(), reviveSwarmer == null);
             return false;
         }
+        if (forceRevive && swarmerManager != null && swarmerManager.callBackSwarmers != null)
+        {
+            swarmerManager.callBackSwarmers--;
+        }
 
-        effectColor = reviveSwarmer is AbstractCreature ? Color.white : nsh.ReviveSwarmerModules.NSHswarmerColor;
+        effectColor = reviveSwarmer != null && reviveSwarmer is not AbstractCreature ? nsh.ReviveSwarmerModules.NSHswarmerColor : Color.white;
 
         bool deathExplode = true;
         if (deathReason == PlayerDeathReason.DangerGrasp || deathReason == PlayerDeathReason.Violence)
@@ -496,7 +501,7 @@ public class DeathPreventer
 
 
         // 移除复活用的神经元
-        RemoveSwarmer(reviveSwarmer);
+        if (reviveSwarmer  != null) RemoveSwarmer(reviveSwarmer);
 
 
 

@@ -232,19 +232,12 @@ public class PlayerGraphicsModule
     {
         On.PlayerGraphics.TailSpeckles.DrawSprites += TailSpecks_DrawSprites;
         // IL.PlayerGraphics.Update += IL_PlayerGraphics_Update;
-        On.Player.SpitOutOfShortCut += Player_SpitOutOfShortCut;
+        
     }
 
 
     // 防止玩家离开房间之后没有把自发光带过去
-    private static void Player_SpitOutOfShortCut(On.Player.orig_SpitOutOfShortCut orig, Player self, IntVector2 pos, Room newRoom, bool spitOutAllSticks)
-    {
-        orig(self, pos, newRoom, spitOutAllSticks);
-        if (self.SlugCatClass == Enums.SRSname && Plugin.playerModules.TryGetValue(self, out var module) && module.srsLightSource != null)
-        {
-            module.srsLightSource.AddModules();
-        }
-    }
+    
 
 
 

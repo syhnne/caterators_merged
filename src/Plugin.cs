@@ -150,6 +150,8 @@ class Plugin : BaseUnityPlugin
     // 一些我的开发者模式专用按键
     private void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
     {
+        orig(self);
+
         if (DevMode && self.devToolsActive)
         {
             // 按Y生成一个复活用的神经元
@@ -182,22 +184,20 @@ class Plugin : BaseUnityPlugin
                     }
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                foreach (AbstractCreature p in self.Players)
+                {
+                    if (p.realizedObject != null && p.realizedCreature.room != null && Plugin.playerModules.TryGetValue(p.realizedCreature as Player, out var module) && module.swarmerManager != null)
+                    {
+                        module.swarmerManager.LogAllSwarmersData();
+                    }
+                }
+            }
         }
 
-        try
-        {
-            orig(self);
-        }
-        catch (Exception e)
-        {
-            Plugin.Logger.LogError(e);
-            throw;
-        }
-        finally
-        {
 
-            
-        }
     }
 
 
