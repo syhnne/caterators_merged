@@ -98,6 +98,8 @@ public class PlayerReviver
 
             if (Activated)
             {
+                
+
                 Player slug = slugcat;
 
                 if (player.dangerGraspTime > 0)
@@ -107,6 +109,12 @@ public class PlayerReviver
                 else if (slug != null && CanBeRevived(slug))
                 {
                     reviveCounter++;
+                    // 防止玩家在此期间抓住队友开吃
+                    player.eatMeat = 0;
+                    if (player.slugOnBack != null)
+                    {
+                        player.slugOnBack.counter = 0;
+                    }
                     activatedSwarmer.activatedPos = Vector2.Lerp((Vector2)activatedSwarmer.activatedPos, slug.mainBodyChunk.pos, 0.05f);
                     // Plugin.Log("reviveCounter:", reviveCounter);
                 }
@@ -116,11 +124,11 @@ public class PlayerReviver
                     reviveCounter = 0;
                 }
 
-                if (reviveCounter > 55)
+                if (reviveCounter > 50)
                 {
                     Plugin.Log("try revive player", slug.abstractCreature.ID.number);
-                    RevivePlayer(slug);
-                    activatedSwarmer.Use(true);
+                    RevivePlayer(slug, activatedSwarmer);
+                    
                 }
 
             }
@@ -159,17 +167,30 @@ public class PlayerReviver
 
     public static bool CanBeRevived(Player player)
     {
+        if (Plugin.playerModules.TryGetValue(player, out var mod) && mod.swarmerManager != null) return true;
         if (player.room == null || !(player.dead || !player.playerState.alive || player.playerState.permaDead)) return false;
         return true;
     }
 
 
 
-    public static bool RevivePlayer(Player slugcat)
+    public static bool RevivePlayer(Player slugcat, ReviveSwarmerModules.ReviveSwarmer activatedSwarmer)
     {
-        if (slugcat == null) { Plugin.Log("RevivePlayer(): null slugcat"); return false; }
+        
         try
         {
+            if (slugcat == null) { Plugin.Log("RevivePlayer(): null slugcat"); return false; }
+            else if (Plugin.playerModules.TryGetValue(slugcat, out var mod) && mod.swarmerManager != null)
+            {
+
+                mod.swarmerManager.ConvertNSHSwarmer(activatedSwarmer);
+
+                if (!slugcat.dead) { return true; }
+            }
+            else
+            {
+                activatedSwarmer.Use(true);
+            }
             slugcat.playerState.permanentDamageTracking = 0f;
             slugcat.playerState.alive = true;
             slugcat.playerState.permaDead = false;

@@ -63,7 +63,7 @@ public class MoonSwarmer : Creature
     public MoonSwarmer(AbstractCreature abstr) : base(abstr, abstr.world)
     {
         isActive = true;
-        graphicsModule = new MoonSwarmerGraphics(this);
+        graphicsModule = new MoonSwarmerGraphics(this, false);
 
         this.collisionLayer = 1;
         base.bodyChunks = new BodyChunk[1];
@@ -126,8 +126,8 @@ public class MoonSwarmer : Creature
         }
 
         // 太长时间不在一个房间就全部重生（
-        /*Plugin.Log("holdingSwarmerGrasp", abstractCreature.ID.number, "notinsameroomCounter:", notInSameRoomCounter);
-        if (room != null) Plugin.Log("--holdingSwarmerGrasp:", room.abstractRoom.index);
+        /*Plugin.Log("swarmer", abstractCreature.ID.number, "notinsameroomCounter:", notInSameRoomCounter);
+        if (room != null) Plugin.Log("--swarmer:", room.abstractRoom.index);
         Plugin.Log("player??", manager == null);
         if (manager != null && manager.player.room != null) Plugin.Log("--player:", manager.player.room.abstractRoom.index); */
 
@@ -142,12 +142,12 @@ public class MoonSwarmer : Creature
         // 呃啊只好抄别人的代码了。。脑子不好使了
         if (notInSameRoomCounter > 10)
         {
-            // Plugin.Log("holdingSwarmerGrasp", abstractCreature.ID.number, "not in same room");
+            // Plugin.Log("swarmer", abstractCreature.ID.number, "not in same room");
         }
 
         if (isActive && State.alive && graphicsModule == null)
         {
-            graphicsModule = new MoonSwarmerGraphics(this);
+            graphicsModule = new MoonSwarmerGraphics(this, false);
         }
         AI?.Update();
 
@@ -163,7 +163,7 @@ public class MoonSwarmer : Creature
         /*if (manager != null)
         {
             affectedByGravity = Mathf.Lerp(affectedByGravity, (manager.player.dead || dead) ? 1f : 0f, 0.1f);
-            Plugin.Log("holdingSwarmerGrasp affectedbyG", affectedByGravity);
+            Plugin.Log("swarmer affectedbyG", affectedByGravity);
         }*/
 
 
@@ -244,7 +244,7 @@ public class MoonSwarmer : Creature
 
     public void TryMoveTowards(Vector2 connectionEnd, Vector2 dest)
     {
-        // Plugin.Log("holdingSwarmerGrasp movetowards:", dest.x, dest.y);
+        // Plugin.Log("swarmer movetowards:", dest.x, dest.y);
 
         // 如果距离小于3f就不移动
         if (Custom.DistLess(firstChunk.pos, dest, 10f))
@@ -316,6 +316,14 @@ public class MoonSwarmer : Creature
 
 
 
+    public void SpawnColorLerp()
+    {
+        base.RemoveGraphicsModule();
+        graphicsModule = new MoonSwarmerGraphics(this, true);
+        graphicsModule.Reset();
+    }
+
+
 
 
     public override void RemoveGraphicsModule()
@@ -325,7 +333,7 @@ public class MoonSwarmer : Creature
 
     public override void InitiateGraphicsModule()
     {
-        graphicsModule ??= new MoonSwarmerGraphics(this);
+        graphicsModule ??= new MoonSwarmerGraphics(this, false);
         graphicsModule.Reset();
     }
 

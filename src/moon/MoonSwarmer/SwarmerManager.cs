@@ -170,19 +170,19 @@ public class SwarmerManager
             Plugin.Log("CallBack() before:", swarmers.Count);
             bool succeed = true;
             // 奥 懂了 foreach循环内部不能改变这个list的值
-            /*foreach (var holdingSwarmerGrasp in swarmers)
+            /*foreach (var swarmer in swarmers)
             {
-                // Plugin.Log("CallBack(): callback holdingSwarmerGrasp");
+                // Plugin.Log("CallBack(): callback swarmer");
 
-                if (holdingSwarmerGrasp.Kill(false))
+                if (swarmer.Kill(false))
                 {
-                    swarmers.Remove(holdingSwarmerGrasp);
+                    swarmers.Remove(swarmer);
                     callBackSwarmers++;
                 }
                 else
                 {
                     succeed = false;
-                    Plugin.Log("trying to kill holdingSwarmerGrasp", holdingSwarmerGrasp.abstractCreature.ID.number, ", failed");
+                    Plugin.Log("trying to kill swarmer", swarmer.abstractCreature.ID.number, ", failed");
                 }
             }*/
 
@@ -196,7 +196,7 @@ public class SwarmerManager
                 else
                 {
                     succeed = false;
-                    Plugin.Log("trying to kill holdingSwarmerGrasp", swarmers[i].abstractCreature.ID.number, ", failed");
+                    Plugin.Log("trying to kill swarmer", swarmers[i].abstractCreature.ID.number, ", failed");
                 }
             }
             Plugin.Log("CallBack(): after:", callBackSwarmers);
@@ -263,7 +263,7 @@ public class SwarmerManager
     /// 一般来说不要直接调用这个，最好给callBackSwarmers赋值然后使用Respawn()
     /// </summary>
     /// <param name="number"></param>
-    public void SpawnSwarmer(int number = 1)
+    public void SpawnSwarmer(int number = 1, Vector2? spawnPos = null)
     {
         Plugin.Log("spawn MoonSwarmer:", number);
         for (int i = 0; i < number; i++)
@@ -272,13 +272,35 @@ public class SwarmerManager
             player.room.abstractRoom.AddEntity(abstr);
             abstr.RealizeInRoom();
             // (abstr.realizedCreature as MoonSwarmer).stickToPlayer = new Player.AbstractOnBackStick(player.abstractCreature, abstr);
-            abstr.realizedObject.firstChunk.pos = player.firstChunk.pos;
+            abstr.realizedObject.firstChunk.pos = spawnPos != null? (Vector2)spawnPos : player.firstChunk.pos;
             (abstr.realizedCreature as MoonSwarmer).manager = this;
             (abstr.realizedCreature as MoonSwarmer).AI.manager = this;
             swarmers.Add(abstr.realizedCreature as MoonSwarmer);
             
         }
         SwarmersUpdate();
+    }
+
+
+    // TODO: 目前这东西是一个有缝衔接，虽然pos和我想的一样是衔接了，但颜色没衔接需要修改一下
+    public void ConvertNSHSwarmer(nsh.ReviveSwarmerModules.ReviveSwarmer swarmer)
+    {
+        if (swarmer.room == null) { Plugin.Log("ConvertNSHSwarmer(): null room"); return; }
+
+        Plugin.Log("converting NSHswarmer");
+        if (callBackSwarmers != null)
+        {
+            swarmer.Use(false);
+            callBackSwarmers++;
+            return;
+        }
+        Vector2 vel = swarmer.firstChunk.vel;
+        Vector2 pos = swarmer.firstChunk.pos;
+
+        swarmer.Use(false);
+        SpawnSwarmer(1, pos);
+        swarmers[swarmers.Count - 1].firstChunk.vel = vel;
+        swarmers[swarmers.Count - 1].SpawnColorLerp();
     }
 
 
@@ -292,7 +314,7 @@ public class SwarmerManager
             s.killTag = null;
             s.Kill(explode);
             swarmers.Remove(s);
-            Plugin.Log("killed, moon has holdingSwarmerGrasp:", hasSwarmers);
+            Plugin.Log("killed, moon has swarmer:", hasSwarmers);
             result = true;
         }
         SwarmersUpdate();
@@ -382,7 +404,7 @@ public class SwarmerManager
         {
             if (!swarmers[i].TryTeleportToOwner())
             {
-                Plugin.Log("!! failed to teleport holdingSwarmerGrasp", i);
+                Plugin.Log("!! failed to teleport swarmer", i);
                 succeed = false;
             }
         }

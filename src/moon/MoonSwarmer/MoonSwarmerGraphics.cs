@@ -17,11 +17,26 @@ public class MoonSwarmerGraphics : GraphicsModule
     private Color blackColor;
     public float blackMode;
 
+    public int colorLerpCounter = 0;
+    public Color mainColor;
+    public Color dotColor;
+    public static Color mainColor2 = new Color(0.9f, 0.9f, 0.9f);
 
-    public MoonSwarmerGraphics(MoonSwarmer ow) : base(ow, false) 
+    public MoonSwarmerGraphics(MoonSwarmer ow, bool spawnColorLerp = false) : base(ow, false) 
     {
         this.swarmer = ow;
         this.owner = ow;
+        if (spawnColorLerp)
+        {
+            mainColor = nsh.ReviveSwarmerModules.NSHswarmerColor;
+            dotColor = nsh.ReviveSwarmerModules.NSHswarmerColor;
+            colorLerpCounter = 80;
+        }
+        else
+        {
+            mainColor = Color.white;
+            dotColor = mainColor2;
+        }
     }
 
 
@@ -54,7 +69,7 @@ public class MoonSwarmerGraphics : GraphicsModule
             sLeaser.sprites[2 + i].anchorX = 0f;
         }
         sLeaser.sprites[4] = new FSprite("JetFishEyeB", true);
-        sLeaser.sprites[4].color = new Color(0.9f, 0.9f, 0.9f);
+        sLeaser.sprites[4].color = dotColor;
         this.AddToContainer(sLeaser, rCam, null);
     }
 
@@ -79,6 +94,18 @@ public class MoonSwarmerGraphics : GraphicsModule
 
     public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
+        if (colorLerpCounter > 0)
+        {
+            colorLerpCounter--;
+            mainColor = Color.Lerp(mainColor, Color.white, 0.02f);
+            dotColor = Color.Lerp(dotColor, mainColor2, 0.02f);
+        }
+        else if (colorLerpCounter ==  0)
+        {
+            mainColor = Color.white;
+            dotColor = mainColor2;
+        }
+
         Vector2 vector = Vector2.Lerp(swarmer.firstChunk.lastPos, swarmer.firstChunk.pos, timeStacker);
         bool flag = rCam.room.ViewedByAnyCamera(vector, 48f);
         if (flag != swarmer.lastVisible)
@@ -119,10 +146,10 @@ public class MoonSwarmerGraphics : GraphicsModule
 
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
-            sLeaser.sprites[i].color = Color.Lerp(Color.white, this.blackColor, this.blackMode);
+            sLeaser.sprites[i].color = Color.Lerp(mainColor, this.blackColor, this.blackMode);
         }
         sLeaser.sprites[0].alpha = 0.2f * (1f - this.blackMode);
-        sLeaser.sprites[4].color = Color.Lerp(Color.white, this.blackColor, this.blackMode * 0.9f);
+        sLeaser.sprites[4].color = Color.Lerp(dotColor, this.blackColor, this.blackMode * 0.9f);
 
         if (swarmer.slatedForDeletetion || swarmer.room != rCam.room)
         {

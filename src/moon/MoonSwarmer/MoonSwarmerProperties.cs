@@ -20,7 +20,7 @@ public class MoonSwarmerProperties : ItemProperties
     public override void Grabability(Player player, ref Player.ObjectGrabability grabability)
     {
         grabability = Player.ObjectGrabability.OneHand;
-        /*if (holdingSwarmerGrasp.dead)
+        /*if (swarmer.dead)
         {
             grabability = Player.ObjectGrabability.OneHand;
         }

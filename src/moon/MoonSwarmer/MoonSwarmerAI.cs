@@ -88,7 +88,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
                 if (IdleCoordScore(lastIdlePos) > IdleCoordScore((WorldCoordinate)c) - (float)destCounter)
                 {
                     lastIdlePos = (WorldCoordinate)c;
-                    Plugin.Log("holdingSwarmerGrasp", creature.ID.number, "new idle destination:", c.ToString());
+                    // Plugin.Log("swarmer", creature.ID.number, "new idle destination:", c.ToString());
                     this.creature.abstractAI.SetDestination((WorldCoordinate)c);
                 }
                 break;
@@ -99,7 +99,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
     {
         if (playerPos != null && pathFinder.CoordinateReachableAndGetbackable((WorldCoordinate)playerPos))
         {
-            // Plugin.Log("holdingSwarmerGrasp", creature.ID.number, "findPlayer:", playerPos.ToString());
+            // Plugin.Log("swarmer", creature.ID.number, "findPlayer:", playerPos.ToString());
             WorldCoordinate c = (WorldCoordinate)playerPos;
             c.y += 4;
             this.creature.abstractAI.SetDestination(c);
@@ -112,7 +112,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
     public void SwitchBehavior(MoonSwarmerAI.Behavior behaviour)
     {
         if (behaviour == currentBehavior) return;
-        Plugin.Log("holdingSwarmerGrasp", creature.ID.number, "behavior switch to:", behaviour.ToString());
+        // Plugin.Log("swarmer", creature.ID.number, "behavior switch to:", behaviour.ToString());
         currentBehavior = behaviour;
     }
 

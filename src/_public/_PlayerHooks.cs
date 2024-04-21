@@ -48,7 +48,7 @@ public class PlayerHooks
             typeof(Player).GetProperty(nameof(Player.CanIPutDeadSlugOnBack), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
             get_Player_CanIPutDeadSlugOnBack
             );*/
-        On.Player.CanEatMeat += Player_CanEatMeat;
+        // On.Player.CanEatMeat += Player_CanEatMeat;
         On.Player.CanIPutDeadSlugOnBack += Player_CanIPutDeadSlugOnBack;
         On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.Update += JollyMeter_PlayerIcon_Update;
 
@@ -105,32 +105,23 @@ public class PlayerHooks
     private static void JollyMeter_PlayerIcon_Update(On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.orig_Update orig, JollyCoop.JollyHUD.JollyMeter.PlayerIcon self)
     {
         orig(self);
-        if (self.playerState.alive || !self.playerState.permaDead)
+        if (!self.playerState.dead && self.dead)
         {
             self.color = PlayerGraphics.SlugcatColor(self.playerState.slugcatCharacter);
-            if (self.dead)
-            {
-                self.iconSprite.RemoveFromContainer();
-                self.gradient.RemoveFromContainer();
-                self.iconSprite = new FSprite("Kill_Slugcat", true);
-                self.iconSprite.scale *= 1.25f;
-                self.meter.fContainer.AddChild(self.iconSprite);
-                self.AddGradient(JollyCustom.ColorClamp(self.color, -1f, 360f, 60f, 360f, -1f, 360f));
-                self.dead = false;
-                self.meter.customFade = 5f;
-                self.blink = 3f;
-            }
+            self.iconSprite.RemoveFromContainer();
+            self.gradient.RemoveFromContainer();
+            self.iconSprite = new FSprite("Kill_Slugcat", true);
+            self.meter.fContainer.AddChild(self.iconSprite);
+            self.AddGradient(JollyCustom.ColorClamp(self.color, -1f, 360f, 60f, 360f, -1f, 360f));
+            self.dead = false;
+            self.meter.customFade = 5f;
+            self.blink = 3f;
         }
     }
 
     private static bool Player_CanEatMeat(On.Player.orig_CanEatMeat orig, Player self, Creature crit)
     {
-        bool result = orig(self, crit);
-        if (Plugin.playerModules.TryGetValue(self, out var mod) && mod.playerReviver != null && crit is Player)
-        {
-            result = false;
-        }
-        return result;
+        return orig(self, crit) && crit is not Player;
     }
 
 
