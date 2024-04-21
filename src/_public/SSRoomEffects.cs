@@ -217,7 +217,7 @@ public class SSRoomEffects
         }
         catch
         {
-            // base.Logger.LogError(ex);
+            // Plugin.LogException(ex);
         }
 
     }

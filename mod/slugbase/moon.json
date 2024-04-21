@@ -25,7 +25,7 @@
         "auto_grab_batflies": true,
         "karma": 9,
         "karma_cap": 9,
-        "the_mark": true,
+        "the_mark": false,
         "the_glow": true,
         "throw_skill": [ 1.0, 0.9 ],
         "crouch_stealth": [ 1.0, 0.9 ],

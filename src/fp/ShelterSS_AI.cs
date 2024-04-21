@@ -84,7 +84,7 @@ public static class ShelterSS_AI
         }
         catch (Exception e)
         {
-            Plugin.Logger.LogError(e);
+            Plugin.LogException(e);
         }
 
     }

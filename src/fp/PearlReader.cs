@@ -87,7 +87,7 @@ public class PearlReader
         }
         catch (Exception e)
         {
-            Plugin.Logger.LogError(e);
+            Plugin.LogException(e);
         }
 
 
@@ -466,7 +466,7 @@ public class PearlReader
         }
         catch (Exception e)
         {
-            Plugin.Logger.LogError(e);
+            Plugin.LogException(e);
             return new List<string>()
             {
                 "LoadConversationFromFile error!",

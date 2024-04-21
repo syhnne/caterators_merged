@@ -45,6 +45,10 @@ public class SSOracleHooks
         {
             result = false;
         }
+        else if (self.room.game.IsStorySession && self.ID == Oracle.OracleID.SL && self.room.game.StoryCharacter == Enums.Moonname)
+        {
+            result = false;
+        }
         return result;
     }
 

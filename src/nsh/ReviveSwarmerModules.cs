@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Permissions;
 using RWCustom;
+using Random = UnityEngine.Random;
 
 namespace Caterators_by_syhnne.nsh;
 
@@ -18,6 +19,7 @@ namespace Caterators_by_syhnne.nsh;
 public class ReviveSwarmerModules
 {
     public static Color NSHswarmerColor = new Color(0f, 1f, 0.3f);
+    public const int MaxActivateTime = 280;
 
     public class ReviveSwarmerCreatureSelector : UpdatableAndDeletable
     {
@@ -38,7 +40,7 @@ public class ReviveSwarmerModules
         public ReviveSwarmerAbstract Abstr;
         public float rotation;
         public float lastRotation;
-        public Creature selectedCreature;
+        // public Creature selectedCreature;
 
         public LightSource lightsource;
         public float roomDarkness;
@@ -49,6 +51,9 @@ public class ReviveSwarmerModules
         public bool lastVisible;
         public float affectedByGravity = 1f;
         public float revolveSpeed;
+
+        public float activatedCounter = 0;
+        public Vector2? activatedPos;
 
 
         public ReviveSwarmer(ReviveSwarmerAbstract abstr) : base(abstr)
@@ -68,8 +73,23 @@ public class ReviveSwarmerModules
             this.lastRotation = this.rotation;
         }
 
+
+        
+
+
+
+
+
+
+
+
+
+
+
         public override void Update(bool eu)
         {
+            
+
             ChangeCollisionLayer(grabbedBy.Count == 0 ? 2 : 1);
             firstChunk.collideWithTerrain = grabbedBy.Count == 0;
             firstChunk.collideWithSlopes = grabbedBy.Count == 0;
@@ -100,7 +120,7 @@ public class ReviveSwarmerModules
             }
             base.Update(eu);
 
-            if (this.lightsource != null && Abstr.isActive)
+            if (this.lightsource != null)
             {
                 this.lightsource.setPos = new Vector2?(base.firstChunk.pos);
                 if (this.roomDarkness < 0.2f || this.lightsource.room != this.room)
@@ -113,50 +133,86 @@ public class ReviveSwarmerModules
                     this.lightsource = null;
                 }
             }
-            else if (this.roomDarkness >= 0.2f && Abstr.isActive)
+            else if (this.roomDarkness >= 0.2f)
             {
                 this.lightsource = new LightSource(base.firstChunk.pos, false, NSHswarmerColor, this);
                 this.room.AddObject(this.lightsource);
             }
 
-            return;
 
-            // 参考：JollyPointUpdate()
-            if (grabbedBy.Count > 0 && grabbedBy[0].grabber is Player)
+            if ((activatedCounter > 0 && grabbedBy.Count > 0) || room == null)
             {
-                Player player = (grabbedBy[0].grabber as Player);
-                if (player.input[0].pckp && player.input[0].y == -1)
+                Plugin.Log("-- obj");
+                Deactivate();
+            }
+
+            if (activatedCounter > 0 && activatedPos != null && grabbedBy.Count == 0)
+            {
+                activatedCounter--;
+                base.firstChunk.vel += Custom.DirVec(base.bodyChunks[0].pos, (Vector2)activatedPos) * 2f;
+                // base.firstChunk.vel *= 0.3f;
+                if (activatedCounter % 8 == 0)
                 {
-                    selectedCreature = null;
-                    return;
-                }
-                else if (player.room != null && player.input[0].pckp && player.input[0].y == 1)
-                {
-                    if (selectedCreature == null)
-                    {
-                        /*foreach (var obj in player.room.physicalObjects)
-                        {
-                            foreach (var obj2 in obj)
-                            {
-                                phyObj += obj2.GetType().Name + " ";
-                            }
-                        }*/
-                    }
+                    GreenSparks.GreenSpark spark = new GreenSparks.GreenSpark(firstChunk.pos);
+                    spark.lifeTime = 50;
+                    room.AddObject(spark);
                 }
             }
+            else if (activatedCounter == 0 && activatedPos != null && grabbedBy.Count == 0)
+            {
+                activatedPos = null;
+                firstChunk.vel.x *= 0.3f;
+                firstChunk.vel += Vector2.down * 15f;
+            }
+            
+            
+
         }
 
 
-        public void Use()
+        
+
+        public void Activate(Vector2 pos)
         {
-            if (!Abstr.isActive || selectedCreature == null || grabbedBy.Count <= 0 || grabbedBy[0].grabber is not Player
-                 || grabbedBy[0].grabber.room == null || selectedCreature.room != grabbedBy[0].grabber.room) 
-            { return; }
-            Plugin.Log("reviveSwarmer use:", selectedCreature.GetType().Name, selectedCreature.abstractCreature.ID.number);
+            if (activatedCounter > 0) { return; }
+            activatedCounter = MaxActivateTime;
+            activatedPos = pos;
+            affectedByGravity = 0.1f;
             AllGraspsLetGoOfThisObject(true);
-
-            Destroy();
+            Plugin.Log("activated swarmer at", pos);
         }
+
+        public void Deactivate()
+        {
+            activatedCounter = 0;
+            activatedPos = null;
+            affectedByGravity = 1f;
+            Plugin.Log("deactivated swarmer");
+        }
+
+
+
+        public bool Use(bool explode)
+        {
+            if (activatedCounter <= 0 || room == null) return false;
+            AllGraspsLetGoOfThisObject(true);
+            if (explode)
+            {
+                Vector2 pos = firstChunk.pos;
+                for (int l = 0; l < 8; l++)
+                {
+                    Vector2 vector2 = Custom.RNV();
+                    room.AddObject(new Spark(pos + vector2 * Random.value * 40f, vector2 * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
+                }
+                
+                room.AddObject(new LightSource(pos, false, NSHswarmerColor, this));
+            }
+            RemoveFromRoom();
+            Destroy();
+            return true;
+        }
+
+        
 
 
 
@@ -330,7 +386,7 @@ public class ReviveSwarmerModules
 
     public class ReviveSwarmerFisob : Fisob
     {
-        private static readonly ReviveSwarmerProperties properties = new();
+        // private static readonly ReviveSwarmerProperties properties = new();
         public static readonly AbstractPhysicalObject.AbstractObjectType ReviveSwarmer = new("ReviveSwarmer", true);
         public ReviveSwarmerFisob() : base(ReviveSwarmer)
         {
@@ -363,11 +419,11 @@ public class ReviveSwarmerModules
             return result;
         }
 
-        public override ItemProperties Properties(PhysicalObject forObject)
+        public override ItemProperties Properties(PhysicalObject swarmer)
         {
             // If you need to use the forObject parameter, pass it to your ItemProperties class's constructor.
             // The Mosquitoes example demonstrates this.
-            return properties;
+            return new ReviveSwarmerProperties(swarmer as ReviveSwarmer);
         }
     }
 
@@ -410,6 +466,12 @@ public class ReviveSwarmerModules
 
     public class ReviveSwarmerProperties : ItemProperties
     {
+        private readonly ReviveSwarmer swarmer;
+
+        public ReviveSwarmerProperties(ReviveSwarmer swarmer)
+        {
+            this.swarmer = swarmer;
+        }
 
         public override void Throwable(Player player, ref bool throwable)
             => throwable = true;
@@ -426,7 +488,15 @@ public class ReviveSwarmerModules
 
         public override void Grabability(Player player, ref Player.ObjectGrabability grabability)
         {
-            grabability = Player.ObjectGrabability.OneHand;
+            if (swarmer.activatedCounter > MaxActivateTime - 30)
+            {
+                grabability = Player.ObjectGrabability.CantGrab; 
+            }
+            else
+            {
+                grabability = Player.ObjectGrabability.OneHand;
+            }
+            
         }
     }
 

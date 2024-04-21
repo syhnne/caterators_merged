@@ -173,7 +173,7 @@ internal class PlayerHooks
         }
         catch (Exception ex)
         {
-            Plugin.Logger.LogError(ex);
+            Plugin.LogException(ex);
         }
     }
 
@@ -210,9 +210,7 @@ internal class PlayerHooks
 
 
 
-    // 除了特效以外，数值跟炸猫差不多，因为我不知道那堆二段跳的数值怎么改。我想改得小一点，让他没有那么强的机动性，不然太超模了（
-    // 因为这个电击在水下是有伤害的（痛击你的队友。jpg）我不是故意的，我是真的写不出来那个判定。我不知道他为什么会闪退。。
-    // 我大概应该用原版方法，然后做ilhooking。但是，说真的，想想那个工作量吧（汗）我都不太清楚自己究竟改了些什么
+    // 学c#的第三天，那时我只会复制粘贴……
     private static void Player_ClassMechanicsArtificer(On.Player.orig_ClassMechanicsArtificer orig, Player self)
     {
         // 卧槽 这代码啥时候写的

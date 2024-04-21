@@ -29,6 +29,8 @@ using System.Security.Cryptography;
 using Caterators_by_syhnne.srs;
 using Caterators_by_syhnne.nsh;
 using Caterators_by_syhnne.moon.MoonSwarmer;
+using System.Drawing;
+using JollyCoop;
 
 namespace Caterators_by_syhnne._public;
 
@@ -37,7 +39,18 @@ public class PlayerHooks
 
     public static void Apply()
     {
-        
+        // playerReviver
+        /*new Hook(
+            typeof(Player).GetProperty(nameof(Player.CanEatMeat), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+            get_Player_CanEatMeat
+            );
+        new Hook(
+            typeof(Player).GetProperty(nameof(Player.CanIPutDeadSlugOnBack), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+            get_Player_CanIPutDeadSlugOnBack
+            );*/
+        On.Player.CanEatMeat += Player_CanEatMeat;
+        On.Player.CanIPutDeadSlugOnBack += Player_CanIPutDeadSlugOnBack;
+        On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.Update += JollyMeter_PlayerIcon_Update;
 
 
         // nshInventory
@@ -81,11 +94,59 @@ public class PlayerHooks
         srs.PlayerHooks.Apply();
         nsh.PlayerHooks.Apply();
         moon.PlayerHooks.Apply();
+
+        
     }
 
 
-    
 
+    #region playerReviver
+
+    private static void JollyMeter_PlayerIcon_Update(On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.orig_Update orig, JollyCoop.JollyHUD.JollyMeter.PlayerIcon self)
+    {
+        orig(self);
+        if (self.playerState.alive || !self.playerState.permaDead)
+        {
+            self.color = PlayerGraphics.SlugcatColor(self.playerState.slugcatCharacter);
+            if (self.dead)
+            {
+                self.iconSprite.RemoveFromContainer();
+                self.gradient.RemoveFromContainer();
+                self.iconSprite = new FSprite("Kill_Slugcat", true);
+                self.iconSprite.scale *= 1.25f;
+                self.meter.fContainer.AddChild(self.iconSprite);
+                self.AddGradient(JollyCustom.ColorClamp(self.color, -1f, 360f, 60f, 360f, -1f, 360f));
+                self.dead = false;
+                self.meter.customFade = 5f;
+                self.blink = 3f;
+            }
+        }
+    }
+
+    private static bool Player_CanEatMeat(On.Player.orig_CanEatMeat orig, Player self, Creature crit)
+    {
+        bool result = orig(self, crit);
+        if (Plugin.playerModules.TryGetValue(self, out var mod) && mod.playerReviver != null && crit is Player)
+        {
+            result = false;
+        }
+        return result;
+    }
+
+
+    private static bool Player_CanIPutDeadSlugOnBack(On.Player.orig_CanIPutDeadSlugOnBack orig, Player self, Player pickUpCandidate)
+    {
+        bool result = orig(self, pickUpCandidate);
+        if (Plugin.playerModules.TryGetValue(self, out var mod) && mod.playerReviver != null && mod.playerReviver.Activated)
+        {
+            result = false;
+        }
+        return result;
+
+    }
+
+
+    #endregion
 
 
 
@@ -142,7 +203,7 @@ public class PlayerHooks
         }
         catch (Exception e)
         {
-            Plugin.Logger.LogError(e);
+            Plugin.LogException(e);
         }
     }
 
@@ -397,13 +458,18 @@ public class PlayerHooks
 
 
 
-    // 垃圾回收
+    // 好家伙 我都写了这么多东西了
     private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
     {
         if (Plugin.playerModules.TryGetValue(self, out var module))
         {
             module.gravityController?.Destroy();
             module.gravityController = null;
+            module.nshInventory = null;
+            module.deathPreventer = null;
+            module.srsLightSource = null;
+            module.nshScarf = null;
+            module.swarmerManager = null;
         }
         orig(self);
     }
@@ -430,7 +496,6 @@ public class PlayerHooks
         {
             module.gravityController?.Die();
             module.nshInventory?.RemoveAndRealizeAllObjects();
-            if (self.dead) { module.deathPreventer = null; }
             if (module.swarmerManager != null && module.swarmerManager.LastAliveSwarmer != null)
             {
                 module.swarmerManager.KillSwarmer(module.swarmerManager.LastAliveSwarmer, false);

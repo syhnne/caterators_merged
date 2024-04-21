@@ -191,14 +191,14 @@ public class DeathPreventHooks
                 stunBonus = Mathf.Lerp(1f, 0.1f, self.room.world.rainCycle.RainApproaching) * stunBonus;
             }
         }
-        else if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var module) && module.deathPreventer != null)
+        /*else if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var module) && module.deathPreventer != null)
         {
             if (self.room.world.rainCycle.RainApproaching > 0f && module.deathPreventer.TryPreventDeath(PlayerDeathReason.Violence))
             {
                 { return; }
             }
             
-        }
+        }*/
         orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
     }
 
@@ -309,7 +309,7 @@ public class DeathPreventer
                 }
             }
         }*/
-        if (player.dangerGraspTime > 30)
+        if (player.dangerGraspTime > 58)
         {
             TryPreventDeath(PlayerDeathReason.DangerGrasp);
         }
@@ -326,13 +326,22 @@ public class DeathPreventer
         {
             if (player == null || player.slatedForDeletetion) return null;
             bool getModule = Plugin.playerModules.TryGetValue(player, out var module);
+
+            // 如果启动了一个神经元，在准备复活队友的时候自己去世了，就会使用启动的这个神经元
+            if (getModule && module.playerReviver != null && module.playerReviver.activatedSwarmer != null)
+            {
+                return module.playerReviver.activatedSwarmer.abstractPhysicalObject;
+            }
+
+            // moon会优先消耗自己的神经元，因为这个只能复活自己不能复活队友
             if (getModule && module.swarmerManager != null && module.swarmerManager.CanConsumeSwarmer)
             {
                 return module.swarmerManager.LastAliveSwarmer.abstractCreature;
             }
 
 
-            // TODO: 这个目前有bug，抓在手上的时候不好使。而且这个的触发逻辑其实有点奇妙，有的时候我压根没看出来自己咋死的就爆绿光了。
+            // TODO: 这个目前有bug，抓在手上的时候不好使。
+            // 触发逻辑倒是修好了，原来蛞蝓猫被咬的时候会先调用violence造成咬伤啊（恍然大悟
             if (player.grasps != null)
             {
                 foreach (var grasp in player.grasps)
@@ -343,10 +352,7 @@ public class DeathPreventer
                     }
                 }
             }
-            if (player.objectInStomach != null && player.objectInStomach is ReviveSwarmerAbstract)
-            {
-                return player.objectInStomach;
-            }
+            
             if (getModule && module.nshInventory != null)
             {
                 foreach (AbstractPhysicalObject obj in module.nshInventory.Items)
@@ -356,6 +362,11 @@ public class DeathPreventer
                         return obj;
                     }
                 }
+            }
+
+            if (player.objectInStomach != null && player.objectInStomach is ReviveSwarmerAbstract)
+            {
+                return player.objectInStomach;
             }
 
             return null;
@@ -369,7 +380,7 @@ public class DeathPreventer
     {
         if (dontRevive || justPreventedCounter > 0) { return false; }
         AbstractPhysicalObject reviveSwarmer = DeathPreventObject;
-        Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "object:", reviveSwarmer == null);
+        Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "nullObject:", reviveSwarmer == null, "nullRoom:", player.room == null);
         
         if (player.room == null || (reviveSwarmer == null && !forceRevive))
         {
@@ -386,18 +397,10 @@ public class DeathPreventer
         bool deathExplode = true;
         if (deathReason == PlayerDeathReason.DangerGrasp || deathReason == PlayerDeathReason.Violence)
         {
-            foreach (var grabber in player.grabbedBy)
+            for (int i = 0; i < player.grabbedBy.Count; i++)
             {
-                if (grabber.grabber != null)
-                {
-                    for(int i = 0; i < grabber.grabber.grasps.Count(); i++)
-                    {
-                        if (grabber.grabber.grasps[i] != null && grabber.grabber.grasps[i].grabbed == player)
-                        {
-                            grabber.grabber.ReleaseGrasp(i);
-                        }
-                    }
-                }
+                player.grabbedBy[i]?.Release();
+
             }
             player.AllGraspsLetGoOfThisObject(true);
         }
@@ -524,13 +527,17 @@ public class DeathPreventer
             swarmerManager.KillSwarmer(reviveSwarmer.realizedObject as MoonSwarmer, true);
             return;
         }
-
-        if (reviveSwarmer.realizedObject != null)
+        
+        
+        if (reviveSwarmer.realizedObject != null && reviveSwarmer is ReviveSwarmerAbstract)
         {
-            reviveSwarmer.realizedObject.AllGraspsLetGoOfThisObject(true);
-            player.room.RemoveObject(reviveSwarmer.realizedObject);
-            reviveSwarmer.realizedObject = null;
+            (reviveSwarmer.realizedObject as ReviveSwarmer).Use(false);
         }
+        else
+        {
+            reviveSwarmer.Destroy();
+        }
+
         if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null && module.nshInventory.RemoveSpecificObj(reviveSwarmer))
         {
         }

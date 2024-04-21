@@ -20,6 +20,7 @@ public class PlayerModule
     public moon.MoonSwarmer.SwarmerManager swarmerManager;
     public int spearExhaustCounter;
     public fp.PearlReader pearlReader;
+    public _public.PlayerReviver playerReviver;
 
 
     public PlayerModule(Player player, AbstractCreature abstractCreature, World world)
@@ -40,6 +41,7 @@ public class PlayerModule
 
 
         deathPreventer = new DeathPreventer(player);
+        playerReviver = new PlayerReviver(player);
         if (isCaterator && storyName != null)
         {
             gravityController = new GravityController(player);
@@ -77,6 +79,7 @@ public class PlayerModule
         }
         pearlReader?.Update(eu);
         deathPreventer?.Update();
+        playerReviver?.Update(eu);
         swarmerManager?.Update();
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
         srsLightSource?.Update();

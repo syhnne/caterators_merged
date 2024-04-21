@@ -19,6 +19,7 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
 public class SwarmerManager
 {
+    // TODO: 坏了 这个地方应该用弱引用 但我前面写了那么多东西全都不是弱引用（（
     public Player player;
     public static int maxSwarmer = 5;
     public List<MoonSwarmer> swarmers;
@@ -30,11 +31,13 @@ public class SwarmerManager
     public bool weakMode;
     public bool agility;
 
-    /// <summary>
-    /// 离得太远的时候把这个值设置为true，下次玩家钻管道的时候会直接重生一波新的
-    /// </summary>
+    // 没事了 这个好像不好使
     public bool needCallBack = false;
     public int? callBackSwarmers;
+
+    private int teleportFail = -1;
+    public bool tryingToTeleport = false;
+    private bool tryingToCallBack = false;
 
     public int hasSwarmers
     {
@@ -102,6 +105,15 @@ public class SwarmerManager
             alive = false;  
         }
 
+        if (tryingToCallBack)
+        {
+            tryingToCallBack = !CallBack();
+        }
+        if (tryingToTeleport)
+        {
+            tryingToTeleport = !TryTeleportAllSwarmers();
+        }
+
         if (weakMode)
         {
             if (player.aerobicLevel > 0.95f)
@@ -148,19 +160,53 @@ public class SwarmerManager
     /// callback(x) 重开（v)
     /// 不要在这里updateswarmers，经测试这会使神经元数量变成-1并引发deathpreventer
     /// </summary>
-    public void CallBack()
+    public bool CallBack()
     {
-        callBackSwarmers = 0;
-        deathPreventer.forceRevive = true;
-        Plugin.Log("CallBack():", swarmers.Count);
-        foreach (var swarmer in swarmers)
+        if (swarmers.Count == 0 && callBackSwarmers != null) return true;
+        try
         {
-            Plugin.Log("CallBack(): callback swarmer");
-            callBackSwarmers++;
-            swarmer.Kill(false);
+            callBackSwarmers ??= 0;
+            deathPreventer.forceRevive = true;
+            Plugin.Log("CallBack() before:", swarmers.Count);
+            bool succeed = true;
+            // 奥 懂了 foreach循环内部不能改变这个list的值
+            /*foreach (var holdingSwarmerGrasp in swarmers)
+            {
+                // Plugin.Log("CallBack(): callback holdingSwarmerGrasp");
+
+                if (holdingSwarmerGrasp.Kill(false))
+                {
+                    swarmers.Remove(holdingSwarmerGrasp);
+                    callBackSwarmers++;
+                }
+                else
+                {
+                    succeed = false;
+                    Plugin.Log("trying to kill holdingSwarmerGrasp", holdingSwarmerGrasp.abstractCreature.ID.number, ", failed");
+                }
+            }*/
+
+            for (int i = swarmers.Count - 1; i >= 0; i--)
+            {
+                if (swarmers[i].Kill(false))
+                {
+                    swarmers.RemoveAt(i);
+                    callBackSwarmers++;
+                }
+                else
+                {
+                    succeed = false;
+                    Plugin.Log("trying to kill holdingSwarmerGrasp", swarmers[i].abstractCreature.ID.number, ", failed");
+                }
+            }
+            Plugin.Log("CallBack(): after:", callBackSwarmers);
+            return succeed;
         }
-        swarmers.Clear();
-        Plugin.Log("CallBack(): call back swarmers:", callBackSwarmers);
+        catch (Exception ex)
+        {
+            Plugin.LogException(ex);
+            return false;
+        }
     }
 
 
@@ -168,7 +214,7 @@ public class SwarmerManager
 
     public bool Respawn()
     {
-        
+        deathPreventer.forceRevive = false;
         if (callBackSwarmers == null || callBackSwarmers == 0)
         {
             Plugin.Log("Respawn(): null callBackSwarmers");
@@ -184,16 +230,15 @@ public class SwarmerManager
 
     public void SwarmersUpdate()
     {
-        switch (hasSwarmers)
-        {
+        switch (hasSwarmers) 
+        { 
             case 0:
                 if (player.stillInStartShelter) break; // 不加这句的下场就是，一点开游戏就看到已经死了（（（
+                weakMode = true; agility = false;
                 try
-                {
-                    player.Die();
-                }
+                { player.Die(); }
                 catch (Exception e) 
-                { Plugin.Logger.LogError(e); }
+                { Plugin.LogException(e); }
                 // if (deathPreventer != null) { deathPreventer.dontRevive = true; } // 防止deathpreventer再消耗神经元复活玩家（。
                 break;
             case 1:
@@ -220,7 +265,7 @@ public class SwarmerManager
     /// <param name="number"></param>
     public void SpawnSwarmer(int number = 1)
     {
-        Plugin.Log("spawn MoonSwarmer");
+        Plugin.Log("spawn MoonSwarmer:", number);
         for (int i = 0; i < number; i++)
         {
             AbstractCreature abstr = new AbstractCreature(player.room.world, StaticWorld.GetCreatureTemplate(MoonSwarmerCritob.MoonSwarmer), null, player.abstractCreature.pos, player.room.game.GetNewID());
@@ -247,7 +292,7 @@ public class SwarmerManager
             s.killTag = null;
             s.Kill(explode);
             swarmers.Remove(s);
-            Plugin.Log("killed, moon has swarmer:", hasSwarmers);
+            Plugin.Log("killed, moon has holdingSwarmerGrasp:", hasSwarmers);
             result = true;
         }
         SwarmersUpdate();
@@ -258,7 +303,10 @@ public class SwarmerManager
     public void CycleEndSave()
     {
         if (callBackSwarmers != null) { return; }
-        CallBack();
+        for (; ; )
+        {
+            if (CallBack()) break;
+        }
         if (player.room == null)
         {
             Plugin.Log("CycleEndSave(): Null player.room, neurons not saved");
@@ -285,7 +333,18 @@ public class SwarmerManager
         {
             Respawn();
         }
-        
+        else if (player.room.abstractRoom.shelter || player.room.abstractRoom.gate)
+        {
+            /*for (; ; )
+            {
+                if (CallBack()) break;
+            }*/
+            tryingToCallBack = true;
+        }
+        else
+        {
+            // tryingToTeleport = true;
+        }
 
         /*if (player.room.abstractRoom.gate || player.room.abstractRoom.shelter)
         {
@@ -306,6 +365,31 @@ public class SwarmerManager
 
     }
 
+
+
+
+    public bool TryTeleportAllSwarmers()
+    {
+        if (swarmers ==  null || swarmers.Count == 0 || callBackSwarmers != null) return false;
+        
+        // 防止有神经元在管道里
+        foreach (MoonSwarmer s in swarmers)
+        {
+            if (s.room == null) return false;
+        }
+        bool succeed = true;
+        for (int i = 0; i < swarmers.Count; i++)
+        {
+            if (!swarmers[i].TryTeleportToOwner())
+            {
+                Plugin.Log("!! failed to teleport holdingSwarmerGrasp", i);
+                succeed = false;
+            }
+        }
+
+        player.room.abstractRoom.realizedRoom.aimap.NewWorld(player.room.abstractRoom.index);
+        return succeed;
+    }
 
 
 

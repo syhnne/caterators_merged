@@ -16,7 +16,6 @@ using Caterators_by_syhnne.srs;
 using Caterators_by_syhnne.nsh;
 using EffExt;
 using System.Net.Configuration;
-using Caterators_by_syhnne.effects;
 using static Caterators_by_syhnne.srs.OxygenMaskModules;
 using DevInterface;
 
@@ -80,8 +79,6 @@ class Plugin : BaseUnityPlugin
 
             On.RainWorldGame.Update += RainWorldGame_Update;
             On.World.GetNode += World_GetNode;
-            On.MoreSlugcats.ChatlogData.getChatlog_ChatlogID += ChatlogData_getChatlog_ChatlogID;
-            // On.SaveState.AbstractPhysicalObjectFromString += SaveState_AbstractPhysicalObjectFromString;
 
 
             _public.PlayerHooks.Apply();
@@ -92,11 +89,6 @@ class Plugin : BaseUnityPlugin
             _public.DeathPreventHooks.Apply();
             CustomSaveData.Apply();
             fp.ShelterSS_AI.Apply();
-            /*new EffectDefinitionBuilder("MyRoofTopView_syhnne")
-                .AddFloatField("position", 0f, 100f, 1f, 26f, "floorLevel")
-                .SetUADFactory((room, data, firstTimeRealized) => new MyRoofTopView(room, data))
-                .SetCategory("POMEffectsExamples")
-                .Register();*/
 
             // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
             _public.SSOracleHooks.Apply();
@@ -144,6 +136,13 @@ class Plugin : BaseUnityPlugin
     }
 
 
+    public static void LogException(Exception ex)
+    {
+        if (!ShowLogs || Logger == null) return;
+        Plugin.Logger.LogError(ex);
+    }
+
+
 
 
 
@@ -158,7 +157,7 @@ class Plugin : BaseUnityPlugin
             if (Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)
             {
                 AbstractPhysicalObject abstr = new ReviveSwarmerModules.ReviveSwarmerAbstract(self.world, self.Players[0].pos, self.GetNewID(), true);
-                abstr.destroyOnAbstraction = true;
+                // abstr.destroyOnAbstraction = true;
                 self.Players[0].Room.AddEntity(abstr);
                 abstr.RealizeInRoom();
                 abstr.realizedObject.firstChunk.pos = self.Players[0].realizedObject.firstChunk.pos;
@@ -185,6 +184,7 @@ class Plugin : BaseUnityPlugin
                 }
             }
 
+            // 输出所有神经元的位置坐标
             if (Input.GetKeyDown(KeyCode.H))
             {
                 foreach (AbstractCreature p in self.Players)
@@ -195,6 +195,18 @@ class Plugin : BaseUnityPlugin
                     }
                 }
             }
+
+            // 传送至玩家
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                foreach (AbstractCreature p in self.Players)
+                {
+                    if (p.realizedObject != null && p.realizedCreature.room != null && Plugin.playerModules.TryGetValue(p.realizedCreature as Player, out var module) && module.swarmerManager != null)
+                    {
+                        module.swarmerManager.tryingToTeleport = true;
+                    }
+                }
+            }
         }
 
 
@@ -202,17 +214,6 @@ class Plugin : BaseUnityPlugin
 
 
 
-    private string[] ChatlogData_getChatlog_ChatlogID(On.MoreSlugcats.ChatlogData.orig_getChatlog_ChatlogID orig, ChatlogData.ChatlogID id)
-    {
-        string[] result = orig(id);
-        string str = "ChatlogID:" + id.ToString() + " - ";
-        foreach (string s in result)
-        {
-            str += s + " ";
-        }
-        Plugin.Log(str);
-        return result;
-    }
 
 
 
