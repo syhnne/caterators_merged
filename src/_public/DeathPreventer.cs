@@ -380,7 +380,7 @@ public class DeathPreventer
     {
         if (dontRevive || justPreventedCounter > 0) { return false; }
         AbstractPhysicalObject reviveSwarmer = DeathPreventObject;
-        Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "nullObject:", reviveSwarmer == null, "nullRoom:", player.room == null);
+        // Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "nullObject:", reviveSwarmer == null, "nullRoom:", player.room == null);
         
         if (player.room == null || (reviveSwarmer == null && !forceRevive))
         {

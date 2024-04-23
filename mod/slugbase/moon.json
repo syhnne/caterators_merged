@@ -29,8 +29,8 @@
         "the_glow": true,
         "throw_skill": [ 1.0, 0.9 ],
         "crouch_stealth": [ 1.0, 0.9 ],
-        "food_min": 7,
-        "food_max": 8,
+        "food_min": 6,
+        "food_max": 7,
 
         "guide_overseer": 1,
         "start_room": "CC_S01",

@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Caterators_by_syhnne.nsh;
 
 
 
@@ -29,7 +30,7 @@ public class PlayerGraphicsModule
             self.lightSource.setAlpha = 1.5f;
             self.player.room.AddObject(self.lightSource);
         }
-        self.gills.Update();
+        // self.gills.Update();
     }
 
 
@@ -37,14 +38,20 @@ public class PlayerGraphicsModule
     
     public static void PlayerGraphics_ctor(PlayerGraphics self, PhysicalObject ow)
     {
-        self.gills = new PlayerGraphics.AxolotlGills(self, 14);
+        // self.gills = new PlayerGraphics.AxolotlGills(self, 13);
+        if (Plugin.playerModules.TryGetValue(self.player, out var module) && module.playerName == Enums.Moonname)
+        {
+            Plugin.Log("gills added");
+            module.gills = new PlayerGraphics.AxolotlGills(self, 13);
+        }
     }
 
 
     public static void InitiateSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
+        if (!Plugin.playerModules.TryGetValue(self.player, out var module)) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
-        sLeaser.sprites = new FSprite[14 + self.gills.numberOfSprites];
+        sLeaser.sprites = new FSprite[13 + module.gills.numberOfSprites];
         sLeaser.sprites[0] = new FSprite("BodyA", true);
         sLeaser.sprites[0].anchorY = 0.7894737f;
         if (self.RenderAsPup)
@@ -71,7 +78,15 @@ public class PlayerGraphicsModule
         TriangleMesh triangleMesh;
         triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
         sLeaser.sprites[2] = triangleMesh;
-        sLeaser.sprites[3] = new FSprite("HeadA0", true);
+        if (Futile.atlasManager.DoesContainElementWithName("moon_HeadA0"))
+        {
+            sLeaser.sprites[3] = new FSprite("moon_HeadA0", true);
+        }
+        else
+        {
+            Plugin.Log("sprite moon_HeadA0 NOT FOUND");
+            sLeaser.sprites[3] = new FSprite("HeadA0", true);
+        }
         sLeaser.sprites[4] = new FSprite("LegsA0", true);
         sLeaser.sprites[4].anchorY = 0.25f;
         sLeaser.sprites[5] = new FSprite("PlayerArm0", true);
@@ -88,10 +103,11 @@ public class PlayerGraphicsModule
         sLeaser.sprites[10] = new FSprite("Futile_White", true);
         sLeaser.sprites[10].shader = rCam.game.rainWorld.Shaders["FlatLight"];
         // 这是留给脑门上那个圆点的，回头再写（
-        sLeaser.sprites[13] = new FSprite("Futile_White", true);
-        sLeaser.sprites[13].isVisible = false;
+        // 算了，拉倒吧，那玩意儿我恐怕得单独写个class了
+        /*sLeaser.sprites[13] = new FSprite("Futile_White", true);
+        sLeaser.sprites[13].isVisible = false;*/
 
-        self.gills.InitiateSprites(sLeaser, rCam);
+        module.gills.InitiateSprites(sLeaser, rCam);
         self.gown.InitiateSprite(self.gownIndex, sLeaser, rCam);
         self.AddToContainer(sLeaser, rCam, null);
     }
@@ -99,13 +115,14 @@ public class PlayerGraphicsModule
 
     public static void AddToContainer(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
     {
+        if (!Plugin.playerModules.TryGetValue(self.player, out var module)) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
         newContatiner ??= rCam.ReturnFContainer("Midground");
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
-            if (i >= self.gills.startSprite && i < self.gills.startSprite + self.gills.numberOfSprites)
+            if (i >= module.gills.startSprite && i < module.gills.startSprite + module.gills.numberOfSprites)
             {
-                rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[i]);
+                rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground").AddChild(sLeaser.sprites[i]);
             }
             else if (i == self.gownIndex)
             {
@@ -135,8 +152,27 @@ public class PlayerGraphicsModule
 
     public static void DrawSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
-        self.gills.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+        if (!Plugin.playerModules.TryGetValue(self.player, out var module)) { return; }
+        module.gills.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+        for (int i = 0; i < sLeaser.sprites.Length; i++)
+        {
+            if (Futile.atlasManager.DoesContainElementWithName("moon_" + sLeaser.sprites[i].element.name))
+            {
+                sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "moon_" + sLeaser.sprites[i].element.name));
+            }
+        }
     }
 
+
+
+
+
+    public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+    {
+        if (Plugin.playerModules.TryGetValue(self.player, out var module))
+        {
+            module.gills.ApplyPalette(sLeaser, rCam, palette);
+        }
+    }
 
 }

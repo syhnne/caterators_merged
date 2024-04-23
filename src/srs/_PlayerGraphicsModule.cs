@@ -16,7 +16,7 @@ public class PlayerGraphicsModule
     internal static readonly Color spearColor = new Color(1f, 0.2f, 0.1f);
     internal static readonly Color32 bodyColor = new Color32(255, 207, 88, 255);
     internal static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, };
-
+    private const string tailAtlasName = "srs_tail";
 
     public static void PlayerGraphics_Update(PlayerGraphics self, _public.PlayerModule module)
     {
@@ -87,16 +87,35 @@ public class PlayerGraphicsModule
             new TriangleMesh.Triangle(10, 11, 12),
             new TriangleMesh.Triangle(11, 12, 13)
         };
-        TriangleMesh triangleMesh;
-        if (Futile.atlasManager.DoesContainElementWithName("srs_tail"))
+        TriangleMesh triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
+        if (Futile.atlasManager.DoesContainElementWithName(tailAtlasName))
         {
-            Plugin.Log("sprite srs_tail NOT FOUND");
-            triangleMesh = new TriangleMesh("srs_tail", tris, false, false);
+            triangleMesh = new TriangleMesh(tailAtlasName, tris, false, true);
         }
         else
         {
-            triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
+            Plugin.Log("sprite srs_tail NOT FOUND");
         }
+
+        // 这是反编译了伪装者的代码复制过来的，我是一点也没看懂，但不加这几行就会导致尾巴材质不显示。
+        // 盲猜一波，这应该是决定了材质按什么样的方式拉伸铺在triangleMesh上面
+        FAtlas fatlas = Futile.atlasManager.LoadAtlas("atlases/srs_tail");
+        triangleMesh.UVvertices[0] = fatlas._elementsByName[tailAtlasName].uvBottomLeft;
+        triangleMesh.UVvertices[1] = fatlas._elementsByName[tailAtlasName].uvTopLeft;
+        triangleMesh.UVvertices[13] = fatlas._elementsByName[tailAtlasName].uvTopRight;
+        triangleMesh.UVvertices[14] = fatlas._elementsByName[tailAtlasName].uvBottomRight;
+        float num = (triangleMesh.UVvertices[13].x - triangleMesh.UVvertices[1].x) / 6f;
+        for (int i = 2; i < 14; i += 2)
+        {
+            triangleMesh.UVvertices[i].x = (float)((double)fatlas._elementsByName[tailAtlasName].uvBottomLeft.x + (double)num * 0.5 * (double)i);
+            triangleMesh.UVvertices[i].y = fatlas._elementsByName[tailAtlasName].uvBottomLeft.y;
+        }
+        for (int j = 3; j < 13; j += 2)
+        {
+            triangleMesh.UVvertices[j].x = (float)((double)fatlas._elementsByName[tailAtlasName].uvTopLeft.x + (double)num * 0.5 * (double)(j - 1));
+            triangleMesh.UVvertices[j].y = fatlas._elementsByName[tailAtlasName].uvTopLeft.y;
+        }
+
         sLeaser.sprites[2] = triangleMesh;
         if (Futile.atlasManager.DoesContainElementWithName("srs_HeadA0"))
         {
@@ -146,13 +165,17 @@ public class PlayerGraphicsModule
         }*/
         // self.tailSpecks.AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("Midground"));
 
+        
+        // Plugin.Log("srs_add to container");
+        
         sLeaser.RemoveAllSpritesFromContainer();
         newContatiner ??= rCam.ReturnFContainer("Midground");
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             if (i >= self.tailSpecks.startSprite && i < self.tailSpecks.startSprite + self.tailSpecks.numberOfSprites)
             {
-                rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[i]);
+                // 可喜可贺，输出日志显示玩家在背上的时候这个函数每帧都被调用一次，那么问题就很好解决了
+                rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground").AddChild(sLeaser.sprites[i]);
             }
             else if (i == self.gownIndex)
             {
@@ -184,7 +207,11 @@ public class PlayerGraphicsModule
         self.tailSpecks.DrawSprites(sLeaser, rCam, timeStacker, camPos);
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
-            if (Futile.atlasManager.DoesContainElementWithName("srs_" + sLeaser.sprites[i].element.name))
+            if (i == 2)
+            {
+                sLeaser.sprites[2].element = Futile.atlasManager.GetElementWithName("srs_tail");
+            }
+            else if (Futile.atlasManager.DoesContainElementWithName("srs_" + sLeaser.sprites[i].element.name))
             {
                 sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(sLeaser.sprites[i].element.name.Replace(sLeaser.sprites[i].element.name, "srs_" + sLeaser.sprites[i].element.name));
             }

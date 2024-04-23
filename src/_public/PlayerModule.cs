@@ -26,6 +26,7 @@ public class PlayerModule
     public int spearExhaustCounter;
     public fp.PearlReader pearlReader;
     public _public.PlayerReviver playerReviver;
+    public PlayerGraphics.AxolotlGills gills;
 
 
     public PlayerModule(Player player, AbstractCreature abstractCreature, World world)
@@ -55,11 +56,11 @@ public class PlayerModule
         {
             nshInventory = new nsh.Inventory(player);
         }
-        if (playerName == Enums.SRSname)
+        else if (playerName == Enums.SRSname)
         {
             srsLightSource = new srs.LightSourceModule(player);
         }
-        if (playerName == Enums.Moonname)
+        else if (playerName == Enums.Moonname)
         {
             // 最费劲的一集
             swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
@@ -68,8 +69,9 @@ public class PlayerModule
             // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
             swarmerManager.callBackSwarmers = Math.Min(world.game.GetDeathPersistent().MoonHasSwarmers + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer);
             Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers);
+            // gills = new PlayerGraphics.AxolotlGills(player.graphicsModule as PlayerGraphics, 13);
         }
-        if (playerName == Enums.FPname)
+        else if (playerName == Enums.FPname)
         {
             pearlReader = new fp.PearlReader(player);
         }

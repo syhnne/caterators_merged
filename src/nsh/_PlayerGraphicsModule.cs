@@ -104,7 +104,7 @@ public class PlayerGraphicsModule
     public static void AddToContainer(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
     {
         if (!Plugin.playerModules.TryGetValue(self.player, out var module) || module.playerName != Enums.NSHname) { return; }
-        sLeaser.RemoveAllSpritesFromContainer();
+        // sLeaser.RemoveAllSpritesFromContainer();
         // Plugin.Log(sLeaser.sprites.Count());
         // if (sLeaser.sprites.Count() <= module.nshScarf.startSprite) return;
         // rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[module.nshScarf.startSprite]);
@@ -119,7 +119,14 @@ public class PlayerGraphicsModule
         {
             if (i == module.nshScarf.startSprite)
             {
-                rCam.ReturnFContainer("Background").AddChild(sLeaser.sprites[i]);
+                if (self.player.onBack == null)
+                {
+                    rCam.ReturnFContainer("Background").AddChild(sLeaser.sprites[i]);
+                }
+                else
+                {
+                    rCam.ReturnFContainer("Background").AddChildAtIndex(sLeaser.sprites[i], 0);
+                }
             }
             else if (i == module.nshScarf.startSprite + 1)
             {

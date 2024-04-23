@@ -282,7 +282,7 @@ public class SwarmerManager
     }
 
 
-    // TODO: 目前这东西是一个有缝衔接，虽然pos和我想的一样是衔接了，但颜色没衔接需要修改一下
+    // TODO: 目前这东西是一个有缝衔接，因为那个颜色衔接他不知道为啥压根不干活
     public void ConvertNSHSwarmer(nsh.ReviveSwarmerModules.ReviveSwarmer swarmer)
     {
         if (swarmer.room == null) { Plugin.Log("ConvertNSHSwarmer(): null room"); return; }

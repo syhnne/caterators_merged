@@ -31,7 +31,6 @@ public class PlayerGraphicsModule
 
     public static void Apply()
     {
-        On.Player.SlugOnBack.ChangeOverlap += Player_SlugOnBack_ChangeOverlap;
 
         On.PlayerGraphics.ctor += PlayerGraphics_ctor;
         On.PlayerGraphics.Update += PlayerGraphics_Update;
@@ -46,30 +45,6 @@ public class PlayerGraphicsModule
 
 
 
-
-    // 防止联机背背时图层出问题
-    // 淦 联机那是因为所有东西都在background上了 所以防不住 拉倒罢
-    private static void Player_SlugOnBack_ChangeOverlap(On.Player.SlugOnBack.orig_ChangeOverlap orig, Player.SlugOnBack self, bool newOverlap)
-    {
-        orig(self, newOverlap);
-        if (self.slugcat == null) { return; }
-        if (self.slugcat.SlugCatClass == Enums.SRSname && (self.slugcat.graphicsModule as PlayerGraphics).tailSpecks != null)
-        {
-            for (int i = 0; i < self.owner.room.game.cameras.Length; i++)
-            {
-                // 这个会有用吗
-                self.owner.room.game.cameras[i].MoveObjectToContainer(self.slugcat.graphicsModule as PlayerGraphics, self.owner.room.game.cameras[i].ReturnFContainer(!newOverlap ? "Background" : "Midground"));
-            }
-
-        }
-        else if (self.slugcat.SlugCatClass == Enums.NSHname && Plugin.playerModules.TryGetValue(self.slugcat, out var module) && module.nshScarf != null)
-        {
-            for (int i = 0; i < self.owner.room.game.cameras.Length; i++)
-            {
-                self.owner.room.game.cameras[i].MoveObjectToContainer(module.nshScarf, self.owner.room.game.cameras[i].ReturnFContainer(!newOverlap ? "Background" : "Midground"));
-            }
-        }
-    }
 
 
 
@@ -97,7 +72,8 @@ public class PlayerGraphicsModule
 
     private static void PlayerGraphics_Update(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
     {
-        if (self.player.SlugCatClass == Enums.SRSname && Plugin.playerModules.TryGetValue(self.player, out var module))
+        bool getModule = Plugin.playerModules.TryGetValue(self.player, out var module);
+        if (self.player.SlugCatClass == Enums.SRSname && getModule)
         {
             srs.PlayerGraphicsModule.PlayerGraphics_Update(self, module);
         }
@@ -106,9 +82,13 @@ public class PlayerGraphicsModule
             moon.PlayerGraphicsModule.PlayerGraphics_Update(self);
         }
         orig(self);
-        if (self.player.SlugCatClass == Enums.NSHname && Plugin.playerModules.TryGetValue(self.player, out var module2))
+        if (self.player.SlugCatClass == Enums.NSHname && getModule)
         {
-            module2.nshScarf?.Update();
+            module.nshScarf?.Update();
+        }
+        if (self.player.SlugCatClass == Enums.Moonname && getModule)
+        {
+            module.gills?.Update();
         }
     }
 
@@ -128,7 +108,7 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
+        else if (self.player.SlugCatClass == Enums.Moonname)
         {
             moon.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
         }
@@ -147,7 +127,7 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
+        else if (self.player.SlugCatClass == Enums.Moonname)
         {
             moon.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
         }
@@ -169,7 +149,7 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
+        else if (self.player.SlugCatClass == Enums.Moonname)
         {
             moon.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
         }
@@ -191,6 +171,9 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
         }
-        
+        else if (self.player.SlugCatClass == Enums.Moonname)
+        {
+            moon.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
+        }
     }
 }

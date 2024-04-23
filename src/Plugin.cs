@@ -79,6 +79,8 @@ class Plugin : BaseUnityPlugin
 
             On.RainWorldGame.Update += RainWorldGame_Update;
             On.World.GetNode += World_GetNode;
+            // On.PlayerGraphics.AxolotlGills.DrawSprites += test;
+            // On.PlayerGraphics.AxolotlGills.Update += test2;
 
 
             _public.PlayerHooks.Apply();
@@ -111,6 +113,7 @@ class Plugin : BaseUnityPlugin
             Futile.atlasManager.LoadAtlas("atlases/srs_head");
             Futile.atlasManager.LoadAtlas("atlases/srs_tail");
             Futile.atlasManager.LoadAtlas("atlases/nsh_head");
+            Futile.atlasManager.LoadAtlas("atlases/moon_head");
         }
         catch (Exception ex)
         {
@@ -146,10 +149,51 @@ class Plugin : BaseUnityPlugin
 
 
 
+
+
+    private void test(On.PlayerGraphics.AxolotlGills.orig_DrawSprites orig, PlayerGraphics.AxolotlGills self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+    {
+        orig(self, sLeaser, rCam, timeStacker, camPos);
+        Plugin.Log("axolot gills drawsprites");
+    }
+    private void test2(On.PlayerGraphics.AxolotlGills.orig_Update orig, PlayerGraphics.AxolotlGills self)
+    {
+        orig(self);
+        Plugin.Log("axolot gills update");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // 一些我的开发者模式专用按键
     private void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
     {
-        orig(self);
+        try
+        {
+            orig(self);
+        }
+        catch (Exception e)
+        {
+            Plugin.LogException(e);
+            throw;
+        }
 
         if (DevMode && self.devToolsActive)
         {
