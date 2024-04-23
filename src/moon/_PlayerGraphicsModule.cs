@@ -5,7 +5,6 @@ using UnityEngine;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Caterators_by_syhnne.nsh;
 
 
 
@@ -30,28 +29,22 @@ public class PlayerGraphicsModule
             self.lightSource.setAlpha = 1.5f;
             self.player.room.AddObject(self.lightSource);
         }
-        // self.gills.Update();
+        self.gills.Update();
     }
 
 
 
-    
+
     public static void PlayerGraphics_ctor(PlayerGraphics self, PhysicalObject ow)
     {
-        // self.gills = new PlayerGraphics.AxolotlGills(self, 13);
-        if (Plugin.playerModules.TryGetValue(self.player, out var module) && module.playerName == Enums.Moonname)
-        {
-            Plugin.Log("gills added");
-            module.gills = new PlayerGraphics.AxolotlGills(self, 13);
-        }
+        self.gills = new PlayerGraphics.AxolotlGills(self, 14);
     }
 
 
     public static void InitiateSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
-        if (!Plugin.playerModules.TryGetValue(self.player, out var module)) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
-        sLeaser.sprites = new FSprite[13 + module.gills.numberOfSprites];
+        sLeaser.sprites = new FSprite[14 + self.gills.numberOfSprites];
         sLeaser.sprites[0] = new FSprite("BodyA", true);
         sLeaser.sprites[0].anchorY = 0.7894737f;
         if (self.RenderAsPup)
@@ -103,11 +96,10 @@ public class PlayerGraphicsModule
         sLeaser.sprites[10] = new FSprite("Futile_White", true);
         sLeaser.sprites[10].shader = rCam.game.rainWorld.Shaders["FlatLight"];
         // 这是留给脑门上那个圆点的，回头再写（
-        // 算了，拉倒吧，那玩意儿我恐怕得单独写个class了
-        /*sLeaser.sprites[13] = new FSprite("Futile_White", true);
-        sLeaser.sprites[13].isVisible = false;*/
+        sLeaser.sprites[13] = new FSprite("Futile_White", true);
+        sLeaser.sprites[13].isVisible = false;
 
-        module.gills.InitiateSprites(sLeaser, rCam);
+        self.gills.InitiateSprites(sLeaser, rCam);
         self.gown.InitiateSprite(self.gownIndex, sLeaser, rCam);
         self.AddToContainer(sLeaser, rCam, null);
     }
@@ -115,12 +107,11 @@ public class PlayerGraphicsModule
 
     public static void AddToContainer(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
     {
-        if (!Plugin.playerModules.TryGetValue(self.player, out var module)) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
         newContatiner ??= rCam.ReturnFContainer("Midground");
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
-            if (i >= module.gills.startSprite && i < module.gills.startSprite + module.gills.numberOfSprites)
+            if (i >= self.gills.startSprite && i < self.gills.startSprite + self.gills.numberOfSprites)
             {
                 rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground").AddChild(sLeaser.sprites[i]);
             }
@@ -152,8 +143,7 @@ public class PlayerGraphicsModule
 
     public static void DrawSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
-        if (!Plugin.playerModules.TryGetValue(self.player, out var module)) { return; }
-        module.gills.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+        self.gills.DrawSprites(sLeaser, rCam, timeStacker, camPos);
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             if (Futile.atlasManager.DoesContainElementWithName("moon_" + sLeaser.sprites[i].element.name))
@@ -163,16 +153,5 @@ public class PlayerGraphicsModule
         }
     }
 
-
-
-
-
-    public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
-    {
-        if (Plugin.playerModules.TryGetValue(self.player, out var module))
-        {
-            module.gills.ApplyPalette(sLeaser, rCam, palette);
-        }
-    }
 
 }

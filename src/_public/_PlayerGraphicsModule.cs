@@ -86,10 +86,10 @@ public class PlayerGraphicsModule
         {
             module.nshScarf?.Update();
         }
-        if (self.player.SlugCatClass == Enums.Moonname && getModule)
+        /*if (self.player.SlugCatClass == Enums.Moonname && getModule)
         {
             module.gills?.Update();
-        }
+        }*/
     }
 
 
@@ -108,7 +108,7 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname)
+        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
         {
             moon.PlayerGraphicsModule.InitiateSprites(self, sLeaser, rCam);
         }
@@ -127,7 +127,7 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname)
+        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
         {
             moon.PlayerGraphicsModule.AddToContainer(self, sLeaser, rCam, newContatiner);
         }
@@ -149,7 +149,7 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname)
+        else if (self.player.SlugCatClass == Enums.Moonname && self.gills != null)
         {
             moon.PlayerGraphicsModule.DrawSprites(self, sLeaser, rCam, timeStacker, camPos);
         }
@@ -171,9 +171,9 @@ public class PlayerGraphicsModule
         {
             nsh.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
         }
-        else if (self.player.SlugCatClass == Enums.Moonname)
+        /*else if (self.player.SlugCatClass == Enums.Moonname)
         {
             moon.PlayerGraphicsModule.ApplyPalette(self, sLeaser, rCam, palette);
-        }
+        }*/
     }
 }
