@@ -40,7 +40,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
     }
     public WorldCoordinate? playerPos
     {
-        get { return manager?.player.abstractCreature.pos; }
+        get { return manager?.player?.abstractCreature.pos; }
     }
 
     public enum Behavior
@@ -73,7 +73,8 @@ public class MoonSwarmerAI : ArtificialIntelligence
         if (destCounter > 0){
             destCounter--;
         }
-
+        // FindPlayer();
+        return;
         
         // if (creature.Room != null && creature.Room.shelter) { return; }
         switch (currentBehavior)
@@ -97,15 +98,15 @@ public class MoonSwarmerAI : ArtificialIntelligence
 
     public void FindPlayer()
     {
-        if (playerPos != null && pathFinder.CoordinateReachableAndGetbackable((WorldCoordinate)playerPos))
+
+        WorldCoordinate? coord = playerPos != null? playerPos : null;
+        if (coord != null)
         {
             // Plugin.Log("swarmer", creature.ID.number, "findPlayer:", playerPos.ToString());
-            WorldCoordinate c = (WorldCoordinate)playerPos;
-            c.y += 4;
-            this.creature.abstractAI.SetDestination(c);
+            WorldCoordinate c = (WorldCoordinate)coord;
+            this.creature.abstractAI.SetDestination((WorldCoordinate)c);
         }
     }
-
 
 
 

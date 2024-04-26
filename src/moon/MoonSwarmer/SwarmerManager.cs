@@ -20,9 +20,17 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 public class SwarmerManager
 {
     // TODO: 坏了 这个地方应该用弱引用 但我前面写了那么多东西全都不是弱引用（（
-    public Player player;
+    public WeakReference<Player> owner;
+    public Player? player
+    {
+        get
+        {
+            if (owner.TryGetTarget(out Player player)) { return player; }
+            return null;
+        }
+    }
     public static int maxSwarmer = 5;
-    public List<MoonSwarmer> swarmers;
+    public List<AbstractCreature> swarmers;
     public _public.DeathPreventer deathPreventer;
     public SwarmerHUD hud;
 
@@ -38,6 +46,7 @@ public class SwarmerManager
     private int teleportFail = -1;
     public bool tryingToTeleport = false;
     private bool tryingToCallBack = false;
+    private int teleportRetryCounter = 0;
 
     public int hasSwarmers
     {
@@ -52,9 +61,9 @@ public class SwarmerManager
         get
         {
             int count = 0;
-            foreach (MoonSwarmer s in swarmers)
+            foreach (AbstractCreature s in swarmers)
             {
-                if (s.State.alive)
+                if (s.realizedCreature != null && s.realizedCreature.State.alive)
                 {
                     count++;
                 }
@@ -70,9 +79,9 @@ public class SwarmerManager
             if (swarmers == null) return null;
             for (int i = swarmers.Count - 1; i >= 0; i--)
             {
-                if (swarmers[i].State.alive)
+                if (swarmers[i].realizedCreature != null && swarmers[i].realizedCreature.State.alive)
                 {
-                    return swarmers[i];
+                    return swarmers[i].realizedCreature as MoonSwarmer;
                 }
             }
             return null;
@@ -91,7 +100,7 @@ public class SwarmerManager
     public SwarmerManager(Player player)
     {
         swarmers = new();
-        this.player = player;
+        this.owner = new WeakReference<Player>(player);
         alive = true;
         weakMode = false;
         SwarmersUpdate();
@@ -100,6 +109,8 @@ public class SwarmerManager
 
     public void Update()
     {
+        if (player == null) { Plugin.Log("swarmermanager update: null player!!"); return; }
+
         if (player.dead)
         {
             alive = false;  
@@ -111,7 +122,12 @@ public class SwarmerManager
         }
         if (tryingToTeleport)
         {
-            tryingToTeleport = !TryTeleportAllSwarmers();
+            tryingToTeleport = !(TryTeleportAllSwarmers() || teleportRetryCounter > 14);
+            teleportRetryCounter++;
+        }
+        else
+        {
+            teleportRetryCounter = 0;
         }
 
         if (weakMode)
@@ -147,7 +163,16 @@ public class SwarmerManager
             }
         }
 
-
+        // 受不了了，不知道是不是因为我把player改成了弱引用，隔壁ai那里死活找不到玩家在哪。还是这样统一管理吧。
+        // 以后可以直接参考原版神经元的代码，能直接在房间里搜索到玩家才会跟着玩家走
+        // 至于tp有没有问题，我想大约是没有了罢
+        foreach (AbstractCreature sw in swarmers)
+        {
+            if (sw.realizedCreature != null && player != null)
+            {
+                (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+            }
+        }
         /*if (player.room != null && player.room.abstractRoom.shelter)
         {
             CallBack();
@@ -158,10 +183,12 @@ public class SwarmerManager
 
     /// <summary>
     /// callback(x) 重开（v)
-    /// 不要在这里updateswarmers，经测试这会使神经元数量变成-1并引发deathpreventer
+    /// 用来在避难所和业力门门口回收所有的神经元，避免业力门把你的神经元关外面
+    /// 不要在这里updateswarmers，经测试这会使神经元数量变成-1并引发deathpreventer的自动防御
     /// </summary>
     public bool CallBack()
     {
+        if (player == null) { return false; }
         if (swarmers.Count == 0 && callBackSwarmers != null) return true;
         try
         {
@@ -188,7 +215,7 @@ public class SwarmerManager
 
             for (int i = swarmers.Count - 1; i >= 0; i--)
             {
-                if (swarmers[i].Kill(false))
+                if (swarmers[i].realizedCreature != null && (swarmers[i].realizedCreature as MoonSwarmer).Kill(false))
                 {
                     swarmers.RemoveAt(i);
                     callBackSwarmers++;
@@ -196,7 +223,7 @@ public class SwarmerManager
                 else
                 {
                     succeed = false;
-                    Plugin.Log("trying to kill swarmer", swarmers[i].abstractCreature.ID.number, ", failed");
+                    Plugin.Log("trying to kill swarmer", swarmers[i].ID.number, ", failed");
                 }
             }
             Plugin.Log("CallBack(): after:", callBackSwarmers);
@@ -214,6 +241,7 @@ public class SwarmerManager
 
     public bool Respawn()
     {
+        if (player == null) return false;
         deathPreventer.forceRevive = false;
         if (callBackSwarmers == null || callBackSwarmers == 0)
         {
@@ -230,6 +258,7 @@ public class SwarmerManager
 
     public void SwarmersUpdate()
     {
+        if (player == null) { Plugin.Log("SwarmersUpdate(): null player"); return; }
         switch (hasSwarmers) 
         { 
             case 0:
@@ -265,6 +294,7 @@ public class SwarmerManager
     /// <param name="number"></param>
     public void SpawnSwarmer(int number = 1, Vector2? spawnPos = null)
     {
+        if (player == null) return;
         Plugin.Log("spawn MoonSwarmer:", number);
         for (int i = 0; i < number; i++)
         {
@@ -275,7 +305,7 @@ public class SwarmerManager
             abstr.realizedObject.firstChunk.pos = spawnPos != null? (Vector2)spawnPos : player.firstChunk.pos;
             (abstr.realizedCreature as MoonSwarmer).manager = this;
             (abstr.realizedCreature as MoonSwarmer).AI.manager = this;
-            swarmers.Add(abstr.realizedCreature as MoonSwarmer);
+            swarmers.Add(abstr);
             
         }
         SwarmersUpdate();
@@ -285,7 +315,7 @@ public class SwarmerManager
     // TODO: 目前这东西是一个有缝衔接，因为那个颜色衔接他不知道为啥压根不干活
     public void ConvertNSHSwarmer(nsh.ReviveSwarmerModules.ReviveSwarmer swarmer)
     {
-        if (swarmer.room == null) { Plugin.Log("ConvertNSHSwarmer(): null room"); return; }
+        if (player == null || swarmer.room == null) { Plugin.Log("ConvertNSHSwarmer(): null room or null player"); return; }
 
         Plugin.Log("converting NSHswarmer");
         if (callBackSwarmers != null)
@@ -299,8 +329,8 @@ public class SwarmerManager
 
         swarmer.Use(false);
         SpawnSwarmer(1, pos);
-        swarmers[swarmers.Count - 1].firstChunk.vel = vel;
-        swarmers[swarmers.Count - 1].SpawnColorLerp();
+        swarmers[swarmers.Count - 1].realizedCreature.firstChunk.vel = vel;
+        (swarmers[swarmers.Count - 1].realizedCreature as MoonSwarmer).SpawnColorLerp();
     }
 
 
@@ -313,7 +343,7 @@ public class SwarmerManager
             s.isActive = false;
             s.killTag = null;
             s.Kill(explode);
-            swarmers.Remove(s);
+            swarmers.Remove(s.abstractCreature);
             Plugin.Log("killed, moon has swarmer:", hasSwarmers);
             result = true;
         }
@@ -322,25 +352,21 @@ public class SwarmerManager
     }
 
 
-    public void CycleEndSave()
+    public int CycleEndSave()
     {
-        if (callBackSwarmers != null) { return; }
+        if (player == null || callBackSwarmers != null) { return SwarmerManager.maxSwarmer; }
         for (; ; )
         {
             if (CallBack()) break;
-        }
-        if (player.room == null)
-        {
-            Plugin.Log("CycleEndSave(): Null player.room, neurons not saved");
-            return;
         }
         if (callBackSwarmers == null || callBackSwarmers == 0)
         {
             Plugin.Log("CycleEndSave(): null callBackSwarmers");
             callBackSwarmers = swarmers.Count;
         }
-        player.room.game.GetDeathPersistent().MoonHasSwarmers = (int)callBackSwarmers;
+        int result = (int)callBackSwarmers;
         callBackSwarmers = null;
+        return result;
     }
 
 
@@ -348,14 +374,14 @@ public class SwarmerManager
     public void Player_SpitOutOfShortCut(bool stillInStartShelter)
     {
         // 好好好 没想到这个逻辑还挺简单的
-        if (player.room == null) return;
+        if (player == null || player.room == null) return;
 
         
         if (callBackSwarmers != null)
         {
             Respawn();
         }
-        else if (player.room.abstractRoom.shelter || player.room.abstractRoom.gate)
+        else if (player.room.abstractRoom.gate)
         {
             /*for (; ; )
             {
@@ -365,7 +391,7 @@ public class SwarmerManager
         }
         else
         {
-            // tryingToTeleport = true;
+            tryingToTeleport = true;
         }
 
         /*if (player.room.abstractRoom.gate || player.room.abstractRoom.shelter)
@@ -392,25 +418,103 @@ public class SwarmerManager
 
     public bool TryTeleportAllSwarmers()
     {
-        if (swarmers ==  null || swarmers.Count == 0 || callBackSwarmers != null) return false;
-        
-        // 防止有神经元在管道里
-        foreach (MoonSwarmer s in swarmers)
-        {
-            if (s.room == null) return false;
-        }
+        if (player == null || swarmers == null || swarmers.Count == 0 || callBackSwarmers != null) return false;
+        Plugin.Log("trying to teleport swarmers for", teleportRetryCounter, "times:");
+
         bool succeed = true;
         for (int i = 0; i < swarmers.Count; i++)
         {
-            if (!swarmers[i].TryTeleportToOwner())
+            if (!TryTeleportSwarmer(swarmers[i]))
             {
                 Plugin.Log("!! failed to teleport swarmer", i);
                 succeed = false;
             }
         }
 
-        player.room.abstractRoom.realizedRoom.aimap.NewWorld(player.room.abstractRoom.index);
+        // player.room.abstractRoom.realizedRoom.aimap.NewWorld(player.room.abstractRoom.index);
         return succeed;
+    }
+
+
+
+
+    public void ForceAllSwarmersIntoShortcut(IntVector2 entrancePos)
+    {
+        if (callBackSwarmers != null)
+        {
+            Plugin.Log("callbackswarmers not forced into shortcut");
+            return;
+        }
+        if (player.room == null) return;
+        bool enteringShortcut = !player.room.shortcutData(entrancePos).ToNode || player.room.abstractRoom.nodes[player.room.shortcutData(entrancePos).destNode].type == AbstractRoomNode.Type.Exit;
+        bool enteringDen = player.room.shortcutData(entrancePos).ToNode && player.room.abstractRoom.nodes[player.room.shortcutData(entrancePos).destNode].type == AbstractRoomNode.Type.Den;
+        if (enteringShortcut && enteringDen) 
+        {
+            Plugin.Log("player entering den, not forced into shortcut");
+            return; 
+        }
+        Plugin.Log("forcing all swarmers into shortcut:", entrancePos.ToString());
+        foreach(var swarmer in swarmers)
+        {
+            if (swarmer.realizedCreature == null) continue;
+            (swarmer.realizedCreature as MoonSwarmer).ForceIntoShortcut(entrancePos);
+        }
+    }
+
+
+
+    public bool TryTeleportSwarmer(AbstractCreature swarmer)
+    {
+        if (player == null || player.room == null) return false;
+        try
+        {
+            
+            if (swarmer.realizedCreature != null)
+            {
+                if ((swarmer.realizedCreature as MoonSwarmer).justTeleported > 0)
+                {
+                    Plugin.Log("swarmer", swarmer.ID.number, "just teleported");
+                    return true;
+                }
+                if (swarmer.realizedCreature.room != null && swarmer.realizedCreature.room == player.room)
+                {
+                    Plugin.Log("teleporting", swarmer.ID.number, "in player room");
+                    swarmer.realizedCreature.firstChunk.HardSetPosition(player.mainBodyChunk.pos);
+                }
+                else if (swarmer.realizedCreature.room != null)
+                {
+                    Plugin.Log("teleporting", swarmer.ID.number, "from", swarmer.Room.name, " to player room:", player.room.abstractRoom.name);
+                    swarmer.realizedCreature.room?.RemoveObject(swarmer.realizedCreature);
+                    swarmer.destroyOnAbstraction = false;
+                    swarmer.Abstractize(player.abstractCreature.pos);
+                    swarmer.RealizeInRoom();
+                }
+                else 
+                {
+                    Plugin.Log("realized swarmer", swarmer.ID.number, "in null room, retry");
+                    return false; 
+                }
+            }
+            else
+            {
+                Plugin.Log("teleporting abstract", swarmer.ID.number, "from", swarmer.Room.name, " to player room:", player.room.abstractRoom.name);
+                swarmer.Move(player.abstractCreature.pos);
+                swarmer.RealizeInRoom();
+            }
+            (swarmer.realizedCreature as MoonSwarmer).manager = this;
+            (swarmer.realizedCreature as MoonSwarmer).justTeleported = 60;
+            (swarmer.realizedCreature as MoonSwarmer).AI?.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
+            (swarmer.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+            swarmer.realizedCreature.firstChunk.pos = player.mainBodyChunk.pos;
+            swarmer.realizedCreature.firstChunk.vel = player.mainBodyChunk.vel;
+            return true;
+        }
+        catch (Exception e)
+        {
+            Plugin.LogException(e);
+            Plugin.Log("failed to teleport", swarmer.ID.number);
+            return false;
+        }
     }
 
 
@@ -418,6 +522,10 @@ public class SwarmerManager
     public void LogAllSwarmersData()
     {
         Plugin.Log(" ~ swarmers ~ ");
+        if (player == null)
+        {
+            Plugin.Log(" ~ DISCONNECTED");
+        }
         if (callBackSwarmers != null)
         {
             Plugin.Log(" ~ not realized, has swarmers:" + callBackSwarmers.ToString());
@@ -426,7 +534,11 @@ public class SwarmerManager
         {
             foreach (var swarmer in swarmers)
             {
-                Plugin.Log(" ~ ", swarmer.abstractCreature.ID.number + " - pos: " + swarmer.abstractCreature.pos.ToString() + " behavior: " + swarmer.AI.currentBehavior.ToString());
+                Plugin.Log(" ~ ", swarmer.ID.number + " - pos: " + swarmer.pos.ToString() + " behavior: " + (swarmer.realizedCreature as MoonSwarmer).AI.currentBehavior.ToString(), " - player:", player.abstractCreature.ID.number);
+                if ((swarmer.realizedCreature as MoonSwarmer).AI != null && (swarmer.realizedCreature as MoonSwarmer).AI.pathFinder != null)
+                {
+                    Plugin.Log("   ai destination:", (swarmer.realizedCreature as MoonSwarmer).AI.pathFinder.destination);
+                }
             }
         }
         

@@ -32,7 +32,7 @@ public class MoonSwarmer : Creature
     // public Player.AbstractOnBackStick stickToPlayer;
     public bool isActive;
 
-    public Player player
+    public Player? player
     {
         get { return manager?.player; }
     }
@@ -45,10 +45,14 @@ public class MoonSwarmer : Creature
     public Vector2 lastLazyDirection;
     public float revolveSpeed;
     public bool lastVisible;
+    public Vector2 drift;
 
     public float moveSpeed;
 
     public bool callBack = false;
+
+    public int justTeleported = 0;
+    public int cantSeeCounter = 0;
     /*{
         get
         {
@@ -56,7 +60,8 @@ public class MoonSwarmer : Creature
         }
     }*/
     public int notInSameRoomCounter = 0;
-    public bool notInSameRoom => room != null && manager != null && manager.player.room != null && room.abstractRoom.index != manager.player.room.abstractRoom.index;
+    public bool notInSameRoom => room != null && reachable && manager.player.room != null && room.abstractRoom.index != manager.player.room.abstractRoom.index;
+    public bool reachable => manager != null && manager.player != null;
     public float affectedByGravity = 1f;
     public MovementConnection currentConnection;
 
@@ -123,6 +128,11 @@ public class MoonSwarmer : Creature
                 this.revolveSpeed *= 0.5f;
                 this.rotation = Mathf.Lerp(this.rotation, Mathf.Floor(this.rotation) + 0.25f, Mathf.InverseLerp(0.5f, 1f, this.room.gravity * this.affectedByGravity) * 0.1f);
             }
+            this.direction = new Vector2(0f, 1f);
+            this.lazyDirection = this.direction;
+            this.revolveSpeed += Mathf.Lerp(-1f, 1f, Random.value) * 1f / 120f;
+            this.revolveSpeed = Mathf.Clamp(this.revolveSpeed, -0.025f, 0.025f) * 0.99f;
+
         }
 
         // 太长时间不在一个房间就全部重生（
@@ -140,9 +150,9 @@ public class MoonSwarmer : Creature
             notInSameRoomCounter = 0;
         }
         // 呃啊只好抄别人的代码了。。脑子不好使了
-        if (notInSameRoomCounter > 10)
+        if (justTeleported > 0)
         {
-            // Plugin.Log("swarmer", abstractCreature.ID.number, "not in same room");
+            justTeleported--;
         }
 
         if (isActive && State.alive && graphicsModule == null)
@@ -159,7 +169,14 @@ public class MoonSwarmer : Creature
         {
             base.bodyChunks[0].vel += Custom.DirVec(base.bodyChunks[0].pos, new Vector2(Futile.mousePosition.x, Futile.mousePosition.y) + this.room.game.cameras[0].pos) * 14f;
         }
-
+        if (AI != null && !AI.VisualContact(player.abstractCreature.pos, 2f))
+        {
+            cantSeeCounter++;
+        }
+        else
+        {
+            cantSeeCounter = 0;
+        }
         /*if (manager != null)
         {
             affectedByGravity = Mathf.Lerp(affectedByGravity, (manager.player.dead || dead) ? 1f : 0f, 0.1f);
@@ -181,10 +198,25 @@ public class MoonSwarmer : Creature
                 Destroy();
             }
         }*/
-        if (!dead && !inShortcut)
+        affectedByGravity = 0f;
+        if (!dead)
         {
-            Act();
+            if (reachable && room != null && player.room != null && !notInSameRoom
+                // && Custom.DistLess(firstChunk.pos, player.mainBodyChunk.pos, 700f)
+                // && AI.VisualContact(player.abstractCreature.pos, 3f)
+                && AI != null && AI.pathFinder != null
+                && AI.pathFinder.CoordinateCost(player.abstractCreature.pos).legality < PathCost.Legality.Unwanted
+                && cantSeeCounter < 20
+                )
+            {
+                HoverAtPlayerPos();
+            }
+            else
+            {
+                MoveToDest();
+            }
         }
+        
 
 
         /*try
@@ -200,12 +232,12 @@ public class MoonSwarmer : Creature
 
     }
 
-    public void Act()
+    public void MoveToDest()
     {
         try
         {
 
-            if (grabbedBy.Count == 0 && manager != null && !notInSameRoom && Custom.DistLess(manager.player.mainBodyChunk.pos, firstChunk.pos, 80f) && player.touchedNoInputCounter > 100)
+            if (grabbedBy.Count == 0 && reachable && !notInSameRoom && Custom.DistLess(manager.player.mainBodyChunk.pos, firstChunk.pos, 80f) && player.touchedNoInputCounter > 100)
             {
                 AI.SwitchBehavior(MoonSwarmerAI.Behavior.Idle);
             }
@@ -232,7 +264,7 @@ public class MoonSwarmer : Creature
             }
             else if (grabbedBy.Count == 0)
             {
-                firstChunk.vel = Vector2.up;
+                firstChunk.vel = Vector2.zero;
             }
         }
         catch (Exception ex)
@@ -280,39 +312,32 @@ public class MoonSwarmer : Creature
 
 
 
-    public bool TryTeleportToOwner()
+    public void HoverAtPlayerPos()
     {
-        if (player == null || player.room == null || room == null) return false;
-        try
+        Vector2 atPlayerTop = Vector2.zero;
+        if (player != null && player.room != null && !player.room.GetTile(player.firstChunk.pos + new Vector2(0f, 70f)).Solid)
         {
-            if (room == player.room)
-            {
-                firstChunk.HardSetPosition(player.mainBodyChunk.pos);
-            }
-            else
-            {
-                // RemoveGraphicsModule();
-                room.updateList.Remove(this);
-                room.RemoveObject(this);
-
-                abstractCreature.Move(player.abstractCreature.pos);
-
-                player.room.abstractRoom.AddEntity(abstractCreature);
-                abstractCreature.RealizeInRoom();
-
-                // InitiateGraphicsModule();
-                firstChunk.pos = player.mainBodyChunk.pos;
-                firstChunk.vel = player.mainBodyChunk.vel;
-            }
-            return true;
+            atPlayerTop += new Vector2(0f, 70f);
         }
-        catch (Exception e)
-        {
-            Plugin.LogException(e);
-            return false;
-        }
+
+        Vector2 vector = (player.mainBodyChunk.pos - base.firstChunk.pos) / 100f;
+        this.drift = (this.drift + Custom.RNV() * Random.value * 0.22f + vector * 0.03f).normalized;
+        base.firstChunk.vel += this.drift * 0.05f;
+        base.firstChunk.vel += vector * 0.025f;
+        base.firstChunk.vel += vector.normalized * 0.05f;
+        base.firstChunk.vel += Custom.DirVec(base.firstChunk.pos, player.firstChunk.pos + atPlayerTop) * Mathf.InverseLerp(25f, 550f, Vector2.Distance(base.firstChunk.pos, player.firstChunk.pos + atPlayerTop));
+        base.firstChunk.vel *= Custom.LerpMap(base.firstChunk.vel.magnitude, 0.2f, 3f, 1f, 0.9f);
+
+        firstChunk.vel += Vector2.up;
     }
 
+
+
+    public void ForceIntoShortcut(IntVector2 entrancePos)
+    {
+        Plugin.Log("swarmer", abstractCreature.ID.number, "forced into shortcut:", entrancePos.ToString());
+        SuckedIntoShortCut(entrancePos, true);
+    }
 
 
 
@@ -340,7 +365,7 @@ public class MoonSwarmer : Creature
 
     public override Color ShortCutColor()
     {
-        return manager != null? manager.player.ShortCutColor() : Color.white;
+        return reachable? manager.player.ShortCutColor() : Color.white;
     }
 
 
@@ -349,6 +374,15 @@ public class MoonSwarmer : Creature
     public override void Die()
     {
         // 懒得给o+8键写ilhook，于是想了这个招，只要我不执行这个函数不就好了吗（
+        if (!reachable) return;
+        if (manager.callBackSwarmers != null)
+        {
+            manager.callBackSwarmers++;
+        }
+        else
+        {
+            manager.callBackSwarmers = 1;
+        }
     }
 
 

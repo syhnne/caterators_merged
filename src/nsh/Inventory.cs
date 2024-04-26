@@ -174,7 +174,56 @@ public class Inventory
         {
             RemoveAndRealizeObjectFromTop(eu);
         }
-        
+
+
+        #region spear straight to back
+        /*bool flag7 = true;
+        if (player.animation == Player.AnimationIndex.DeepSwim)
+        {
+            if (player.grasps[0] == null && player.grasps[1] == null)
+            {
+                flag7 = false;
+            }
+            else
+            {
+                for (int num18 = 0; num18 < 10; num18++)
+                {
+                    if (player.input[num18].y > -1 || player.input[num18].x != 0)
+                    {
+                        flag7 = false;
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int num19 = 0; num19 < 5; num19++)
+            {
+                if (player.input[num19].y > -1)
+                {
+                    flag7 = false;
+                    break;
+                }
+            }
+        }
+        if (player.grasps[0] != null && player.grasps[0].grabbed is EnergyCell && player.mainBodyChunk.submersion > 0f)
+        {
+            flag7 = false;
+        }
+        if (!ModManager.MMF && player.grasps[0] != null && player.HeavyCarry(player.grasps[0].grabbed))
+        {
+            flag7 = true;
+        }
+
+        if (!flag7 && player.PickupCandidate != null && player.CanPutSpearToBack && ((player.grasps[0] != null && player.Grabability(player.grasps[0].grabbed) >= Player.ObjectGrabability.BigOneHand) || (player.grasps[1] != null && player.Grabability(player.grasps[1].grabbed) >= Player.ObjectGrabability.BigOneHand) || (player.grasps[0] != null && player.grasps[1] != null)))
+        {
+            Plugin.Log("spear straight to back");
+            player.room.PlaySound(SoundID.Slugcat_Switch_Hands_Init, player.mainBodyChunk);
+            AddObjectToTop(player.pickUpCandidate as Spear);
+        }*/
+        #endregion
+
 
         lastInputY = inputY;
         lastIsActive = IsActive;
@@ -244,7 +293,7 @@ public class Inventory
             obj.Spawn();
         }
         
-        PhysicalObject realObj = obj.realizedObject;
+        
         // currCapacity -= ItemVolumeFromAbstr(obj);
 
         if (ModManager.MMF && MMF.cfgKeyItemTracking.Value && AbstractPhysicalObject.UsesAPersistantTracker(obj) && player.room.game.IsStorySession)
@@ -278,12 +327,20 @@ public class Inventory
                 player.SlugcatGrab(obj.realizedObject, player.FreeHand());
             }
         }
+        else
+        {
+            player.room.socialEventRecognizer.CreaturePutItemOnGround(obj.realizedObject, player);
+        }
 
     }
 
 
 
-
+    /// <summary>
+    /// without realizing it
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public bool RemoveSpecificObj(AbstractPhysicalObject obj)
     {
         if (Items.Contains(obj))

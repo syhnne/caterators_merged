@@ -46,7 +46,7 @@ internal class PlayerHooks
         // 这个跟肚子里有多少吃的有关，众所周知饿着肚子更容易冷
         if (self.room != null && self.room.blizzard)
         {
-            self.Hypothermia += Mathf.Lerp((Mathf.Lerp(self.Malnourished ? 1f : 2f, 0f, (self.FoodInStomach / self.MaxFoodInStomach))) * RainWorldGame.DefaultHeatSourceWarmth, 0f, self.HypothermiaExposure);
+            self.Hypothermia += Mathf.Lerp(Mathf.Lerp(self.Malnourished ? 1f : 2.5f, 0.2f, (self.FoodInStomach / self.MaxFoodInStomach)) * RainWorldGame.DefaultHeatSourceWarmth, 0.1f, self.HypothermiaExposure);
         }
     }
 

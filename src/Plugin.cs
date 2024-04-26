@@ -151,16 +151,7 @@ class Plugin : BaseUnityPlugin
 
 
 
-    private void test(On.PlayerGraphics.AxolotlGills.orig_DrawSprites orig, PlayerGraphics.AxolotlGills self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
-    {
-        orig(self, sLeaser, rCam, timeStacker, camPos);
-        Plugin.Log("axolot gills drawsprites");
-    }
-    private void test2(On.PlayerGraphics.AxolotlGills.orig_Update orig, PlayerGraphics.AxolotlGills self)
-    {
-        orig(self);
-        Plugin.Log("axolot gills update");
-    }
+
 
 
 

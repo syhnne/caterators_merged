@@ -12,10 +12,10 @@
         "select_menu_scene_ascended": "Ghost_nsh",
 
         "back_spear": false,
-        "walk_speed": 1.5,
-        "climb_speed": 1.5,
-        "tunnel_speed": 1.5,
-        "lung_capacity": 1.5,
+        "walk_speed": 1.4,
+        "climb_speed": 1.4,
+        "tunnel_speed": 1.4,
+        "lung_capacity": 1.2,
         "auto_grab_batflies": false,
         "karma": 9,
         "karma_cap": 9,
@@ -27,7 +27,7 @@
         "food_max": 9,
 
         "guide_overseer": 2,
-        "start_room": "CC_A02",
+        "start_room": "LF_S01",
         "world_state": [ "NSHslugcat", "Rivulet", "Yellow" ],
         "timeline_after": "Yellow",
         "cycle_length_min": 5,

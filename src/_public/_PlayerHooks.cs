@@ -74,6 +74,7 @@ public class PlayerHooks
         On.Player.Die += Player_Die;
         On.Player.Destroy += Player_Destroy;
         On.Player.MovementUpdate += Player_MovementUpdate;
+        // On.Creature.SuckedIntoShortCut += Creature_SuckedIntoShortCut;
 
 
         // 不能吃神经元
@@ -259,18 +260,18 @@ public class PlayerHooks
         CustomSaveData.SaveMiscProgression mp = newRoom.game.GetMiscProgression();
 
 
-        Plugin.Log("ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
+        Plugin.Log("--ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
 
         // Plugin.Log("--CustomSaveData: CyclesFromLastEnterSSAI", dp.CyclesFromLastEnterSSAI);
 
         // Plugin.Log("--CustomSaveData:", mp.beaten_fp, mp.beaten_srs, mp.beaten_nsh, mp.beaten_moon);
 
-        string warmth = "--IProvideWarmth: ";
+        /*string warmth = "--IProvideWarmth: ";
         foreach (IProvideWarmth obj in newRoom.blizzardHeatSources)
         {
             warmth += obj.GetType().Name + " ";
         }
-        Plugin.Log(warmth);
+        Plugin.Log(warmth);*/
 
     }
 
@@ -405,6 +406,16 @@ public class PlayerHooks
 
 
     #region PlayerModule
+
+    private static void Creature_SuckedIntoShortCut(On.Creature.orig_SuckedIntoShortCut orig, Creature self, IntVector2 entrancePos, bool carriedByOther)
+    {
+        if (self is Player && Plugin.playerModules.TryGetValue((self as Player), out var mod) && mod.swarmerManager != null) 
+        {
+            mod.swarmerManager.ForceAllSwarmersIntoShortcut(entrancePos);
+        }
+        orig(self, entrancePos, carriedByOther);
+    }
+
 
 
     private static void Player_SpitOutOfShortCut(On.Player.orig_SpitOutOfShortCut orig, Player self, IntVector2 pos, Room newRoom, bool spitOutAllSticks)

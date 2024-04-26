@@ -14,3 +14,9 @@ Gravity control toggle|启用重力控制
 Options|其他选项
 Gravity Control|重力控制选项
 Fallen Bridge|断桥
+You need to consume a large amount of food in order to maintain body temperature.|你需要大量进食以维持体温
+Hold [up] and [pickup] to create high-temperature needles, stab creatures with them to leech energy.|按住拾取键和上键，从你的体内拔出高温的针头，用它们刺伤生物并吸取营养。
+Exposure to water or cold air can cause your body to lose temperature rapidly.|水体和寒冷环境会让你的身体快速失温。
+Hold [D] and [up/down] to store objects in your backpack.|按住D键和上下键，将物品存储在背包里。
+While in the air, press [jump] and [pickup] together to activate the green neuron.|在空中时，同时按下拾取和跳跃键启用绿色的神经元
+After that, grab a slugcat and hold [pickup] to revive them.|然后抓住其他蛞蝓猫来复活他们。

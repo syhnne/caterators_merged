@@ -1,7 +1,7 @@
 {
     "id": "Moonslugcat",
     "name": "moon",
-    "description": "world state test",
+    "description": "求你了别卡bug了",
     "features": {
         "color": "3ab0b4",
         "custom_colors": [
@@ -18,9 +18,9 @@
         "select_menu_scene_ascended": "Ghost_moon",
 
         "back_spear": false,
-        "walk_speed": 1.4,
-        "climb_speed": 1.4,
-        "tunnel_speed": 1.4,
+        "walk_speed": 1.5,
+        "climb_speed": 1.5,
+        "tunnel_speed": 1.5,
         "lung_capacity": 5,
         "auto_grab_batflies": true,
         "karma": 9,

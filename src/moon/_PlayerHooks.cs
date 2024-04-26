@@ -17,6 +17,12 @@ public class PlayerHooks
 
     public static void Apply()
     {
+        
+        /*new Hook(
+                typeof(SlugcatStats).GetProperty(nameof(SlugcatStats.runspeedFac), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                get_SlugcatStats_runspeedFac
+                );*/
+
         new Hook(
                 typeof(Player).GetProperty(nameof(Player.isRivulet), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 get_Player_isRivulet
@@ -34,6 +40,18 @@ public class PlayerHooks
         }
         return result;
     }
+
+
+    /*private delegate bool SlugcatStats_runspeedFac(SlugcatStats self);
+    private static bool get_SlugcatStats_runspeedFac(SlugcatStats_runspeedFac orig, SlugcatStats self)
+    {
+        var result = orig(self);
+        if (self.name == Enums.Moonname && Plugin.playerModules.TryGetValue(self., out var module) && module.swarmerManager != null && module.swarmerManager.agility)
+        {
+            result = true;
+        }
+        return result;
+    }*/
 
 
 }

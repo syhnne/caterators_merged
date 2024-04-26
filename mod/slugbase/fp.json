@@ -18,7 +18,7 @@
 		"auto_grab_batflies": false,
 		"back_spear": false,
 		"weight": [ 1.1, 0.9 ],
-		"lung_capacity": [ 0.6, 0.3 ],
+		"lung_capacity": [ 0.5, 0.3 ],
 		"walk_speed": 1.4,
 		"climb_speed": 1.4,
 		"tunnel_speed": 1.5,

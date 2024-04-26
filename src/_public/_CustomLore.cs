@@ -156,7 +156,8 @@ public class CustomLore
                 }
                 if (module.swarmerManager != null)
                 {
-                    module.swarmerManager.CycleEndSave();
+                    self.GetDeathPersistent().MoonHasSwarmers = module.swarmerManager.CycleEndSave();
+                    Plugin.Log("moonswarmer save:", self.GetDeathPersistent().MoonHasSwarmers);
                 }
             }
         }
@@ -215,18 +216,25 @@ public class CustomLore
     }
 
 
-
+    /// <summary>
+    /// aka AddRoomSpecificScripts
+    /// </summary>
+    /// <param name="self"></param>
     private static void Room_Loaded(On.Room.orig_Loaded orig, Room self)
     {
         if (self.game != null && self.game.IsStorySession && self.game.IsCaterator())
         {
             if (self.game.StoryCharacter == Enums.FPname)
             {
-                fp.CustomLore.AddRoomSpecificScripts(self);
+                fp.CustomLore.Room_Loaded(self);
             }
             else if (self.game.StoryCharacter == Enums.SRSname)
             {
                 srs.CustomLore.Room_Loaded(self);
+            }
+            else if (self.game.StoryCharacter == Enums.NSHname)
+            {
+                nsh.CustomLore.Room_Loaded(self);
             }
         }
 

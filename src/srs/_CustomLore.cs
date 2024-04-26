@@ -13,7 +13,13 @@ public class CustomLore
 
     public static void Room_Loaded(Room self)
     {
-        if (self.abstractRoom.name == "SS_AI" && self.game.GetDeathPersistent() != null)
+        if (self.game.GetDeathPersistent() == null) { return; }
+        if ((self.water || self.blizzard) && !self.game.GetDeathPersistent().SRSwaterMessage)
+        {
+            self.AddObject(new roomScript.SRSwaterMessage(self));
+        }
+
+        if (self.abstractRoom.name == "SS_AI")
         {
             Plugin.Log("Add OxygenMask");
             AbstractPhysicalObject abstr = new OxygenMaskAbstract(self.game.world, new WorldCoordinate(self.abstractRoom.index, -1, -1, 0), self.game.GetNewID(), 3);
@@ -21,6 +27,10 @@ public class CustomLore
             self.abstractRoom.AddEntity(abstr);
             abstr.RealizeInRoom();
             (abstr.realizedObject as OxygenMask).firstChunk.pos = new Vector2(300f, 300f);
+        }
+        else if (self.abstractRoom.name == "OE_RAIL03" && !self.game.GetDeathPersistent().SRSstartTutorial)
+        {
+            self.AddObject(new roomScript.SRSstartTutorial(self));
         }
     }
 

@@ -68,7 +68,7 @@ public class PlayerModule
             swarmerManager.deathPreventer = deathPreventer;
             // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
             swarmerManager.callBackSwarmers = Math.Min(world.game.GetDeathPersistent().MoonHasSwarmers + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer);
-            Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers);
+            Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers, "last cycle swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
             // gills = new PlayerGraphics.AxolotlGills(player.graphicsModule as PlayerGraphics, 13);
         }
         else if (playerName == Enums.FPname)

@@ -128,6 +128,10 @@ public static class CustomSaveData
 
         public int MoonHasSwarmers { get; set; }
 
+        public bool SRSstartTutorial { get; set; }
+        public bool SRSwaterMessage { get; set; }
+        public bool NSHinventoryTutorial { get; set; }
+        public bool NSHneuronTutorial { get; set; }
     }
 
 
