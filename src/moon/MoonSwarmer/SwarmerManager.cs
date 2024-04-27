@@ -29,6 +29,8 @@ public class SwarmerManager
             return null;
         }
     }
+    public int lastPlayerRoom;
+    public int playerRoom;
     public static int maxSwarmer = 5;
     public List<AbstractCreature> swarmers;
     public _public.DeathPreventer deathPreventer;
@@ -312,7 +314,8 @@ public class SwarmerManager
     }
 
 
-    // TODO: 目前这东西是一个有缝衔接，因为那个颜色衔接他不知道为啥压根不干活
+    // 目前这东西是一个有缝衔接，因为那个颜色衔接他不知道为啥压根不干活
+    // 不TODO了，我放弃了
     public void ConvertNSHSwarmer(nsh.ReviveSwarmerModules.ReviveSwarmer swarmer)
     {
         if (player == null || swarmer.room == null) { Plugin.Log("ConvertNSHSwarmer(): null room or null player"); return; }
@@ -375,8 +378,8 @@ public class SwarmerManager
     {
         // 好好好 没想到这个逻辑还挺简单的
         if (player == null || player.room == null) return;
-
-        
+        lastPlayerRoom = playerRoom;
+        playerRoom = player.room.abstractRoom.index;
         if (callBackSwarmers != null)
         {
             Respawn();
@@ -389,26 +392,11 @@ public class SwarmerManager
             }*/
             tryingToCallBack = true;
         }
-        else
+        else if (lastPlayerRoom != playerRoom)
         {
             tryingToTeleport = true;
         }
 
-        /*if (player.room.abstractRoom.gate || player.room.abstractRoom.shelter)
-        {
-            CallBack();
-        }
-        else if (callBackSwarmers != null)
-        {
-            Respawn();
-        }
-        else if (needCallBack)
-        {
-            // 非常的简单粗暴，直接重生一波新的，连tp都免了
-            // 不过要是有人按着visible ID一直看的话，我就要露馅了（（
-            CallBack();
-            Respawn();
-        }*/
         
 
     }
@@ -437,7 +425,7 @@ public class SwarmerManager
 
 
 
-
+    // 算了 这个不好 他会让所有神经元全卡在管道里
     public void ForceAllSwarmersIntoShortcut(IntVector2 entrancePos)
     {
         if (callBackSwarmers != null)

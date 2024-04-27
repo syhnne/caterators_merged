@@ -1,0 +1,6 @@
+timeOnEachImage: 200
+showTime: 1400
+RND_Image: fp_PROJ
+startCutscene_31
+startCutscene_21
+holdingNeuron2

@@ -106,14 +106,19 @@ class Plugin : BaseUnityPlugin
     {
         try
         {
+            Plugin.Log("---- ALL ELEMENTS ----");
+            Futile.atlasManager.LogAllElementNames();
+            Plugin.Log("---- ELEMENTS NAMES END HERE ----");
             Futile.atlasManager.LoadAtlas("atlases/fp_tail");
             Futile.atlasManager.LoadAtlas("atlases/fp_head");
             Futile.atlasManager.LoadAtlas("atlases/fp_arm");
-            Futile.atlasManager.LoadImage("overseerHolograms/PebblesSlugHologram");
+            //Futile.atlasManager.LoadImage("overseerHolograms/PebblesSlugHologram");
             Futile.atlasManager.LoadAtlas("atlases/srs_head");
             Futile.atlasManager.LoadAtlas("atlases/srs_tail");
             Futile.atlasManager.LoadAtlas("atlases/nsh_head");
             Futile.atlasManager.LoadAtlas("atlases/moon_head");
+            
+            
         }
         catch (Exception ex)
         {

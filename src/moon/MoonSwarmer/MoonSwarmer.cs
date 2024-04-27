@@ -23,6 +23,9 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
     呃啊 那咋整啊 弄一个圣猫同款大狙吗 什么暴力奶妈（？？
 
     奶奶的。。这玩意儿真的难写。。*/
+
+// TODO: 让这玩意儿学会下台阶，他现在动不动就卡在平台上
+
 public class MoonSwarmer : Creature
 {
     // 好好好 这个manager被引用了14次 我特么测了三天才发现自己从来没给它赋过值
@@ -135,11 +138,6 @@ public class MoonSwarmer : Creature
 
         }
 
-        // 太长时间不在一个房间就全部重生（
-        /*Plugin.Log("swarmer", abstractCreature.ID.number, "notinsameroomCounter:", notInSameRoomCounter);
-        if (room != null) Plugin.Log("--swarmer:", room.abstractRoom.index);
-        Plugin.Log("player??", manager == null);
-        if (manager != null && manager.player.room != null) Plugin.Log("--player:", manager.player.room.abstractRoom.index); */
 
         if (notInSameRoom)
         {
@@ -149,19 +147,13 @@ public class MoonSwarmer : Creature
         {
             notInSameRoomCounter = 0;
         }
-        // 呃啊只好抄别人的代码了。。脑子不好使了
+
         if (justTeleported > 0)
         {
             justTeleported--;
         }
 
-        if (isActive && State.alive && graphicsModule == null)
-        {
-            graphicsModule = new MoonSwarmerGraphics(this, false);
-        }
         AI?.Update();
-
-        // mainBodyChunk.vel *= 0.9f;
 
         // 可以被b键拖拽
         // 所以他为什么那么喜欢卡在管道里。。
@@ -169,64 +161,50 @@ public class MoonSwarmer : Creature
         {
             base.bodyChunks[0].vel += Custom.DirVec(base.bodyChunks[0].pos, new Vector2(Futile.mousePosition.x, Futile.mousePosition.y) + this.room.game.cameras[0].pos) * 14f;
         }
-        if (AI != null && !AI.VisualContact(player.abstractCreature.pos, 2f))
-        {
-            cantSeeCounter++;
-        }
-        else
-        {
-            cantSeeCounter = 0;
-        }
-        /*if (manager != null)
-        {
-            affectedByGravity = Mathf.Lerp(affectedByGravity, (manager.player.dead || dead) ? 1f : 0f, 0.1f);
-            Plugin.Log("swarmer affectedbyG", affectedByGravity);
-        }*/
 
 
+        try
+        {
+            
+            affectedByGravity = 0f;
 
-        /*if (room != null && room.gravity * affectedByGravity > 0.5f)
-        {
-            return;
-        }*/
-        /*if (callBack && !notInSameRoom)
-        {
-            TryMoveTowards(manager.player.DangerPos, manager.player.DangerPos);
-            if (Custom.DistLess(DangerPos, manager.player.DangerPos, 5f))
+            if (player.abstractCreature.pos.room != abstractCreature.pos.room || (room != null && player.room != null && !room.VisualContact(firstChunk.pos, player.mainBodyChunk.pos)))
             {
-                manager.callBackSwarmers++;
-                Destroy();
-            }
-        }*/
-        affectedByGravity = 0f;
-        if (!dead)
-        {
-            if (reachable && room != null && player.room != null && !notInSameRoom
-                // && Custom.DistLess(firstChunk.pos, player.mainBodyChunk.pos, 700f)
-                // && AI.VisualContact(player.abstractCreature.pos, 3f)
-                && AI != null && AI.pathFinder != null
-                && AI.pathFinder.CoordinateCost(player.abstractCreature.pos).legality < PathCost.Legality.Unwanted
-                && cantSeeCounter < 20
-                )
-            {
-                HoverAtPlayerPos();
+                cantSeeCounter++;
             }
             else
             {
-                MoveToDest();
+                cantSeeCounter = 0;
             }
-        }
-        
 
 
-        /*try
-        {
-            
+            // 如果和玩家在一个房间且能看见玩家，就直接移动
+            // 否则按照pathfinder的路线行进
+            // 其实这个移动逻辑差极了，全仰仗每个房间门口tp一次才能运行的
+            if (!dead)
+            {
+                if (reachable && room != null && player.room != null && !notInSameRoom
+                    // && Custom.DistLess(firstChunk.pos, player.mainBodyChunk.pos, 700f)
+                    // && AI.VisualContact(player.abstractCreature.pos, 3f)
+                    && AI != null && AI.pathFinder != null
+                    && AI.pathFinder.CoordinateCost(player.abstractCreature.pos).legality < PathCost.Legality.Unwanted
+                    && cantSeeCounter < 30
+                    )
+                {
+                    HoverAtPlayerPos();
+                }
+                else
+                {
+                    MoveToDest();
+                }
+            }
+
+
         }
         catch (Exception ex)
         {
             Plugin.LogException(ex);
-        }*/
+        }
 
 
 
@@ -236,15 +214,6 @@ public class MoonSwarmer : Creature
     {
         try
         {
-
-            if (grabbedBy.Count == 0 && reachable && !notInSameRoom && Custom.DistLess(manager.player.mainBodyChunk.pos, firstChunk.pos, 80f) && player.touchedNoInputCounter > 100)
-            {
-                AI.SwitchBehavior(MoonSwarmerAI.Behavior.Idle);
-            }
-            else
-            {
-                AI.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
-            }
 
             if (grabbedBy.Count == 0 && AI.pathFinder != null && AI.pathFinder.destination != null && AI.pathFinder.DoneMappingAccessibility)
             {
@@ -292,19 +261,10 @@ public class MoonSwarmer : Creature
         {
             Vector2 dir1 = Custom.DirVec(firstChunk.pos, connectionEnd);
             // Vector2 dir2 = Custom.DirVec(firstChunk.pos, dest);
-            float vel = Mathf.Lerp(moveSpeed, 3f, Custom.Dist(firstChunk.pos, connectionEnd) * 0.5f);
+            float vel = Mathf.Lerp(moveSpeed, 5f, Custom.Dist(firstChunk.pos, connectionEnd) * 0.05f);
             bodyChunks[0].vel = dir1 * vel;
             bodyChunks[0].vel = Vector2.Lerp(bodyChunks[0].vel, dir1 * vel, 0.02f);
         }
-
-        
-
-        /*Vector2 dir1 = Custom.DirVec(firstChunk.pos, dest);
-        Vector2 accelereation = Vector2.Distance(firstChunk.pos, dest) / 4f;
-        accelereation = Mathf.Clamp(accelereation, 0f, maxAcceleration);
-
-        bodyChunks[0].vel += accelereation * dir1;
-        bodyChunks[0].vel = Vector2.ClampMagnitude(bodyChunks[0].vel, MaxVelocity);*/
 
     }
 
@@ -344,6 +304,7 @@ public class MoonSwarmer : Creature
     public void SpawnColorLerp()
     {
         base.RemoveGraphicsModule();
+        Plugin.Log("swarmer color lerp:");
         graphicsModule = new MoonSwarmerGraphics(this, true);
         graphicsModule.Reset();
     }

@@ -28,7 +28,7 @@ public class NSHinventoryTutorial : UpdatableAndDeletable
             {
                 InGameTranslator t = room.game.rainWorld.inGameTranslator;
                 room.game.GetDeathPersistent().NSHinventoryTutorial = true;
-                this.room.game.cameras[0].hud.textPrompt.AddMessage(t.Translate("Hold [D] and [up/down] to store objects in your backpack."), 20, 200, true, true);
+                this.room.game.cameras[0].hud.textPrompt.AddMessage(t.Translate("Hold [D] and [up/down] to store objects in your backpack."), 60, 240, true, true);
                 // => 按住D键和上下键，将物品存储在背包里。（好翻译腔啊 但无所谓了 这里是雨世界）
                 Destroy();
             }

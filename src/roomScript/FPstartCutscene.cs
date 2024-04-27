@@ -150,16 +150,12 @@ public class FPstartCutscene : UpdatableAndDeletable
         }
 
 
-        if (timer == 640)
+        if (timer == 580)
         {
             room.game.cameras[0].hud.textPrompt.AddMessage(room.game.rainWorld.inGameTranslator.Translate("Press G and up&down arrow keys to adjust the gravity in room."), 140, 500, true, true);
-            // Plugin.Log("total time: ", room.game.GetStorySession.saveState.totTime);
-        }
-
-        if (timer >= 800)
-        {
             Destroy();
             return;
+            // Plugin.Log("total time: ", room.game.GetStorySession.saveState.totTime);
         }
         // Plugin.Log("start cutscene timer: ", timer);
         timer++;

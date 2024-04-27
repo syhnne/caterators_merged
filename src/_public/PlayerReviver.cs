@@ -128,6 +128,7 @@ public class PlayerReviver
                 {
                     Plugin.Log("try revive player", slug.abstractCreature.ID.number);
                     RevivePlayer(slug, activatedSwarmer);
+                    reviveCounter = 0;
                     
                 }
 
@@ -167,7 +168,7 @@ public class PlayerReviver
 
     public static bool CanBeRevived(Player player)
     {
-        if (Plugin.playerModules.TryGetValue(player, out var mod) && mod.swarmerManager != null) return true;
+        if (Plugin.playerModules.TryGetValue(player, out var mod) && mod.swarmerManager != null && mod.deathPreventer != null && mod.deathPreventer.justPreventedCounter <= 0) return true;
         if (player.room == null || !(player.dead || !player.playerState.alive || player.playerState.permaDead)) return false;
         return true;
     }
@@ -182,7 +183,7 @@ public class PlayerReviver
             if (slugcat == null) { Plugin.Log("RevivePlayer(): null slugcat"); return false; }
             else if (Plugin.playerModules.TryGetValue(slugcat, out var mod) && mod.swarmerManager != null)
             {
-
+                if (mod.deathPreventer != null) { mod.deathPreventer.justPreventedCounter = 10; }
                 mod.swarmerManager.ConvertNSHSwarmer(activatedSwarmer);
 
                 if (!slugcat.dead) { return true; }
@@ -197,8 +198,9 @@ public class PlayerReviver
             slugcat.dead = false;
             slugcat.killTag = null;
             slugcat.killTagCounter = 0;
-            slugcat.stun = 25;
+            slugcat.stun = 50;
             slugcat.aerobicLevel = 1f;
+            slugcat.exhausted = true;
             AbstractCreatureAI abstractAI = slugcat.abstractCreature.abstractAI;
             abstractAI?.SetDestination(slugcat.abstractCreature.pos);
 
