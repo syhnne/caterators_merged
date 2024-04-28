@@ -18,7 +18,6 @@ public class MoonSwarmerAI : ArtificialIntelligence
 {
 
     public SwarmerManager manager;
-    public Behavior currentBehavior;
     public int destCounter;
     public WorldCoordinate lastIdlePos;
     public bool notInSameRoom
@@ -43,12 +42,6 @@ public class MoonSwarmerAI : ArtificialIntelligence
         get { return manager?.player?.abstractCreature.pos; }
     }
 
-    public enum Behavior
-    {
-        Idle,
-        FollowPlayer,
-        // 可能还有一些动画效果
-    }
 
 
 
@@ -57,10 +50,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
     {
         // 这个看字面意思肯定得整一个罢 用来寻路找到玩家在哪
         AddModule(new StandardPather(this, abstr.world, abstr));
-        // 这个我猜就是用来追踪其他生物的 加一个逝逝先
-        // AddModule(new Tracker(this, 10, 2, 200, 0.5f, 5, 5, 10));
         swarmer.AI = this;
-        currentBehavior = Behavior.FollowPlayer;
         destCounter = 0;
         pathFinder.stepsPerFrame = 20;
         manager = swarmer.manager;
@@ -72,27 +62,6 @@ public class MoonSwarmerAI : ArtificialIntelligence
         base.Update();
         if (destCounter > 0){
             destCounter--;
-        }
-        // FindPlayer();
-        return;
-        
-        // if (creature.Room != null && creature.Room.shelter) { return; }
-        switch (currentBehavior)
-        {
-            case Behavior.FollowPlayer:
-                FindPlayer();
-                break;
-            case Behavior.Idle:
-            default:
-                WorldCoordinate? c = RandomDest();
-                if (c == null) break;
-                if (IdleCoordScore(lastIdlePos) > IdleCoordScore((WorldCoordinate)c) - (float)destCounter)
-                {
-                    lastIdlePos = (WorldCoordinate)c;
-                    // Plugin.Log("swarmer", creature.ID.number, "new idle destination:", c.ToString());
-                    this.creature.abstractAI.SetDestination((WorldCoordinate)c);
-                }
-                break;
         }
     }
 
@@ -110,17 +79,11 @@ public class MoonSwarmerAI : ArtificialIntelligence
 
 
 
-    public void SwitchBehavior(MoonSwarmerAI.Behavior behaviour)
-    {
-        if (behaviour == currentBehavior) return;
-        // Plugin.Log("swarmer", creature.ID.number, "behavior switch to:", behaviour.ToString());
-        currentBehavior = behaviour;
-    }
 
 
 
 
-    public float IdleCoordScore(WorldCoordinate coord)
+    /*public float IdleCoordScore(WorldCoordinate coord)
     {
         if (coord == null || coord.room != creature.pos.room || (swarmer.room != null && swarmer.room.GetTile(coord).Solid)) return float.MaxValue;
         float result = 10000f;
@@ -137,7 +100,7 @@ public class MoonSwarmerAI : ArtificialIntelligence
         }
         return result;
 
-    }
+    }*/
 
 
 

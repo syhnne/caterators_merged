@@ -76,8 +76,7 @@ public class GravityController : UpdatableAndDeletable
 
 
         if (player.Consious && !player.dead && player.stun == 0
-            && Input.GetKey(Plugin.instance.configOptions.GravityControlKey.Value)
-            && player.animation != Player.AnimationIndex.ZeroGPoleGrab)
+            && Input.GetKey(Plugin.instance.configOptions.GravityControlKey.Value))
         {
             player.Blink(5);
             isAbleToUse = true;

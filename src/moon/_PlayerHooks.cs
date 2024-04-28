@@ -38,6 +38,10 @@ public class PlayerHooks
         {
             result = true;
         }
+        else if (self.SlugCatClass == Enums.test)
+        {
+            result = true;
+        }
         return result;
     }
 

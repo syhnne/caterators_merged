@@ -539,6 +539,10 @@ public class PlayerHooks
                 self.AddPart(swarmerHUD);
                 module.swarmerManager.hud = swarmerHUD;
                 swarmerHUD.UpdateIcons();
+                if (Plugin.DevMode)
+                {
+                    self.AddPart(new moon.MoonSwarmer.DebugHUD(self, self.fContainers[1], module.swarmerManager));
+                }
             }
         }
 

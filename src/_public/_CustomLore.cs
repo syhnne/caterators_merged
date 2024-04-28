@@ -66,6 +66,10 @@ public class CustomLore
             self.GetStorySession.saveState.miscWorldSaveData.moonHeartRestored = true;
             self.GetStorySession.saveState.miscWorldSaveData.pebblesEnergyTaken = true;
         }
+        if (self.IsStorySession && self.StoryCharacter == Enums.test)
+        {
+            self.GetStorySession.saveState.hasRobo = true;
+        }
     }
 
 

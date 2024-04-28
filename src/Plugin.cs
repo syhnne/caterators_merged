@@ -144,6 +144,10 @@ class Plugin : BaseUnityPlugin
     }
 
 
+    /// <summary>
+    /// 用这个来输出日志，方便统一管理
+    /// </summary>
+    /// <param name="ex"></param>
     public static void LogException(Exception ex)
     {
         if (!ShowLogs || Logger == null) return;
@@ -244,6 +248,23 @@ class Plugin : BaseUnityPlugin
                     if (p.realizedObject != null && p.realizedCreature.room != null && Plugin.playerModules.TryGetValue(p.realizedCreature as Player, out var module) && module.swarmerManager != null)
                     {
                         module.swarmerManager.tryingToTeleport = true;
+                    }
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Backspace))
+            {
+                foreach (AbstractCreature p in self.Players)
+                {
+                    if (p.realizedObject != null && p.realizedCreature.room != null)
+                    {
+                        Room r = p.realizedCreature.room;
+                        string s = " --------- UADs IN ROOM " + r.abstractRoom.name + ": ";
+                        foreach (UpdatableAndDeletable uad in r.updateList)
+                        {
+                            s += uad.ToString() + " | ";
+                        }
+                        Plugin.Log(s);
                     }
                 }
             }

@@ -320,7 +320,7 @@ public class DeathPreventer
 
     // private是为了防止我在别的地方调用这些代码，导致出现player.room是null之类的问题
     // 这个东西可能是moon或者nsh的神经元，所以返回一个apo
-    private AbstractPhysicalObject? DeathPreventObject
+    private object? DeathPreventObject
     {
         get
         {
@@ -334,9 +334,17 @@ public class DeathPreventer
             }
 
             // moon会优先消耗自己的神经元，因为这个只能复活自己不能复活队友
-            if (getModule && module.swarmerManager != null && module.swarmerManager.CanConsumeSwarmer)
+            if (getModule && module.swarmerManager != null)
             {
-                return module.swarmerManager.LastAliveSwarmer.abstractCreature;
+                if (module.swarmerManager.callBackSwarmers != null)
+                {
+                    return 1;
+                }
+                else if (module.swarmerManager.CanConsumeSwarmer)
+                {
+                    return module.swarmerManager.LastAliveSwarmer.abstractCreature;
+                }
+                
             }
 
 
@@ -379,7 +387,7 @@ public class DeathPreventer
     public bool TryPreventDeath(PlayerDeathReason deathReason)
     {
         if (dontRevive || justPreventedCounter > 0) { return false; }
-        AbstractPhysicalObject reviveSwarmer = DeathPreventObject;
+        object reviveSwarmer = DeathPreventObject;
         // Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "nullObject:", reviveSwarmer == null, "nullRoom:", player.room == null);
         
         if (player.room == null || (reviveSwarmer == null && !forceRevive))
@@ -517,37 +525,45 @@ public class DeathPreventer
 
 
 
-    public void RemoveSwarmer(AbstractPhysicalObject reviveSwarmer)
+    public void RemoveSwarmer(object reviveSwarmer)
     {
         
         if (justPreventedCounter > 0) { return; }
 
-        if (swarmerManager != null && reviveSwarmer is AbstractCreature && reviveSwarmer.realizedObject != null)
+        if (reviveSwarmer is int) 
         {
-            swarmerManager.KillSwarmer(reviveSwarmer.realizedObject as MoonSwarmer, true);
+            if (swarmerManager.callBackSwarmers != null) swarmerManager.callBackSwarmers--;
+            else Plugin.Log("!! used int as reviveSwarmer, but callBackSwarmers is null");
+            return;
+        }
+        AbstractPhysicalObject s = reviveSwarmer as AbstractPhysicalObject;
+
+        if (swarmerManager != null && s is AbstractCreature && s.realizedObject != null)
+        {
+            swarmerManager.KillSwarmer(s.realizedObject as MoonSwarmer, true);
             return;
         }
         
         
-        if (reviveSwarmer.realizedObject != null && reviveSwarmer is ReviveSwarmerAbstract)
+        if (s.realizedObject != null && s is ReviveSwarmerAbstract)
         {
-            (reviveSwarmer.realizedObject as ReviveSwarmer).Use(false);
+            (s.realizedObject as ReviveSwarmer).Use(false);
         }
         else
         {
-            reviveSwarmer.Destroy();
+            s.Destroy();
         }
 
-        if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null && module.nshInventory.RemoveSpecificObj(reviveSwarmer))
+        if (Plugin.playerModules.TryGetValue(player, out var module) && module.nshInventory != null && module.nshInventory.RemoveSpecificObj(s))
         {
         }
-        else if (player.objectInStomach == reviveSwarmer)
+        else if (player.objectInStomach == s)
         {
             player.objectInStomach = null;
         }
         else
         {
-            player.room.abstractRoom.RemoveEntity(reviveSwarmer);
+            player.room.abstractRoom.RemoveEntity(s);
         }
 
     }

@@ -45,10 +45,10 @@ public class SwarmerManager
     public bool needCallBack = false;
     public int? callBackSwarmers;
 
-    private int teleportFail = -1;
     public bool tryingToTeleport = false;
     private bool tryingToCallBack = false;
     private int teleportRetryCounter = 0;
+    private int callBackRetryCounter = 0;
 
     public int hasSwarmers
     {
@@ -120,12 +120,20 @@ public class SwarmerManager
 
         if (tryingToCallBack)
         {
-            tryingToCallBack = !CallBack();
+            tryingToCallBack = !(CallBack() || callBackRetryCounter > 10);
+            Plugin.Log("trying to callback for", callBackRetryCounter, "times");
+            callBackRetryCounter++;
         }
         if (tryingToTeleport)
         {
-            tryingToTeleport = !(TryTeleportAllSwarmers() || teleportRetryCounter > 14);
+            tryingToTeleport = !TryTeleportAllSwarmers();
             teleportRetryCounter++;
+            if (teleportRetryCounter > 15)
+            {
+                Plugin.Log("retried for 15 times, trying to callback");
+                tryingToCallBack = true;
+                tryingToTeleport = false;
+            }
         }
         else
         {
@@ -168,11 +176,19 @@ public class SwarmerManager
         // 受不了了，不知道是不是因为我把player改成了弱引用，隔壁ai那里死活找不到玩家在哪。还是这样统一管理吧。
         // 以后可以直接参考原版神经元的代码，能直接在房间里搜索到玩家才会跟着玩家走
         // 至于tp有没有问题，我想大约是没有了罢
-        foreach (AbstractCreature sw in swarmers)
+        if (player.touchedNoInputCounter <= 0)
         {
-            if (sw.realizedCreature != null && player != null)
+            foreach (AbstractCreature sw in swarmers)
             {
-                (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+                if (sw.realizedCreature != null && player != null)
+                {
+                    (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+                }
+                else if (sw.realizedCreature != null)
+                {
+                    (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(sw.pos);
+                }
+
             }
         }
         /*if (player.room != null && player.room.abstractRoom.shelter)
@@ -298,6 +314,11 @@ public class SwarmerManager
     {
         if (player == null) return;
         Plugin.Log("spawn MoonSwarmer:", number);
+        if (number > 4 * SwarmerManager.maxSwarmer)
+        {
+            Plugin.Log("too much swarmers! numbers:", number);
+            return;
+        }
         for (int i = 0; i < number; i++)
         {
             AbstractCreature abstr = new AbstractCreature(player.room.world, StaticWorld.GetCreatureTemplate(MoonSwarmerCritob.MoonSwarmer), null, player.abstractCreature.pos, player.room.game.GetNewID());
@@ -355,9 +376,10 @@ public class SwarmerManager
     }
 
 
+
     public int CycleEndSave()
     {
-        if (player == null || callBackSwarmers != null) { return SwarmerManager.maxSwarmer; }
+        if (player == null || callBackSwarmers != null) { return callBackSwarmers!=null? (int)callBackSwarmers : maxSwarmer; }
         for (; ; )
         {
             if (CallBack()) break;
@@ -491,7 +513,7 @@ public class SwarmerManager
             }
             (swarmer.realizedCreature as MoonSwarmer).manager = this;
             (swarmer.realizedCreature as MoonSwarmer).justTeleported = 60;
-            (swarmer.realizedCreature as MoonSwarmer).AI?.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
+            // (swarmer.realizedCreature as MoonSwarmer).AI?.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
             (swarmer.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
             swarmer.realizedCreature.firstChunk.pos = player.mainBodyChunk.pos;
             swarmer.realizedCreature.firstChunk.vel = player.mainBodyChunk.vel;
@@ -520,9 +542,10 @@ public class SwarmerManager
         }
         else
         {
+            Plugin.Log(" ~ player:", player.abstractCreature.pos);
             foreach (var swarmer in swarmers)
             {
-                Plugin.Log(" ~ ", swarmer.ID.number + " - pos: " + swarmer.pos.ToString() + " behavior: " + (swarmer.realizedCreature as MoonSwarmer).AI.currentBehavior.ToString(), " - player:", player.abstractCreature.ID.number);
+                Plugin.Log(" ~ ", swarmer.ID.number , " - pos: ", swarmer.pos.ToString(),  " - player:", player.abstractCreature.ID.number);
                 if ((swarmer.realizedCreature as MoonSwarmer).AI != null && (swarmer.realizedCreature as MoonSwarmer).AI.pathFinder != null)
                 {
                     Plugin.Log("   ai destination:", (swarmer.realizedCreature as MoonSwarmer).AI.pathFinder.destination);
@@ -764,5 +787,156 @@ public class SwarmerHUD : HudPart
         lineSprite.RemoveFromContainer();
         lineSprite = null;
     }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+public class DebugHUD : HudPart
+{
+    public SwarmerManager owner;
+    public MoonSwarmer? swarmer;
+    public Vector2 dest;
+    public Vector2 lastDest;
+    public Vector2 end;
+    public Vector2 lastEnd;
+    public float fade;
+    public float lastFade;
+    /// <summary>
+    /// destination
+    /// </summary>
+    public FSprite destSprite;
+    /// <summary>
+    /// connectionEnd
+    /// </summary>
+    public FSprite endSprite;
+
+    // blueish green / blue
+    public static Color32 destColor = new Color32(98, 255, 223, 255);
+    // orange / red
+    public static Color32 endColor = new Color32(255, 125, 29, 255);
+
+    public DebugHUD(HUD.HUD hud, FContainer fContainer, SwarmerManager owner) : base(hud)
+    {
+        this.owner = owner;
+        
+        destSprite = new FSprite("Futile_White", true)
+        {
+            scale = 0.5f,
+            color = destColor,
+        };
+        
+        endSprite = new FSprite("Futile_White", true)
+        {
+            scale = 0.5f,
+            color = endColor,
+        };
+        fContainer.AddChild(destSprite);
+        fContainer.AddChild(endSprite);
+    }
+
+
+    private bool Show
+    {
+        get
+        {
+            return owner != null && swarmer != null && swarmer.room.game.devToolsActive
+                && swarmer != null && swarmer.room != null && swarmer.AI != null && swarmer.AI.pathFinder != null && swarmer.AI.pathFinder.destination != null;
+                
+        }
+    }
+
+
+    public override void Update()
+    {
+
+        base.Update();
+        /*if (Input.GetKeyDown(KeyCode.Backspace))
+        {
+            visible = !visible;
+        }*/
+
+        lastDest = dest;
+        lastEnd = end;
+        lastFade = fade;
+        Vector2 camPos = Vector2.zero;
+        if (owner != null && (owner.LastAliveSwarmer == null || (owner.LastAliveSwarmer != null && owner.LastAliveSwarmer != swarmer)))
+        {
+            swarmer = owner.LastAliveSwarmer;
+        }
+
+        if (swarmer == null || swarmer.room == null) return; ////////////
+
+        if (owner.playerRoom != swarmer.room.abstractRoom.index)
+        {
+            destSprite.color = Color.blue;
+            endSprite.color = Color.red;
+        }
+        else
+        {
+            destSprite.color = destColor; 
+            endSprite.color = endColor;
+        }
+
+        if ( swarmer.room != null)
+        {
+            camPos = swarmer.room.game.cameras[0].pos;
+        }
+        dest = swarmer.debugDest - camPos;
+        end = swarmer.debugConnectionEnd - camPos;
+
+        destSprite.isVisible = true;
+        endSprite.isVisible = true;
+        if (Show)
+        {
+            fade = Mathf.Min(1f, fade + 0.033333335f);
+        }
+        else
+        {
+            fade = Mathf.Max(0f, fade - 0.1f);
+        }
+
+
+
+
+    }
+
+
+
+
+    public Vector2 DrawPos(Vector2 pos, Vector2 lastPos, float timeStacker)
+    {
+        return Vector2.Lerp(lastPos, pos, timeStacker);
+    }
+
+    public override void Draw(float timeStacker)
+    {
+        if (hud.rainWorld.processManager.currentMainLoop is not RainWorldGame) return;
+        destSprite.alpha = fade;
+        endSprite.alpha = fade;
+        destSprite.SetPosition(DrawPos(dest, lastDest, timeStacker));
+        endSprite.SetPosition(DrawPos(end, lastEnd, timeStacker));
+    }
+
+
+    public override void ClearSprites()
+    {
+        base.ClearSprites();
+        destSprite.RemoveFromContainer();
+        destSprite = null;
+        endSprite.RemoveFromContainer();
+        endSprite = null;
+    }
+
+
 
 }

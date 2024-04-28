@@ -35,7 +35,7 @@ internal static class Enums
     
     public static bool IsCaterator(SlugcatStats.Name name)
     {
-        if (name == FPname || name == SRSname || name == NSHname || name == Moonname) { return true; }
+        if (name == FPname || name == SRSname || name == NSHname || name == Moonname || name == test) { return true; }
         else { return false; }
     }
 
@@ -47,4 +47,5 @@ internal static class Enums
     public static readonly SlugcatStats.Name SRSname = new("SRSslugcat", false);
     public static readonly SlugcatStats.Name NSHname = new("NSHslugcat", false);
     public static readonly SlugcatStats.Name Moonname = new("Moonslugcat", false);
+    public static readonly SlugcatStats.Name test = new("placeholder_syhnne", false);
 }

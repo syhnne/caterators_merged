@@ -36,17 +36,23 @@ public class MoonSwarmerCritob : Critob
             Pathing = PreBakedPathing.Ancestral(CreatureTemplate.Type.Fly),
             TileResistances = new()
             {
-                Air = new(0.8f, Allowed),
+                Air = new(0.3f, Allowed),
                 Floor = new(1.2f, Allowed),
+                Wall = new(1.2f, Allowed),
+                Ceiling = new(1.2f, Allowed),
+                Corridor = new(1.2f, Unwanted),
             },
             ConnectionResistances = new()
             {
                 Standard = new(0.9f, Allowed),
                 OpenDiagonal = new(0.5f, Allowed),
-                ShortCut = new(1.1f, Allowed),
+                ShortCut = new(1.1f, Unwanted),
                 NPCTransportation = new(1, Allowed),
                 OffScreenMovement = new(1, Allowed),
                 BetweenRooms = new(1, Allowed),
+                DropToWater = new(1, Allowed),
+                DropToClimb = new(1, Allowed),
+                DropToFloor = new(1, Allowed),
             },
             DamageResistances = new()
             {
@@ -68,12 +74,15 @@ public class MoonSwarmerCritob : Critob
         t.visualRadius = 1000f;
         t.movementBasedVision = 0.5f;
         t.communityInfluence = 0f;
-        t.waterRelationship = CreatureTemplate.WaterRelationship.AirAndSurface;
-        t.waterPathingResistance = 1f;
+        t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;
+        t.waterPathingResistance = 0.9f;
         t.canFly = true;
         t.meatPoints = 0;
         t.dangerousToPlayer = 0f;
-
+        t.canSwim = true;
+        t.socialMemory = false;
+        t.wormGrassImmune = true;
+        
         t.saveCreature = false;
         return t;
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 
 namespace Caterators_by_syhnne._public;
@@ -94,7 +95,7 @@ public class PlayerModule
         nshInventory?.Update(eu);
         gravityController?.Update(eu, storyName == playerName);
 
-
+        
 
 
 
