@@ -221,7 +221,7 @@ internal class PlayerHooks
             Room room = self.room;
             bool flag = self.wantToJump > 0 && self.input[0].pckp;
             bool flag2 = self.eatMeat >= 20 || self.maulTimer >= 15;
-            int explosionCapacity = ConfigOptions.ExplosionCapacity.Value;
+            int explosionCapacity = Options.ExplosionCapacity.Value;
             int num = Mathf.Max(1, explosionCapacity - 5);
             if (self.pyroJumpCounter > 0 && (self.Consious || self.dead))
             {
@@ -473,7 +473,7 @@ internal class PlayerHooks
                         }
                     }
                 }
-                if (self.Submersion <= 0.5f)
+                if (self.Submersion >= 0.2f)
                 {
                     self.room.AddObject(new UnderwaterShock(self.room, self, pos2, 10, 800f, 2f, self, new Color(0.8f, 0.8f, 1f)));
                 }

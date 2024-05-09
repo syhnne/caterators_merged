@@ -254,7 +254,7 @@ public class PlayerHooks
 
 
         // logs
-        if (!Plugin.DevMode || !newRoom.game.IsStorySession) { return; }
+        if (!Options.DevMode.Value || !newRoom.game.IsStorySession) { return; }
 
         CustomSaveData.SaveDeathPersistent dp = newRoom.game.GetDeathPersistent();
         CustomSaveData.SaveMiscProgression mp = newRoom.game.GetMiscProgression();
@@ -289,13 +289,17 @@ public class PlayerHooks
     private static void Player_Jump(On.Player.orig_Jump orig, Player self)
     {
         orig(self);
-        if (self.SlugCatClass == Enums.FPname || self.SlugCatClass == Enums.NSHname)
+        if (self.SlugCatClass == Enums.FPname || self.SlugCatClass == Enums.NSHname || self.SlugCatClass == Enums.test)
         {
             self.jumpBoost *= 1.2f;
         }
-        else if (self.SlugCatClass == Enums.SRSname || self.SlugCatClass == Enums.Moonname)
+        else if (self.SlugCatClass == Enums.SRSname)
         {
             self.jumpBoost *= 1.1f;
+        }
+        else if (self.SlugCatClass == Enums.Moonname && Plugin.playerModules.TryGetValue(self, out var mod) && mod.swarmerManager != null)
+        {
+            self.jumpBoost *= mod.swarmerManager.weakMode ? 0.9f : 1.1f;
         }
 
 
@@ -539,7 +543,7 @@ public class PlayerHooks
                 self.AddPart(swarmerHUD);
                 module.swarmerManager.hud = swarmerHUD;
                 swarmerHUD.UpdateIcons();
-                if (Plugin.DevMode)
+                if (Options.DevMode.Value)
                 {
                     self.AddPart(new moon.MoonSwarmer.DebugHUD(self, self.fContainers[1], module.swarmerManager));
                 }

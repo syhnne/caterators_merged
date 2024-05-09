@@ -29,7 +29,7 @@ using System.Drawing.Imaging;
 
 namespace Caterators_by_syhnne.srs;
 
-internal class PlayerHooks
+public static class PlayerHooks
 {
 
 
@@ -107,9 +107,69 @@ internal class PlayerHooks
         player.Die();*/
     }
 
-
-
-
+    /*public static void PercentageViolence(this Creature crit, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, float damage) => PercentageViolence(crit, source, directionAndMomentum, hitChunk, hitAppendage, Creature.DamageType.Stab, damage, 0.1f);
+*/
+    public static void PercentageViolence(this Creature crit, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
+    {
+        if (source != null && source.owner is Creature)
+        {
+            crit.SetKillTag((source.owner as Creature).abstractCreature);
+        }
+        if (directionAndMomentum != null)
+        {
+            if (hitChunk != null)
+            {
+                hitChunk.vel += Vector2.ClampMagnitude(directionAndMomentum.Value / hitChunk.mass, 10f);
+            }
+            else if (hitAppendage != null && crit is PhysicalObject.IHaveAppendages)
+            {
+                (crit as PhysicalObject.IHaveAppendages).ApplyForceOnAppendage(hitAppendage, directionAndMomentum.Value);
+            }
+        }
+        float num = damage / crit.Template.baseDamageResistance;
+        float num2 = (damage * 30f + stunBonus) / crit.Template.baseStunResistance;
+        if (crit.State is HealthState)
+        {
+            num2 *= 1.5f + Mathf.InverseLerp(0.5f, 0f, (crit.State as HealthState).health) * Random.value;
+        }
+        if (type.Index != -1)
+        {
+            if (crit.Template.damageRestistances[type.Index, 0] > 0f)
+            {
+                num /= crit.Template.damageRestistances[type.Index, 0];
+            }
+            if (crit.Template.damageRestistances[type.Index, 1] > 0f)
+            {
+                num2 /= crit.Template.damageRestistances[type.Index, 1];
+            }
+        }
+        if (ModManager.MSC)
+        {
+            if (crit.room != null && crit.room.world.game.IsArenaSession && crit.room.world.game.GetArenaGameSession.chMeta != null && crit.room.world.game.GetArenaGameSession.chMeta.resistMultiplier > 0f && !(crit is Player))
+            {
+                num /= crit.room.world.game.GetArenaGameSession.chMeta.resistMultiplier;
+            }
+            if (crit.room != null && crit.room.world.game.IsArenaSession && crit.room.world.game.GetArenaGameSession.chMeta != null && crit.room.world.game.GetArenaGameSession.chMeta.invincibleCreatures && !(crit is Player))
+            {
+                num = 0f;
+            }
+        }
+        crit.stunDamageType = type;
+        crit.Stun((int)num2);
+        crit.stunDamageType = Creature.DamageType.None;
+        if (crit.State is HealthState)
+        {
+            (crit.State as HealthState).health -= damage;
+            if (crit.Template.quickDeath && (Random.value < -(crit.State as HealthState).health || (crit.State as HealthState).health < -1f || ((crit.State as HealthState).health < 0f && Random.value < 0.33f)))
+            {
+                crit.Die();
+            }
+        }
+        if (num >= crit.Template.instantDeathDamageLimit)
+        {
+            crit.Die();
+        }
+    }
 
 
 
@@ -225,12 +285,15 @@ internal class PlayerHooks
     {
 
         bool die = false;
+        float dmg = 0f;
         if (result.obj != null && result.obj is Creature && !(result.obj as Creature).dead
             && self.thrownBy is Player && (self.thrownBy as Player).slugcatStats.name == Enums.SRSname
             && self.Spear_NeedleCanFeed() && self.spearmasterNeedleType > 3
-            && (result.obj as Creature).SpearStick(self, Mathf.Lerp(0.55f, 0.62f, Random.value), result.chunk, result.onAppendagePos, self.firstChunk.vel))
+            && (result.obj as Creature).State is HealthState
+            && (result.obj as Creature).SpearStick(self, 0.1f, result.chunk, result.onAppendagePos, self.firstChunk.vel))
         {
             die = true;
+            dmg = ((result.obj as Creature).State as HealthState).h;
         }
 
         // 写完这些代码大概两周以后，我才想起来他有嘴，吃爆米花不用只吃五个。。
@@ -246,8 +309,13 @@ internal class PlayerHooks
 
         if (die)
         {
-            // Plugin.Log("creature instant death:", (result.obj as Creature).GetType().ToString());
-            (result.obj as Creature).Violence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 99f, 20f);
+            
+            Plugin.Log("orig h:", dmg, "crit:", result.obj);
+            // 无论是什么生物，一矛都是投矛本身的基础伤害+30%血量的额外伤害
+            // 没错 就是针对香菇设计的
+            (result.obj as Creature).PercentageViolence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 0.3f, 20f);
+
+            // (result.obj as Creature).Violence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 99f, 20f);
 
             /*(result.obj as Creature).Die();
             (result.obj as Creature).SetKillTag(self.thrownBy.abstractCreature);*/
@@ -312,7 +380,8 @@ internal class PlayerHooks
             self.exhausted = false;
         }
 
-        if (self.exhausted)
+        // 我受不了这个体力限制了，所以现在它在开发者模式下会解除（
+        if (self.exhausted && !(Options.DevMode.Value && self.room != null && self.room.game.devToolsActive))
         {
             self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
             if (self.aerobicLevel > 0.9f && Random.value < 0.05f)

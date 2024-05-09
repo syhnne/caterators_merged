@@ -28,7 +28,7 @@
         "the_mark": false,
         "the_glow": true,
         "throw_skill": [ 1.0, 0.9 ],
-        "crouch_stealth": [ 1.0, 0.9 ],
+        "crouch_stealth": [ 1.0, 1.1 ],
         "food_min": 6,
         "food_max": 7,
 

@@ -51,8 +51,10 @@ public class MoonSwarmerCritob : Critob
                 OffScreenMovement = new(1, Allowed),
                 BetweenRooms = new(1, Allowed),
                 DropToWater = new(1, Allowed),
-                DropToClimb = new(1, Allowed),
-                DropToFloor = new(1, Allowed),
+                ReachDown = new(1, Allowed),
+                ReachOverGap = new(1, Allowed),
+                ReachUp = new(1, Allowed),
+                LizardTurn = new(1, Allowed),
             },
             DamageResistances = new()
             {
@@ -75,14 +77,15 @@ public class MoonSwarmerCritob : Critob
         t.movementBasedVision = 0.5f;
         t.communityInfluence = 0f;
         t.waterRelationship = CreatureTemplate.WaterRelationship.Amphibious;
-        t.waterPathingResistance = 0.9f;
+        t.waterPathingResistance = 0.6f;
         t.canFly = true;
         t.meatPoints = 0;
         t.dangerousToPlayer = 0f;
         t.canSwim = true;
         t.socialMemory = false;
         t.wormGrassImmune = true;
-        
+        t.BlizzardAdapted = true;
+        t.waterVision = 1f;
         t.saveCreature = false;
         return t;
     }
@@ -101,8 +104,7 @@ public class MoonSwarmerCritob : Critob
             }
         }
         self.IsInPack(MoonSwarmer, 1f);
-        // 为了让它跟着玩家走。。这有用吗（
-        self.PlaysWith(CreatureType.Slugcat, 0.5f);
+
         self.Intimidates(CreatureTemplate.Type.Spider, 0.1f);
         self.Intimidates(CreatureTemplate.Type.SpitterSpider, 0.1f);
         self.Intimidates(CreatureTemplate.Type.BigSpider, 0.1f);

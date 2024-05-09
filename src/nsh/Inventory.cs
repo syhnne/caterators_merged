@@ -623,7 +623,7 @@ public class InventoryHUD : HudPart
                 data = new IconSymbol.IconSymbolData(CreatureTemplate.Type.StandardGroundCreature, AbstractPhysicalObject.AbstractObjectType.Creature, 0);
                 icon = new(this, hud.fContainers[0], (IconSymbol.IconSymbolData)data);
             }
-            /*if (Plugin.DevMode)
+            /*if (Options.DevMode.Value)
             {
                 string s = icon.symbol.spriteName.ToString();
                 Plugin.Log("iconspritename:", s);

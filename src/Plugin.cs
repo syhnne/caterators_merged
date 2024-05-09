@@ -35,8 +35,7 @@ namespace Caterators_by_syhnne;
 [BepInPlugin(MOD_ID, MOD_NAME, MOD_VERSION)]
 class Plugin : BaseUnityPlugin
 {
-    // 破案了，registerOI挂不上是因为我modinfo里面写的跟这个不一样（汗
-    // 啊，为什么一样了还是不行？？
+
     public const string MOD_ID = "syhnne.caterators";
     public const string MOD_NAME = "Caterators (alpha ver.)";
     public const string MOD_VERSION = "0.1.0";
@@ -44,10 +43,11 @@ class Plugin : BaseUnityPlugin
     public static new ManualLogSource Logger { get; internal set; }
     public static ConditionalWeakTable<Player, _public.PlayerModule> playerModules = new ConditionalWeakTable<Player, _public.PlayerModule>();
     public static Plugin instance;
-    public ConfigOptions configOptions;
+    public Options configOptions;
 
     internal const bool ShowLogs = true;
-    internal const bool DevMode = true;
+
+    private bool _inited;
 
 
     #region 暂存区
@@ -66,10 +66,10 @@ class Plugin : BaseUnityPlugin
         {
             Logger = base.Logger;
             instance = this;
-            configOptions = new ConfigOptions();
+            
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
-            MachineConnector.SetRegisteredOI(Plugin.MOD_ID, configOptions);
-            MachineConnector._RefreshOIs();
+            On.RainWorld.OnModsInit += RainWorld_OnModsInit;
+            
 
 
             Content.Register(new OxygenMaskModules.OxygenMaskFisob());
@@ -94,6 +94,7 @@ class Plugin : BaseUnityPlugin
 
             // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
             _public.SSOracleHooks.Apply();
+
         }
         catch (Exception ex)
         {
@@ -102,29 +103,41 @@ class Plugin : BaseUnityPlugin
         }
     }
     
+
+
+    private void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
+    {
+        orig(self);
+        if (!_inited)
+        {
+            _inited = true;
+            try
+            {
+                // 好好好 设置界面终于复活了
+                configOptions = new Options();
+                MachineConnector.SetRegisteredOI(Plugin.MOD_ID, configOptions);
+                Plugin.Log("syhnne.caterators INIT");
+            }
+            catch (Exception e)
+            {
+                Plugin.LogException(e);
+            }
+
+        }
+    }
+
+
     private void LoadResources(RainWorld rainWorld)
     {
-        try
-        {
-            Plugin.Log("---- ALL ELEMENTS ----");
-            Futile.atlasManager.LogAllElementNames();
-            Plugin.Log("---- ELEMENTS NAMES END HERE ----");
-            Futile.atlasManager.LoadAtlas("atlases/fp_tail");
-            Futile.atlasManager.LoadAtlas("atlases/fp_head");
-            Futile.atlasManager.LoadAtlas("atlases/fp_arm");
-            //Futile.atlasManager.LoadImage("overseerHolograms/PebblesSlugHologram");
-            Futile.atlasManager.LoadAtlas("atlases/srs_head");
-            Futile.atlasManager.LoadAtlas("atlases/srs_tail");
-            Futile.atlasManager.LoadAtlas("atlases/nsh_head");
-            Futile.atlasManager.LoadAtlas("atlases/moon_head");
-            
-            
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex);
-            throw;
-        }
+        Futile.atlasManager.LoadAtlas("atlases/fp_tail_2");
+        Futile.atlasManager.LoadAtlas("atlases/fp_head");
+        // Futile.atlasManager.LoadAtlas("atlases/fp_arm");
+        //Futile.atlasManager.LoadImage("overseerHolograms/PebblesSlugHologram");
+        Futile.atlasManager.LoadAtlas("atlases/srs_head");
+        Futile.atlasManager.LoadAtlas("atlases/srs_tail");
+        Futile.atlasManager.LoadAtlas("atlases/nsh_head");
+        Futile.atlasManager.LoadAtlas("atlases/moon_head");
+        Futile.atlasManager.LoadAtlas("atlases/moon_dot");
     }
 
 
@@ -195,7 +208,7 @@ class Plugin : BaseUnityPlugin
             throw;
         }
 
-        if (DevMode && self.devToolsActive)
+        if (Options.DevMode.Value && self.devToolsActive)
         {
             // 按Y生成一个复活用的神经元
             if (Input.GetKeyDown(KeyCode.Y) && self.Players[0] != null && self.Players[0].realizedObject != null)

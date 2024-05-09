@@ -53,6 +53,7 @@ public class CustomLore
 
         fp.CustomLore.Apply();
         srs.CustomLore.Apply();
+        moon.CustomLore.Apply();
     }
 
 

@@ -28,6 +28,7 @@ public class PlayerModule
     public fp.PearlReader pearlReader;
     public _public.PlayerReviver playerReviver;
     public PlayerGraphics.AxolotlGills gills;
+    public bool isMoon = false;
 
 
     public PlayerModule(Player player, AbstractCreature abstractCreature, World world)
@@ -63,24 +64,37 @@ public class PlayerModule
         }
         else if (playerName == Enums.Moonname)
         {
-            // 最费劲的一集
-            swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
-            deathPreventer.swarmerManager = swarmerManager;
-            swarmerManager.deathPreventer = deathPreventer;
-            // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
-            swarmerManager.callBackSwarmers = Math.Min(world.game.GetDeathPersistent().MoonHasSwarmers + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer);
-            Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers, "last cycle swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
-            // gills = new PlayerGraphics.AxolotlGills(player.graphicsModule as PlayerGraphics, 13);
+            if (!world.game.IsArenaSession)
+            {
+                // 最费劲的一集
+                swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
+                deathPreventer.swarmerManager = swarmerManager;
+                swarmerManager.deathPreventer = deathPreventer;
+                // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
+                swarmerManager.callBackSwarmers = Math.Min(world.game.GetDeathPersistent().MoonHasSwarmers + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer);
+                Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers, "last cycle swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
+                // gills = new PlayerGraphics.AxolotlGills(player.graphicsModule as PlayerGraphics, 13);
+            }
+            isMoon = true;
         }
         else if (playerName == Enums.FPname)
         {
             pearlReader = new fp.PearlReader(player);
         }
-
+        else if (playerName == Enums.test)
+        {
+            // 只是方便我测试
+            isMoon = true;
+        }
     }
+
+
+
+
 
     public void Update(Player player, bool eu)
     {
+        if (player.SlugCatClass == Enums.Moonname) { isMoon = player.isRivulet; }
         if (spearExhaustCounter > 0)
         {
             spearExhaustCounter--;
@@ -95,9 +109,66 @@ public class PlayerModule
         nshInventory?.Update(eu);
         gravityController?.Update(eu, storyName == playerName);
 
-        
 
 
+
+
+        // 好好好 成功了
+        if (isMoon && player.animation == Player.AnimationIndex.StandOnBeam)
+        {
+            // 加快你的速度，让能后空翻这事显得更合理（？
+            if (player.input[0].x != 0)
+            {
+                player.mainBodyChunk.vel.x += Mathf.Sign(player.mainBodyChunk.vel.x) * 0.5f * player.slugcatStats.runspeedFac;
+            }
+            /*if (player.initSlideCounter > 10 && player.input[0].x != -player.slideDirection)
+            {
+                // 数学最有用的一集（。
+                player.mainBodyChunk.vel.x += Mathf.Log10(player.initSlideCounter - 9) * player.slideDirection;
+            }*/
+
+
+            // slideCounter 就是mod显示的Turn 急转能量
+            if (player.slideCounter > 0)
+            {
+                player.slideCounter++;
+                // 上了杆子之后slidedirection不会变 还得修这个。。
+                if (player.slideCounter > 20 || player.input[0].x != -player.slideDirection)
+                {
+                    player.slideCounter = 0;
+                }
+                float num = -Mathf.Sin((float)player.slideCounter / 20f * 3.1415927f * 0.5f) + 0.5f;
+                player.mainBodyChunk.vel.x += (num * 3.5f * (float)player.slideDirection - (float)player.slideDirection * ((num < 0f) ? 0.8f : 0.5f) * (player.isSlugpup ? 0.25f : 1f));
+                player.bodyChunks[1].vel.x += (num * 3.5f * (float)player.slideDirection + (float)player.slideDirection * 0.5f);
+            }
+            else if (player.input[0].x != 0)
+            {
+                if (player.input[0].x != player.slideDirection)
+                {
+                    if (player.initSlideCounter > 15 && player.mainBodyChunk.vel.x > 0f == player.slideDirection > 0 && Mathf.Abs(player.mainBodyChunk.vel.x) > 0.8f)
+                    {
+                        player.slideCounter = 1;
+                    }
+                    else
+                    {
+                        player.slideDirection = player.input[0].x;
+                    }
+                    player.initSlideCounter = 0;
+                    return;
+                }
+                if (player.initSlideCounter < 30)
+                {
+                    player.initSlideCounter++;
+                    return;
+                }
+            }
+            else if (player.initSlideCounter > 0)
+            {
+                player.initSlideCounter--;
+                return;
+            }
+
+        }
 
     }
 

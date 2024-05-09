@@ -55,6 +55,7 @@ public class MoonSwarmer : Creature
     public float revolveSpeed;
     public bool lastVisible;
     public Vector2 drift;
+    public Vector2? hoverAtPlayerPos;
 
     public float moveSpeed;
 
@@ -198,7 +199,11 @@ public class MoonSwarmer : Creature
                     FindDest();
                 }
 
-                if (inSameRoom && cantSeeCounter < 30
+                if (hoverAtPlayerPos != null)
+                {
+                    firstChunk.setPos = (Vector2)hoverAtPlayerPos;
+                }
+                else if (inSameRoom && cantSeeCounter < 30
                     && AI != null && AI.pathFinder != null && AI.pathFinder.CoordinateCost(player.abstractCreature.pos).legality < PathCost.Legality.Unwanted
                     // && Custom.DistLess(firstChunk.pos, player.mainBodyChunk.pos, 700f)
                     // && AI.VisualContact(player.abstractCreature.pos, 3f)

@@ -124,7 +124,7 @@ public class DeathPreventHooks
                     (physicalObj as Player).Stun(200);
                     physicalObj.room.AddObject(new CreatureSpasmer(physicalObj as Player, false, (physicalObj as Player).stun));
                     (physicalObj as Player).LoseAllGrasps();
-                    if (Plugin.DevMode)
+                    if (Options.DevMode.Value)
                     {
                         int maxfood = (physicalObj as Player).MaxFoodInStomach;
                         int food = (physicalObj as Player).FoodInStomach;
@@ -244,6 +244,8 @@ public class DeathPreventer
     public bool dontRevive = false;
     public bool forceRevive = false;
 
+    public int dangerGraspCounter = 0;
+
     public DeathPreventer(Player player) 
     { 
         this.player = player;
@@ -309,7 +311,18 @@ public class DeathPreventer
                 }
             }
         }*/
-        if (player.dangerGraspTime > 58)
+        bool g = false;
+        for (int i = player.grabbedBy.Count - 1; i >= 0; i--)
+        {
+            // 这我不好说嗷 不知道除了蛞蝓猫以外还有什么属于是危险生物
+            if (player.grabbedBy[i].grabber is not Player)
+            {
+                g = true;
+            }
+        }
+        if (g) dangerGraspCounter++; else dangerGraspCounter = 0;
+
+        if (dangerGraspCounter > 58)
         {
             TryPreventDeath(PlayerDeathReason.DangerGrasp);
         }

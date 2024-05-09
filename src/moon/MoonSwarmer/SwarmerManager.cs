@@ -11,6 +11,7 @@ using Caterators_by_syhnne.nsh;
 using static Caterators_by_syhnne.nsh.InventoryHUD;
 using static System.Net.Mime.MediaTypeNames;
 using System.Xml.Schema;
+using Fisobs.Core;
 
 namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
@@ -49,6 +50,8 @@ public class SwarmerManager
     private bool tryingToCallBack = false;
     private int teleportRetryCounter = 0;
     private int callBackRetryCounter = 0;
+
+    public int meditateTick = 0;
 
     public int hasSwarmers
     {
@@ -120,7 +123,7 @@ public class SwarmerManager
 
         if (tryingToCallBack)
         {
-            tryingToCallBack = !(CallBack() || callBackRetryCounter > 10);
+            tryingToCallBack = !(CallBack() || callBackRetryCounter > 3);
             Plugin.Log("trying to callback for", callBackRetryCounter, "times");
             callBackRetryCounter++;
         }
@@ -128,9 +131,9 @@ public class SwarmerManager
         {
             tryingToTeleport = !TryTeleportAllSwarmers();
             teleportRetryCounter++;
-            if (teleportRetryCounter > 15)
+            if (teleportRetryCounter > 10)
             {
-                Plugin.Log("retried for 15 times, trying to callback");
+                Plugin.Log("retried for 10 times, trying to callback");
                 tryingToCallBack = true;
                 tryingToTeleport = false;
             }
@@ -142,6 +145,8 @@ public class SwarmerManager
 
         if (weakMode)
         {
+            // 我想在虚弱模式下砍点移速，但不会砍，算了，算你们走运（背手离去
+            // player.dynamicRunSpeed[0] *= 0.9f;
             if (player.aerobicLevel > 0.95f)
             {
                 player.exhausted = true;
@@ -191,6 +196,24 @@ public class SwarmerManager
 
             }
         }
+
+        bool idle = player != null && player.room != null && callBackSwarmers == null && player.onBack == null && player.touchedNoInputCounter > 100;
+        foreach (AbstractCreature sw in swarmers)
+        {
+            if (!(sw.realizedCreature != null && (sw.realizedCreature as MoonSwarmer).inSameRoom))
+            {
+                // Plugin.Log("swarmers idle set to false because not in same room");
+                idle = false; break;
+            }
+        }
+        /*WorldCoordinate co = player.abstractCreature.pos;
+        if (player.room.GetTile(co).Solid) idle = false;
+        co.y--;
+        if (player.room.GetTile(co).Solid) idle = false;*/
+        if (!player.room.aimap.IsFreeSpace(player.abstractCreature.pos.Tile, 3)) idle = false;
+        IdleAtPlayerPos(idle? HoverAnimation.Circle : HoverAnimation.None);
+
+
         /*if (player.room != null && player.room.abstractRoom.shelter)
         {
             CallBack();
@@ -423,6 +446,50 @@ public class SwarmerManager
 
     }
 
+
+
+    public enum HoverAnimation
+    {
+        None,
+        Circle,
+
+    }
+
+
+    public void IdleAtPlayerPos(HoverAnimation ani)
+    {
+        meditateTick++;
+        for (int i = 0; i < swarmers.Count; i++)
+        {
+            switch (ani)
+            {
+                case HoverAnimation.Circle:
+                    if (swarmers[i].realizedCreature == null) continue;
+                    float num = 20f;
+                    float num2 = (float)this.meditateTick * 0.035f;
+                    if (i % 2 == 0)
+                    {
+                        num *= Mathf.Sin(num2);
+                    }
+                    else
+                    {
+                        num *= Mathf.Cos(num2);
+                    }
+                    float num3 = ((float)i * (6.2831855f / (float)swarmers.Count) + (float)this.meditateTick * 0.0035f);
+                    num3 %= 6.2831855f;
+                    float num4 = 90f + num;
+                    Vector2 vector = new(Mathf.Cos(num3) * num4 + player.firstChunk.pos.x, -Mathf.Sin(num3) * num4 + player.firstChunk.pos.y);
+                    Vector2 newPos = new(swarmers[i].realizedCreature.firstChunk.pos.x + (vector.x - swarmers[i].realizedCreature.firstChunk.pos.x) * 0.05f, swarmers[i].realizedCreature.firstChunk.pos.y + (vector.y - swarmers[i].realizedCreature.firstChunk.pos.y) * 0.05f);
+                    swarmers[i].realizedCreature.firstChunk.vel = Vector2.zero;
+                    (swarmers[i].realizedCreature as MoonSwarmer).hoverAtPlayerPos = newPos;
+                    break;
+                case HoverAnimation.None:
+                    (swarmers[i].realizedCreature as MoonSwarmer).hoverAtPlayerPos = null;
+                    break;
+            }
+        }
+    }
+			
 
 
 

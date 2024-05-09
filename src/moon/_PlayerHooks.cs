@@ -15,6 +15,8 @@ public class PlayerHooks
 
 
 
+
+
     public static void Apply()
     {
         
@@ -35,6 +37,10 @@ public class PlayerHooks
     {
         var result = orig(self);
         if (self.SlugCatClass == Enums.Moonname && Plugin.playerModules.TryGetValue(self, out var module) && module.swarmerManager != null && module.swarmerManager.agility)
+        {
+            result = true;
+        }
+        else if (self.SlugCatClass == Enums.Moonname && self.room != null && self.room.game.IsArenaSession)
         {
             result = true;
         }

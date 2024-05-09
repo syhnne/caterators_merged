@@ -29,7 +29,7 @@ public class GravityController : UpdatableAndDeletable
     public GravityController(Player player)
     {
         this.player = player;
-        unlocked = player.room.game.IsStorySession && player.room.game.IsCaterator() && player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended || Plugin.DevMode;
+        unlocked = player.room.game.IsStorySession && player.room.game.IsCaterator() && player.room.game.GetStorySession.saveState.deathPersistentSaveData.ascended || Options.DevMode.Value;
         /*if (player.room != null && player.room.abstractRoom.name == "SS_AI" && player.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding)
         {
             gravityBonus = 0;
