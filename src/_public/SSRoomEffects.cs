@@ -215,9 +215,9 @@ public class SSRoomEffects
             }
             orig(self, eu);
         }
-        catch
+        catch (Exception e) 
         {
-            // Plugin.LogException(ex);
+            Plugin.LogException(e);
         }
 
     }

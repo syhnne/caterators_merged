@@ -17,12 +17,12 @@
 		"auto_grab_batflies": false,
 		"back_spear": false,
 		"weight": [ 1.1, 0.9 ],
-		"lung_capacity": 1.8,
-		"walk_speed": 1.8,
-		"climb_speed": 1.8,
-		"tunnel_speed": 1.8,
-		"throw_skill": [ 1.0, 0.7 ],
-		"crouch_stealth": [ 1.0, 0.7 ],
+		"lung_capacity": 2.0,
+		"walk_speed": 2.0,
+		"climb_speed": 2.0,
+		"tunnel_speed": 2.0,
+		"throw_skill": 0.8,
+		"crouch_stealth": 0.8,
 
 
 
@@ -38,9 +38,9 @@
 		"world_state": [ "Spear" ],
 		"diet": {
 			"base": "Gourmand",
-			"meat": 0.25,
+			"meat": 0.5,
 			"corpses": 0.5,
-			"plants": 0.25,
+			"plants": 0.5,
 			"overrides": {
 			}
 		}

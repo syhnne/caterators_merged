@@ -65,16 +65,23 @@ internal class Options : OptionInterface
             { description = inGameTranslator.Translate(desc) }
         );
 
-        desc = "(FP)Explosion capacity ";
+        ypos += 120f;
+        Tabs[0].AddItems(
+            new OpLabelLong(new Vector2(xposLabel, ymax - yspacing - ypos), new Vector2(xmax - 100, 100), "  DevMode keybinds:<LINE>Y - spawn a green swarmer<LINE>U - Pause rain timer<LINE>T - Spawn a swarmer for moon if possible<LINE>H - Log all swarmers position<LINE>J - Teleport all swarmers to player<LINE>")
+        );
+
+
+        desc = "(FP)The maximum number of subsequent explosion actions player can perform before dying";
         ypos = 50f;
         try
         {
-            OpUpdown opUpDown = new OpUpdown(ExplosionCapacity, new Vector2(xposOpt, ymax - yspacing - ypos), 60f);
+            OpUpdown opUpDown = new OpUpdown(ExplosionCapacity, new Vector2(xposOpt, ymax - yspacing - ypos), 60f) { description = inGameTranslator.Translate(desc) };
             opUpDown.SetNextFocusable(UIfocusable.NextDirection.Left, FocusMenuPointer.GetPointer(FocusMenuPointer.MenuUI.CurrentTabButton));
             opUpDown.SetNextFocusable(UIfocusable.NextDirection.Right, opUpDown);
 
             Tabs[1].AddItems(
-            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("Explosion capacity")),
+            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("(FP)Explosion capacity"))
+            { description = inGameTranslator.Translate(desc) },
             opUpDown
             /*new OpSlider(ExplosionCapacity, new Vector2(xposOpt, ymax - yspacing - ypos), 360, false)
             {
@@ -92,7 +99,7 @@ internal class Options : OptionInterface
         desc = "(FP)The key to be pressed when crafting electric spears (if unspecified, hold [pickup] to craft)";
         ypos += 50f;
         Tabs[1].AddItems(
-            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("Crafting key"), false)
+            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("(FP)Crafting key"), false)
             { description = inGameTranslator.Translate(desc) },
             new OpKeyBinder(CraftKey, new Vector2(xposOpt, ymax - yspacing - ypos), new Vector2(50f, 10f), true, OpKeyBinder.BindController.AnyController)
             { description = inGameTranslator.Translate(desc) }
@@ -101,7 +108,7 @@ internal class Options : OptionInterface
         desc = "(NSH)The key to be pressed when adding/removing objects from inventory";
         ypos += 50f;
         Tabs[1].AddItems(
-            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("Inventory key"), false)
+            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("(NSH)Inventory key"), false)
             { description = inGameTranslator.Translate(desc) },
             new OpKeyBinder(InventoryKey, new Vector2(xposOpt, ymax - yspacing - ypos), new Vector2(50f, 10f), true, OpKeyBinder.BindController.AnyController)
             { description = inGameTranslator.Translate(desc) }

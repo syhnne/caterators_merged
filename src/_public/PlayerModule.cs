@@ -113,8 +113,16 @@ public class PlayerModule
 
 
 
-        // 好好好 成功了
-        if (isMoon && player.animation == Player.AnimationIndex.StandOnBeam)
+        // 以下是对于玩家机动性做得一些调整，只要给ismoon赋值为true就可以使用
+        if (!isMoon) return;
+        if (player.animation == Player.AnimationIndex.Flip)
+        {
+            if (player.input[0].x != 0)
+            {
+                player.mainBodyChunk.vel.x += 1.5f * player.slugcatStats.runspeedFac / (player.input[0].x * (Mathf.Abs(player.mainBodyChunk.vel.x) + 0.5f));
+            }
+        }
+        if (player.animation == Player.AnimationIndex.StandOnBeam)
         {
             // 加快你的速度，让能后空翻这事显得更合理（？
             if (player.input[0].x != 0)
@@ -145,7 +153,7 @@ public class PlayerModule
             {
                 if (player.input[0].x != player.slideDirection)
                 {
-                    if (player.initSlideCounter > 15 && player.mainBodyChunk.vel.x > 0f == player.slideDirection > 0 && Mathf.Abs(player.mainBodyChunk.vel.x) > 0.8f)
+                    if (player.initSlideCounter > (player.isRivulet? 10:15) && player.mainBodyChunk.vel.x > 0f == player.slideDirection > 0 && Mathf.Abs(player.mainBodyChunk.vel.x) > 0.8f)
                     {
                         player.slideCounter = 1;
                     }

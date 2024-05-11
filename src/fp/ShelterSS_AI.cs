@@ -303,8 +303,9 @@ public static class ShelterSS_AI
                         {
                             self.room.game.cameras[0].hud.jollyMeter.playerIcons[playerNumber].blinkRed = 20;
                         }
-                        catch
+                        catch (Exception e)
                         {
+                            Plugin.LogException(e);
                         }
                     }
                 }
@@ -378,6 +379,7 @@ public static class ShelterSS_AI
                         catch (Exception arg)
                         {
                             JollyCustom.Log(string.Format("Could not warp and revive player {0} [{1}]", abstractCreature, arg), false);
+                            Plugin.LogException(arg);
                         }
                     }
                 }

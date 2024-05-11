@@ -238,11 +238,7 @@ public class PlayerGraphicsModule
     {
         if (Plugin.playerModules.TryGetValue(self.player, out var module) && module.gills != null)
         {
-            try
-            {
-                module.gills?.ApplyPalette(sLeaser, rCam, palette);
-            }
-            catch { }
+            
 
             Color color2 = (ModManager.MSC && self.player.SlugCatClass == MoreSlugcatsEnums.SlugcatStatsName.Slugpup) ? self.player.ShortCutColor() : PlayerGraphics.SlugcatColor(self.CharacterForColor);
             if (self.malnourished > 0f)
@@ -275,6 +271,16 @@ public class PlayerGraphicsModule
             }
             module.gills.SetGillColors(color2, effectCol);
             module.gills.ApplyPalette(sLeaser, rCam, palette);
+
+            try
+            {
+                module.gills?.ApplyPalette(sLeaser, rCam, palette);
+            }
+            catch (Exception e) 
+            { 
+                Plugin.LogException(e); 
+                return;
+            }
         }
     }
 

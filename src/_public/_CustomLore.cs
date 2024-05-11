@@ -81,7 +81,7 @@ public class CustomLore
     // 但 这玩意儿刷新的及时吗
     private static bool SlugcatStats_SlugcatUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugcatStats.Name i, RainWorld rainWorld)
     {
-        if (ModManager.MSC && MoreSlugcats.MoreSlugcats.chtUnlockCampaigns.Value)
+        if (Options.DevMode.Value)
         {
             return true;
         }

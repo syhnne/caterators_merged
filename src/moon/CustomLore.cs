@@ -26,6 +26,9 @@ public class CustomLore
         {
             orig(self, eu);
         }
-        catch { }
+        catch (Exception e)
+        {
+            Plugin.LogException(e);
+        }
     }
 }

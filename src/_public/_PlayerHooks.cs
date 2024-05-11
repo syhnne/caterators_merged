@@ -222,9 +222,11 @@ public class PlayerHooks
             newRoom.game.GetDeathPersistent().CyclesFromLastEnterSSAI = 0;
             Plugin.Log("CyclesFromLastEnterSSAI CLEARED");
         }
-        else if (newRoom.abstractRoom.name == "SS_AI")
+        else if (newRoom.abstractRoom.name == "SS_AI" && newRoom.game.IsCaterator())
         {
             // TODO: 这里要不要这么写，有待商榷
+            // 我操，这是我给什么东西准备的代码啊，竟然连判定都没加就这么在这躺了两个月，，我查了半天ssoraclehooks那边都没找出来为啥我新开的黄猫档刚到fp那里他就认识我还要把我轰出去
+            // 这注释也是不说人话，我原来是准备写什么啊（恼）一点都不记得了已经
             if (newRoom.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad <= 0)
             {
                 newRoom.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad += 1;
@@ -299,7 +301,7 @@ public class PlayerHooks
         }
         else if (self.SlugCatClass == Enums.Moonname && Plugin.playerModules.TryGetValue(self, out var mod) && mod.swarmerManager != null)
         {
-            self.jumpBoost *= mod.swarmerManager.weakMode ? 0.9f : 1.1f;
+            self.jumpBoost *= mod.swarmerManager.weakMode ? 0.9f : 1.2f;
         }
 
 

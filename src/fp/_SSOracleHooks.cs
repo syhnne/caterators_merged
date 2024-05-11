@@ -60,20 +60,15 @@ public class SSOracleHooks
     private static void PebblesPearl_Update(On.PebblesPearl.orig_Update orig, PebblesPearl self, bool eu)
     {
         orig(self, eu);
-        /*if (self.hoverPos == null && self.oracle != null && self.oracle.room == self.room)
+        if (self.hoverPos == null && self.oracle != null && self.room != null && self.oracle.room != null && self.oracle.room == self.room)
         {
             if (!self.oracle.Consious) self.orbitObj = null;
-            // 写这个&&false 是因为我把console砍了
-            else if ((self.oracle.oracleBehavior as SSOracleBehavior).player != null && false)
+            else
             {
-                self.orbitObj = (self.oracle.oracleBehavior as SSOracleBehavior).player;
-            }
-            else 
-            { 
-                self.orbitObj = self.oracle; 
+                self.orbitObj = self.oracle;
             }
 
-        }*/
+        }
 
     }
 

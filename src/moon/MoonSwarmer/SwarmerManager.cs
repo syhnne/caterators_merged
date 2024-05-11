@@ -458,6 +458,11 @@ public class SwarmerManager
 
     public void IdleAtPlayerPos(HoverAnimation ani)
     {
+        if (callBackSwarmers != null || swarmers == null) { return; }
+        for (int i = 0; i < swarmers.Count; i++)
+        {
+            if ((swarmers[i].realizedCreature as MoonSwarmer).notInSameRoom) return;
+        }
         meditateTick++;
         for (int i = 0; i < swarmers.Count; i++)
         {

@@ -69,8 +69,11 @@ public class SSOracleHooks
     private static void SSOracleBehavior_ctor(On.SSOracleBehavior.orig_ctor orig, SSOracleBehavior self, Oracle oracle)
     {
         orig(self, oracle);
-        if (oracle.room.game.session is not StoryGameSession || !oracle.room.game.GetStorySession.saveState.IsCaterator()) return;
-        self.movementBehavior = SSOracleBehavior.MovementBehavior.Meditate;
+        if (oracle.room.game.IsCaterator())
+        {
+            self.movementBehavior = SSOracleBehavior.MovementBehavior.Meditate;
+        }
+        
 
     }
 
@@ -78,8 +81,7 @@ public class SSOracleHooks
 
     private static void SSOracleBehavior_UnconciousUpdate(On.SSOracleBehavior.orig_UnconciousUpdate orig, SSOracleBehavior self)
     {
-        if (self.oracle.room.game != null && self.oracle.room.game.IsStorySession && self.oracle.ID == Oracle.OracleID.SS
-            && self.oracle.room.game.IsCaterator())
+        if (self.oracle.ID == Oracle.OracleID.SS && self.oracle.room.game.IsCaterator())
         {
             self.FindPlayer();
             self.unconciousTick += 1f;
@@ -122,12 +124,14 @@ public class SSOracleHooks
     // 让fp无视你的大部分行为
     private static void SSOracleBehavior_SeePlayer(On.SSOracleBehavior.orig_SeePlayer orig, SSOracleBehavior self)
     {
+        Plugin.Log("SSOracleBehavior_SeePlayer", self.oracle.room.game.StoryCharacter);
         if (self.oracle.ID == Oracle.OracleID.SS && self.oracle.room.game.IsStorySession && self.oracle.room.game.IsCaterator())
         {
             self.NewAction(ActionID);
             self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad = 0;
         }
         else { orig(self); }
+        Plugin.Log("ssaithrowouts:", self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiThrowOuts);
     }
 
 
@@ -137,6 +141,7 @@ public class SSOracleHooks
 
     private static void SSOracleBehavior_NewAction(On.SSOracleBehavior.orig_NewAction orig, SSOracleBehavior self, SSOracleBehavior.Action nextAction)
     {
+        Plugin.Log("SSOracleBehavior next action:", nextAction);
         if (nextAction == ActionID)
         {
             if (self.currSubBehavior.ID == SubBehavID) return;
@@ -172,10 +177,6 @@ public class SSOracleHooks
 
             // 防止一切洗脑失败的情况（。）直接给你堵死。乐
             nextAction = ActionID;
-
-        }
-        else if (nextAction == ReviveSwarmerAction)
-        {
 
         }
         orig(self, nextAction);

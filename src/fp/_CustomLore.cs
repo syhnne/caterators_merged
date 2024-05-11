@@ -330,18 +330,15 @@ internal class CustomLore
 
 
     // 用于打开统计界面
-    // 对于没打真结局的玩家来说，飞升了和死了一样，都不能再点开了
     private static void Menu_SlugcatSelectMenu_ContinueStartedGame(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugcatStats.Name storyGameCharacter)
     {
-        if (storyGameCharacter == Enums.FPname)
+        if (storyGameCharacter == Enums.FPname && self.saveGameData[storyGameCharacter] != null)
         {
-            if (self.saveGameData[storyGameCharacter] == null) return;
-
             bool redsDeath = self.GetSaveGameData(self.slugcatPageIndex).redsDeath;
             bool altEnding = self.GetSaveGameData(self.slugcatPageIndex).altEnding;
             bool ascended = self.GetSaveGameData(self.slugcatPageIndex).ascended;
             int cycles = self.GetSaveGameData(self.slugcatPageIndex).cycle;
-            if ((!altEnding && cycles > Plugin.Cycles) || redsDeath || (!altEnding && ascended))
+            if ((!altEnding && !ascended && cycles > Plugin.Cycles) || redsDeath)
             {
                 self.redSaveState = self.manager.rainWorld.progression.GetOrInitiateSaveState(Enums.FPname, null, self.manager.menuSetup, false);
                 self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Statistics);

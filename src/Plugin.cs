@@ -67,6 +67,9 @@ class Plugin : BaseUnityPlugin
             Logger = base.Logger;
             instance = this;
             
+            // 虽然不知道这个wrapinit到底有什么魔力，但是我删了它之后整个游戏每一行挂了hook的代码都会给我报错，说我没权限访问。。
+            // 既然跑起来了，还是不要动了罢
+            // 说起来这大概就是整个mod最古老的一行代码了 它从slugbase给的模板就已经存在于此 一直保留到如今。。
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
             
@@ -79,8 +82,6 @@ class Plugin : BaseUnityPlugin
 
             On.RainWorldGame.Update += RainWorldGame_Update;
             On.World.GetNode += World_GetNode;
-            // On.PlayerGraphics.AxolotlGills.DrawSprites += test;
-            // On.PlayerGraphics.AxolotlGills.Update += test2;
 
 
             _public.PlayerHooks.Apply();
