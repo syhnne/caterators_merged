@@ -73,6 +73,9 @@ internal class PlayerHooks
         {
             ShelterSS_AI.Player_Update(self);
         }
+        // fp你是一只小猫咪（？
+        // 正经猫崽12f 大猫17f
+        self.bodyChunkConnections[0].distance = 14f;
     }
 
 
@@ -215,310 +218,309 @@ internal class PlayerHooks
     {
         // 卧槽 这代码啥时候写的
         // 这要是没写origself 以前玩炸猫的时候不卡bug吗
+        // 哈哈，太恐怖啦，其实我写了orig，但我以为我没写，于是写了两遍
         orig(self);
-        if (self.SlugCatClass == Enums.FPname)
+        if (self.SlugCatClass != Enums.FPname) { return; }
+
+        Room room = self.room;
+        bool flag = self.wantToJump > 0 && self.input[0].pckp;
+        bool flag2 = self.eatMeat >= 20 || self.maulTimer >= 15;
+        int explosionCapacity = Options.ExplosionCapacity.Value;
+        int num = Mathf.Max(1, explosionCapacity - 5);
+        if (self.pyroJumpCounter > 0 && (self.Consious || self.dead))
         {
-            Room room = self.room;
-            bool flag = self.wantToJump > 0 && self.input[0].pckp;
-            bool flag2 = self.eatMeat >= 20 || self.maulTimer >= 15;
-            int explosionCapacity = Options.ExplosionCapacity.Value;
-            int num = Mathf.Max(1, explosionCapacity - 5);
-            if (self.pyroJumpCounter > 0 && (self.Consious || self.dead))
+            self.pyroJumpCooldown -= 1f;
+            if (self.pyroJumpCooldown <= 0f)
             {
-                self.pyroJumpCooldown -= 1f;
-                if (self.pyroJumpCooldown <= 0f)
+                if (self.pyroJumpCounter >= num)
                 {
-                    if (self.pyroJumpCounter >= num)
-                    {
-                        self.pyroJumpCooldown = 40f;
-                    }
-                    else
-                    {
-                        self.pyroJumpCooldown = 60f;
-                    }
-                    self.pyroJumpCounter--;
-                }
-            }
-            self.pyroParryCooldown -= 1f;
-            if (self.pyroJumpCounter >= num)
-            {
-                if (Random.value < 0.25f)
-                {
-                    // 这应该是炸多了的冒烟效果
-                    self.room.AddObject(new Explosion.ExplosionSmoke(self.mainBodyChunk.pos, Custom.RNV() * 2f * Random.value, 1f));
-                }
-                if (Random.value < 0.5f)
-                {
-                    self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV(), Color.white, null, 4, 8));
-                }
-            }
-
-            if (flag
-                && !self.pyroJumpped
-                && self.canJump <= 0 && !flag2
-                && (self.input[0].y >= 0 || (self.input[0].y < 0 && (self.bodyMode == Player.BodyModeIndex.ZeroG || self.gravity <= 0.1f)))
-                && self.Consious && self.bodyMode != Player.BodyModeIndex.Crawl
-                && self.bodyMode != Player.BodyModeIndex.CorridorClimb
-                && self.bodyMode != Player.BodyModeIndex.ClimbIntoShortCut
-                && self.animation != Player.AnimationIndex.HangFromBeam
-                && self.animation != Player.AnimationIndex.ClimbOnBeam
-                && self.bodyMode != Player.BodyModeIndex.WallClimb
-                && self.bodyMode != Player.BodyModeIndex.Swimming
-                && self.animation != Player.AnimationIndex.AntlerClimb
-                && self.animation != Player.AnimationIndex.VineGrab
-                && self.animation != Player.AnimationIndex.ZeroGPoleGrab
-                && self.onBack == null)
-            {
-                self.pyroJumpped = true;
-                self.pyroJumpDropLock = 40;
-                self.noGrabCounter = 5;
-                Vector2 pos = self.firstChunk.pos;
-                // 这是正经爆炸效果罢
-                // 哦不，这是有烟无伤的二段跳
-                // 现在有伤害了，只要你在水里起跳，就会让附近生物触电，只不过没什么伤害
-
-
-                for (int i = 0; i < 8; i++)
-                {
-                    Vector2 vector = Custom.DegToVec(360f * Random.value);
-                    self.room.AddObject(new MouseSpark(pos + vector * 9f, self.firstChunk.vel + vector * 36f * Random.value, 20f, new Color(0.7f, 1f, 1f)));
-                }
-                self.room.AddObject(new Explosion.ExplosionLight(pos, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
-                for (int j = 0; j < 10; j++)
-                {
-                    Vector2 vector = Custom.RNV();
-                    self.room.AddObject(new Spark(pos + vector * Random.value * 40f, vector * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
-                }
-                self.room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, self.firstChunk.pos);
-                self.room.InGameNoise(new InGameNoise(pos, 8000f, self, 1f));
-                int num2 = Mathf.Max(1, explosionCapacity - 3);
-                if (self.Submersion <= 0.5f)
-                {
-                    self.room.AddObject(new UnderwaterShock(self.room, self, pos, 10, 500f, 0.5f, self, new Color(0.8f, 0.8f, 1f)));
-                }
-                if (self.bodyMode == Player.BodyModeIndex.ZeroG || self.room.gravity == 0f || self.gravity == 0f)
-                {
-                    float num3 = (float)self.input[0].x;
-                    float num4 = (float)self.input[0].y;
-                    while (num3 == 0f && num4 == 0f)
-                    {
-                        num3 = (float)(((double)Random.value <= 0.33) ? 0 : (((double)Random.value <= 0.5) ? 1 : -1));
-                        num4 = (float)(((double)Random.value <= 0.33) ? 0 : (((double)Random.value <= 0.5) ? 1 : -1));
-                    }
-                    self.bodyChunks[0].vel.x = 9f * num3;
-                    self.bodyChunks[0].vel.y = 9f * num4;
-                    self.bodyChunks[1].vel.x = 8f * num3;
-                    self.bodyChunks[1].vel.y = 8f * num4;
-                    self.pyroJumpCooldown = 150f;
-                    self.pyroJumpCounter++;
+                    self.pyroJumpCooldown = 40f;
                 }
                 else
                 {
-                    if (self.input[0].x != 0)
-                    {
-                        self.bodyChunks[0].vel.y = Mathf.Min(self.bodyChunks[0].vel.y, 0f) + 8f;
-                        self.bodyChunks[1].vel.y = Mathf.Min(self.bodyChunks[1].vel.y, 0f) + 7f;
-                        self.jumpBoost = 6f;
-                    }
-                    if (self.input[0].x == 0 || self.input[0].y == 1)
-                    {
-                        if (self.pyroJumpCounter >= num2)
-                        {
-                            self.bodyChunks[0].vel.y = 16f;
-                            self.bodyChunks[1].vel.y = 15f;
-                            self.jumpBoost = 10f;
-                        }
-                        else
-                        {
-                            self.bodyChunks[0].vel.y = 11f;
-                            self.bodyChunks[1].vel.y = 10f;
-                            self.jumpBoost = 8f;
-                        }
-                    }
-                    if (self.input[0].y == 1)
-                    {
-                        self.bodyChunks[0].vel.x = 8f * (float)self.input[0].x;
-                        self.bodyChunks[1].vel.x = 6f * (float)self.input[0].x;
-                    }
-                    else
-                    {
-                        self.bodyChunks[0].vel.x = 14f * (float)self.input[0].x;
-                        self.bodyChunks[1].vel.x = 12f * (float)self.input[0].x;
-                    }
-                    self.animation = Player.AnimationIndex.Flip;
-                    self.pyroJumpCounter++;
-                    self.pyroJumpCooldown = 150f;
-                    self.bodyMode = Player.BodyModeIndex.Default;
+                    self.pyroJumpCooldown = 60f;
                 }
-                if (self.pyroJumpCounter >= num2)
-                {
-                    self.Stun(60 * (self.pyroJumpCounter - (num2 - 1)));
-                }
-                if (self.pyroJumpCounter >= explosionCapacity)
-                {
-                    self.room.AddObject(new ShockWave(pos, 200f, 0.2f, 6, false));
-                    self.room.AddObject(new Explosion(self.room, self, pos, 7, 350f, 26.2f, 2f, 280f, 0.35f, self, 0.7f, 160f, 1f));
-                    self.room.ScreenMovement(new Vector2?(pos), default(Vector2), 1.3f);
-                    self.room.InGameNoise(new InGameNoise(pos, 9000f, self, 1f));
-                    self.Die();
-                }
-
-            }
-
-
-            else if (flag
-
-                && !flag2
-                && (self.input[0].y < 0 || self.bodyMode == Player.BodyModeIndex.Crawl)
-                && (self.canJump > 0 || self.input[0].y < 0) && self.Consious && !self.pyroJumpped && self.pyroParryCooldown <= 0f)
-            {
-                if (self.canJump <= 0)
-                {
-                    self.pyroJumpped = true;
-                    self.bodyChunks[0].vel.y = 8f;
-                    self.bodyChunks[1].vel.y = 6f;
-                    self.jumpBoost = 6f;
-                    self.forceSleepCounter = 0;
-                }
-                if (self.pyroJumpCounter <= num)
-                {
-                    self.pyroJumpCounter += 2;
-                }
-                else
-                {
-                    self.pyroJumpCounter++;
-                }
-                self.pyroParryCooldown = 40f;
-                self.pyroJumpCooldown = 150f;
-
-                Vector2 pos2 = self.firstChunk.pos;
-
-                for (int i = 0; i < 8; i++)
-                {
-                    Vector2 vector3 = Custom.DegToVec(360f * Random.value);
-                    self.room.AddObject(new MouseSpark(pos2 + vector3 * 9f, self.firstChunk.vel + vector3 * 36f * Random.value, 20f, new Color(0.7f, 1f, 1f)));
-                }
-
-
-                self.room.AddObject(new Explosion.ExplosionLight(pos2, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
-
-                for (int l = 0; l < 8; l++)
-                {
-                    Vector2 vector2 = Custom.RNV();
-                    self.room.AddObject(new Spark(pos2 + vector2 * Random.value * 40f, vector2 * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
-                }
-                self.room.AddObject(new ShockWave(pos2, 200f, 0.2f, 6, false));
-                self.room.AddObject(new ZapCoil.ZapFlash(pos2, 10f));
-                // player.room.PlaySound(SoundID.Flare_Bomb_Burn, pos2);
-                // player.room.PlaySound(SoundID.Zapper_Zap, pos2, 1f, 0.2f + 0.25f * Random.value);
-                self.room.PlaySound(SoundID.Zapper_Zap, pos2, 1f, 1f + 0.25f * Random.value);
-                // player.room.PlaySound(SoundID.Fire_Spear_Explode, pos2, 0.3f + Random.value * 0.3f, 0.5f + Random.value * 2f);
-                self.room.InGameNoise(new InGameNoise(pos2, 8000f, self, 1f));
-
-                if (self.room.Darkness(pos2) > 0f)
-                {
-                    self.room.AddObject(new LightSource(pos2, false, new Color(0.7f, 1f, 1f), self));
-                }
-
-                List<Weapon> list = new List<Weapon>();
-                for (int m = 0; m < self.room.physicalObjects.Length; m++)
-                {
-                    for (int n = 0; n < self.room.physicalObjects[m].Count; n++)
-                    {
-                        if (self.room.physicalObjects[m][n] is Weapon)
-                        {
-                            Weapon weapon = self.room.physicalObjects[m][n] as Weapon;
-                            if (weapon.mode == Weapon.Mode.Thrown && Custom.Dist(pos2, weapon.firstChunk.pos) < 300f)
-                            {
-                                list.Add(weapon);
-                            }
-                        }
-                        bool flag3;
-                        if (ModManager.CoopAvailable && !Custom.rainWorld.options.friendlyFire)
-                        {
-                            Player player = self.room.physicalObjects[m][n] as Player;
-                            flag3 = (player == null || player.isNPC);
-                        }
-                        else
-                        {
-                            flag3 = true;
-                        }
-                        bool flag4 = flag3;
-                        if (self.room.physicalObjects[m][n] is Creature && self.room.physicalObjects[m][n] != self && flag4)
-                        {
-                            Creature creature = self.room.physicalObjects[m][n] as Creature;
-                            if (Custom.Dist(pos2, creature.firstChunk.pos) < 200f && (Custom.Dist(pos2, creature.firstChunk.pos) < 60f || self.room.VisualContact(self.abstractCreature.pos, creature.abstractCreature.pos)))
-                            {
-                                self.room.socialEventRecognizer.WeaponAttack(null, self, creature, true);
-                                creature.SetKillTag(self.abstractCreature);
-                                if (creature is Scavenger)
-                                {
-                                    (creature as Scavenger).HeavyStun(80);
-                                    creature.Blind(400);
-                                }
-                                else
-                                {
-                                    creature.Stun(80);
-                                    creature.Blind(400);
-                                }
-                                creature.firstChunk.vel = Custom.DegToVec(Custom.AimFromOneVectorToAnother(pos2, creature.firstChunk.pos)) * 30f;
-                                if (creature is TentaclePlant)
-                                {
-                                    for (int num5 = 0; num5 < creature.grasps.Length; num5++)
-                                    {
-                                        creature.ReleaseGrasp(num5);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (self.Submersion >= 0.2f)
-                {
-                    self.room.AddObject(new UnderwaterShock(self.room, self, pos2, 10, 800f, 2f, self, new Color(0.8f, 0.8f, 1f)));
-                }
-                if (list.Count > 0 && self.room.game.IsArenaSession)
-                {
-                    self.room.game.GetArenaGameSession.arenaSitting.players[0].parries++;
-                }
-                for (int num6 = 0; num6 < list.Count; num6++)
-                {
-                    list[num6].ChangeMode(Weapon.Mode.Free);
-                    list[num6].firstChunk.vel = Custom.DegToVec(Custom.AimFromOneVectorToAnother(pos2, list[num6].firstChunk.pos)) * 20f;
-                    list[num6].SetRandomSpin();
-                }
-                int num7 = Mathf.Max(1, explosionCapacity - 3);
-                if (self.pyroJumpCounter >= num7)
-                {
-                    self.Stun(60 * (self.pyroJumpCounter - (num7 - 1)));
-                }
-                if (self.pyroJumpCounter >= explosionCapacity)
-                {
-                    self.room.AddObject(new ShockWave(pos2, 200f, 0.2f, 6, false));
-                    self.room.AddObject(new Explosion(self.room, self, pos2, 7, 350f, 26.2f, 2f, 280f, 0.35f, self, 0.7f, 160f, 1f));
-                    self.room.ScreenMovement(new Vector2?(pos2), default(Vector2), 1.3f);
-                    self.room.InGameNoise(new InGameNoise(pos2, 9000f, self, 1f));
-                    self.Die();
-                }
-            }
-
-
-            if (self.canJump > 0
-                || !self.Consious
-                || self.Stunned
-                || self.animation == Player.AnimationIndex.HangFromBeam
-                || self.animation == Player.AnimationIndex.ClimbOnBeam
-                || self.bodyMode == Player.BodyModeIndex.WallClimb
-                || self.animation == Player.AnimationIndex.AntlerClimb
-                || self.animation == Player.AnimationIndex.VineGrab
-                || self.animation == Player.AnimationIndex.ZeroGPoleGrab
-                || self.bodyMode == Player.BodyModeIndex.Swimming
-                || ((self.bodyMode == Player.BodyModeIndex.ZeroG || self.room.gravity <= 0.5f || self.gravity <= 0.5f) && (self.wantToJump == 0 || !self.input[0].pckp)))
-            {
-                self.pyroJumpped = false;
+                self.pyroJumpCounter--;
             }
         }
-        else { orig(self); }
+        self.pyroParryCooldown -= 1f;
+        if (self.pyroJumpCounter >= num)
+        {
+            if (Random.value < 0.25f)
+            {
+                // 这应该是炸多了的冒烟效果
+                self.room.AddObject(new Explosion.ExplosionSmoke(self.mainBodyChunk.pos, Custom.RNV() * 2f * Random.value, 1f));
+            }
+            if (Random.value < 0.5f)
+            {
+                self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV(), Color.white, null, 4, 8));
+            }
+        }
+
+        if (flag
+            && !self.pyroJumpped
+            && self.canJump <= 0 && !flag2
+            && (self.input[0].y >= 0 || (self.input[0].y < 0 && (self.bodyMode == Player.BodyModeIndex.ZeroG || self.gravity <= 0.1f)))
+            && self.Consious && self.bodyMode != Player.BodyModeIndex.Crawl
+            && self.bodyMode != Player.BodyModeIndex.CorridorClimb
+            && self.bodyMode != Player.BodyModeIndex.ClimbIntoShortCut
+            && self.animation != Player.AnimationIndex.HangFromBeam
+            && self.animation != Player.AnimationIndex.ClimbOnBeam
+            && self.bodyMode != Player.BodyModeIndex.WallClimb
+            && self.bodyMode != Player.BodyModeIndex.Swimming
+            && self.animation != Player.AnimationIndex.AntlerClimb
+            && self.animation != Player.AnimationIndex.VineGrab
+            && self.animation != Player.AnimationIndex.ZeroGPoleGrab
+            && self.onBack == null)
+        {
+            self.pyroJumpped = true;
+            self.pyroJumpDropLock = 40;
+            self.noGrabCounter = 5;
+            Vector2 pos = self.firstChunk.pos;
+            // 这是正经爆炸效果罢
+            // 哦不，这是有烟无伤的二段跳
+            // 现在有伤害了，只要你在水里起跳，就会让附近生物触电，只不过没什么伤害
+
+
+            for (int i = 0; i < 8; i++)
+            {
+                Vector2 vector = Custom.DegToVec(360f * Random.value);
+                self.room.AddObject(new MouseSpark(pos + vector * 9f, self.firstChunk.vel + vector * 36f * Random.value, 20f, new Color(0.7f, 1f, 1f)));
+            }
+            self.room.AddObject(new Explosion.ExplosionLight(pos, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
+            for (int j = 0; j < 10; j++)
+            {
+                Vector2 vector = Custom.RNV();
+                self.room.AddObject(new Spark(pos + vector * Random.value * 40f, vector * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
+            }
+            self.room.PlaySound(SoundID.Jelly_Fish_Tentacle_Stun, self.firstChunk.pos);
+            self.room.InGameNoise(new InGameNoise(pos, 8000f, self, 1f));
+            int num2 = Mathf.Max(1, explosionCapacity - 3);
+            if (self.Submersion <= 0.5f)
+            {
+                self.room.AddObject(new UnderwaterShock(self.room, self, pos, 10, 500f, 0.5f, self, new Color(0.8f, 0.8f, 1f)));
+            }
+            if (self.bodyMode == Player.BodyModeIndex.ZeroG || self.room.gravity == 0f || self.gravity == 0f)
+            {
+                float num3 = (float)self.input[0].x;
+                float num4 = (float)self.input[0].y;
+                while (num3 == 0f && num4 == 0f)
+                {
+                    num3 = (float)(((double)Random.value <= 0.33) ? 0 : (((double)Random.value <= 0.5) ? 1 : -1));
+                    num4 = (float)(((double)Random.value <= 0.33) ? 0 : (((double)Random.value <= 0.5) ? 1 : -1));
+                }
+                self.bodyChunks[0].vel.x = 9f * num3;
+                self.bodyChunks[0].vel.y = 9f * num4;
+                self.bodyChunks[1].vel.x = 8f * num3;
+                self.bodyChunks[1].vel.y = 8f * num4;
+                self.pyroJumpCooldown = 150f;
+                self.pyroJumpCounter++;
+            }
+            else
+            {
+                if (self.input[0].x != 0)
+                {
+                    self.bodyChunks[0].vel.y = Mathf.Min(self.bodyChunks[0].vel.y, 0f) + 8f;
+                    self.bodyChunks[1].vel.y = Mathf.Min(self.bodyChunks[1].vel.y, 0f) + 7f;
+                    self.jumpBoost = 6f;
+                }
+                if (self.input[0].x == 0 || self.input[0].y == 1)
+                {
+                    if (self.pyroJumpCounter >= num2)
+                    {
+                        self.bodyChunks[0].vel.y = 16f;
+                        self.bodyChunks[1].vel.y = 15f;
+                        self.jumpBoost = 10f;
+                    }
+                    else
+                    {
+                        self.bodyChunks[0].vel.y = 11f;
+                        self.bodyChunks[1].vel.y = 10f;
+                        self.jumpBoost = 8f;
+                    }
+                }
+                if (self.input[0].y == 1)
+                {
+                    self.bodyChunks[0].vel.x = 8f * (float)self.input[0].x;
+                    self.bodyChunks[1].vel.x = 6f * (float)self.input[0].x;
+                }
+                else
+                {
+                    self.bodyChunks[0].vel.x = 14f * (float)self.input[0].x;
+                    self.bodyChunks[1].vel.x = 12f * (float)self.input[0].x;
+                }
+                self.animation = Player.AnimationIndex.Flip;
+                self.pyroJumpCounter++;
+                self.pyroJumpCooldown = 150f;
+                self.bodyMode = Player.BodyModeIndex.Default;
+            }
+            if (self.pyroJumpCounter >= num2)
+            {
+                self.Stun(60 * (self.pyroJumpCounter - (num2 - 1)));
+            }
+            if (self.pyroJumpCounter >= explosionCapacity)
+            {
+                self.room.AddObject(new ShockWave(pos, 200f, 0.2f, 6, false));
+                self.room.AddObject(new Explosion(self.room, self, pos, 7, 350f, 26.2f, 2f, 280f, 0.35f, self, 0.7f, 160f, 1f));
+                self.room.ScreenMovement(new Vector2?(pos), default(Vector2), 1.3f);
+                self.room.InGameNoise(new InGameNoise(pos, 9000f, self, 1f));
+                self.Die();
+            }
+
+        }
+
+
+        else if (flag
+
+            && !flag2
+            && (self.input[0].y < 0 || self.bodyMode == Player.BodyModeIndex.Crawl)
+            && (self.canJump > 0 || self.input[0].y < 0) && self.Consious && !self.pyroJumpped && self.pyroParryCooldown <= 0f)
+        {
+            if (self.canJump <= 0)
+            {
+                self.pyroJumpped = true;
+                self.bodyChunks[0].vel.y = 8f;
+                self.bodyChunks[1].vel.y = 6f;
+                self.jumpBoost = 6f;
+                self.forceSleepCounter = 0;
+            }
+            if (self.pyroJumpCounter <= num)
+            {
+                self.pyroJumpCounter += 2;
+            }
+            else
+            {
+                self.pyroJumpCounter++;
+            }
+            self.pyroParryCooldown = 40f;
+            self.pyroJumpCooldown = 150f;
+
+            Vector2 pos2 = self.firstChunk.pos;
+
+            for (int i = 0; i < 8; i++)
+            {
+                Vector2 vector3 = Custom.DegToVec(360f * Random.value);
+                self.room.AddObject(new MouseSpark(pos2 + vector3 * 9f, self.firstChunk.vel + vector3 * 36f * Random.value, 20f, new Color(0.7f, 1f, 1f)));
+            }
+
+
+            self.room.AddObject(new Explosion.ExplosionLight(pos2, 200f, 1f, 4, new Color(0.7f, 1f, 1f)));
+
+            for (int l = 0; l < 8; l++)
+            {
+                Vector2 vector2 = Custom.RNV();
+                self.room.AddObject(new Spark(pos2 + vector2 * Random.value * 40f, vector2 * Mathf.Lerp(4f, 30f, Random.value), Color.white, null, 4, 18));
+            }
+            self.room.AddObject(new ShockWave(pos2, 200f, 0.2f, 6, false));
+            self.room.AddObject(new ZapCoil.ZapFlash(pos2, 10f));
+            // player.room.PlaySound(SoundID.Flare_Bomb_Burn, pos2);
+            // player.room.PlaySound(SoundID.Zapper_Zap, pos2, 1f, 0.2f + 0.25f * Random.value);
+            self.room.PlaySound(SoundID.Zapper_Zap, pos2, 1f, 1f + 0.25f * Random.value);
+            // player.room.PlaySound(SoundID.Fire_Spear_Explode, pos2, 0.3f + Random.value * 0.3f, 0.5f + Random.value * 2f);
+            self.room.InGameNoise(new InGameNoise(pos2, 8000f, self, 1f));
+
+            if (self.room.Darkness(pos2) > 0f)
+            {
+                self.room.AddObject(new LightSource(pos2, false, new Color(0.7f, 1f, 1f), self));
+            }
+
+            List<Weapon> list = new List<Weapon>();
+            for (int m = 0; m < self.room.physicalObjects.Length; m++)
+            {
+                for (int n = 0; n < self.room.physicalObjects[m].Count; n++)
+                {
+                    if (self.room.physicalObjects[m][n] is Weapon)
+                    {
+                        Weapon weapon = self.room.physicalObjects[m][n] as Weapon;
+                        if (weapon.mode == Weapon.Mode.Thrown && Custom.Dist(pos2, weapon.firstChunk.pos) < 300f)
+                        {
+                            list.Add(weapon);
+                        }
+                    }
+                    bool flag3;
+                    if (ModManager.CoopAvailable && !Custom.rainWorld.options.friendlyFire)
+                    {
+                        Player player = self.room.physicalObjects[m][n] as Player;
+                        flag3 = (player == null || player.isNPC);
+                    }
+                    else
+                    {
+                        flag3 = true;
+                    }
+                    bool flag4 = flag3;
+                    if (self.room.physicalObjects[m][n] is Creature && self.room.physicalObjects[m][n] != self && flag4)
+                    {
+                        Creature creature = self.room.physicalObjects[m][n] as Creature;
+                        if (Custom.Dist(pos2, creature.firstChunk.pos) < 200f && (Custom.Dist(pos2, creature.firstChunk.pos) < 60f || self.room.VisualContact(self.abstractCreature.pos, creature.abstractCreature.pos)))
+                        {
+                            self.room.socialEventRecognizer.WeaponAttack(null, self, creature, true);
+                            creature.SetKillTag(self.abstractCreature);
+                            if (creature is Scavenger)
+                            {
+                                (creature as Scavenger).HeavyStun(80);
+                                creature.Blind(400);
+                            }
+                            else
+                            {
+                                creature.Stun(80);
+                                creature.Blind(400);
+                            }
+                            creature.firstChunk.vel = Custom.DegToVec(Custom.AimFromOneVectorToAnother(pos2, creature.firstChunk.pos)) * 30f;
+                            if (creature is TentaclePlant)
+                            {
+                                for (int num5 = 0; num5 < creature.grasps.Length; num5++)
+                                {
+                                    creature.ReleaseGrasp(num5);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (self.Submersion >= 0.2f)
+            {
+                self.room.AddObject(new UnderwaterShock(self.room, self, pos2, 10, 800f, 2f, self, new Color(0.8f, 0.8f, 1f)));
+            }
+            if (list.Count > 0 && self.room.game.IsArenaSession)
+            {
+                self.room.game.GetArenaGameSession.arenaSitting.players[0].parries++;
+            }
+            for (int num6 = 0; num6 < list.Count; num6++)
+            {
+                list[num6].ChangeMode(Weapon.Mode.Free);
+                list[num6].firstChunk.vel = Custom.DegToVec(Custom.AimFromOneVectorToAnother(pos2, list[num6].firstChunk.pos)) * 20f;
+                list[num6].SetRandomSpin();
+            }
+            int num7 = Mathf.Max(1, explosionCapacity - 3);
+            if (self.pyroJumpCounter >= num7)
+            {
+                self.Stun(60 * (self.pyroJumpCounter - (num7 - 1)));
+            }
+            if (self.pyroJumpCounter >= explosionCapacity)
+            {
+                self.room.AddObject(new ShockWave(pos2, 200f, 0.2f, 6, false));
+                self.room.AddObject(new Explosion(self.room, self, pos2, 7, 350f, 26.2f, 2f, 280f, 0.35f, self, 0.7f, 160f, 1f));
+                self.room.ScreenMovement(new Vector2?(pos2), default(Vector2), 1.3f);
+                self.room.InGameNoise(new InGameNoise(pos2, 9000f, self, 1f));
+                self.Die();
+            }
+        }
+
+
+        if (self.canJump > 0
+            || !self.Consious
+            || self.Stunned
+            || self.animation == Player.AnimationIndex.HangFromBeam
+            || self.animation == Player.AnimationIndex.ClimbOnBeam
+            || self.bodyMode == Player.BodyModeIndex.WallClimb
+            || self.animation == Player.AnimationIndex.AntlerClimb
+            || self.animation == Player.AnimationIndex.VineGrab
+            || self.animation == Player.AnimationIndex.ZeroGPoleGrab
+            || self.bodyMode == Player.BodyModeIndex.Swimming
+            || ((self.bodyMode == Player.BodyModeIndex.ZeroG || self.room.gravity <= 0.5f || self.gravity <= 0.5f) && (self.wantToJump == 0 || !self.input[0].pckp)))
+        {
+            self.pyroJumpped = false;
+        }
 
     }
 

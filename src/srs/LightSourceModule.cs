@@ -99,16 +99,16 @@ public class LightSourceModule
             new SRSLightSource(this)
             {
                 requireUpKeep = true,
-                setRad = new float?(player.Malnourished? 300f : 700f),
-                setAlpha = new float?(player.Malnourished? 1f : 3f),
+                setRad = player.Malnourished? 300f : 700f,
+                setAlpha = player.Malnourished? 1f : 3f,
                 fadeWithSun = false,
                 affectedByPaletteDarkness = 0.1f,
             },
             new LightSource(player.mainBodyChunk.pos, false, Color.Lerp(PlayerGraphicsModule.spearColor, PlayerGraphicsModule.bodyColor, 0.9f), player)
             {
                 requireUpKeep = true,
-                setRad = new float?(100f),
-                setAlpha = new float?(player.Malnourished? 0.1f : 0.2f),
+                setRad = 100f,
+                setAlpha = player.Malnourished? 0.1f : 0.2f,
                 fadeWithSun = false,
                 flat = true,
                 affectedByPaletteDarkness = 0.3f,
@@ -154,6 +154,7 @@ public class LightSourceModule
                     lightSources[i].stayAlive = true;
                     lightSources[i].setPos = new Vector2?(player.mainBodyChunk.pos);
                     lightSources[i].rad = LightSourceRad(i);
+                    lightSources[i].setAlpha = LightSourceAlpha(i);
                     // 懂了 下面这句话才是让灯光跟随玩家的关键
                     if (lightSources[i].room != player.room)
                     {
@@ -182,7 +183,7 @@ public class LightSourceModule
                 Mathf.Lerp(
                     player.Malnourished? 300f:700f, 
                     0f, 
-                    0.25f * Mathf.Clamp(player.Hypothermia, 0f, 4f)), 
+                    0.1f * Mathf.Clamp(player.Hypothermia, 0f, 10f)), 
                 0f, 
                 deletionCounter * 0.01f);
 
@@ -192,6 +193,32 @@ public class LightSourceModule
             return Mathf.Lerp(
                 Mathf.Lerp(
                     100f,
+                    0f,
+                    0.1f * Mathf.Clamp(player.Hypothermia, 0f, 10f)),
+                0f,
+                deletionCounter * 0.01f);
+        }
+        else { return 0f; }
+    }
+
+    public float LightSourceAlpha(int index)
+    {
+        if (index == 0)
+        {
+            return Mathf.Lerp(
+                Mathf.Lerp(
+                    player.Malnourished ? 1f : 3f,
+                    0f,
+                    0.25f * Mathf.Clamp(player.Hypothermia, 0f, 4f)),
+                0f,
+                deletionCounter * 0.01f);
+
+        }
+        else if (index == 1)
+        {
+            return Mathf.Lerp(
+                Mathf.Lerp(
+                    player.Malnourished ? 0.1f : 0.2f,
                     0f,
                     0.25f * Mathf.Clamp(player.Hypothermia, 0f, 4f)),
                 0f,

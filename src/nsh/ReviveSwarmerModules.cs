@@ -21,15 +21,6 @@ public class ReviveSwarmerModules
     public static Color NSHswarmerColor = new Color(0f, 1f, 0.3f);
     public const int MaxActivateTime = 280;
 
-    public class ReviveSwarmerCreatureSelector : UpdatableAndDeletable
-    {
-        public ReviveSwarmerCreatureSelector(Room room) 
-        { 
-            this.room = room;
-        }
-
-
-    }
 
 
 

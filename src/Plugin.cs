@@ -18,6 +18,7 @@ using EffExt;
 using System.Net.Configuration;
 using static Caterators_by_syhnne.srs.OxygenMaskModules;
 using DevInterface;
+using Menu;
 
 // TODO: 阿西吧 我还得检查探险模式有没有bug 太难顶了
 // 这个mod的大部分工程量都在于防止有人在酒吧里点炒饭。。。（
@@ -25,7 +26,7 @@ using DevInterface;
 namespace Caterators_by_syhnne;
 
 
-
+// TODO: 解决一下食肉猫没法把队友尸体扛回家的问题
 
 
 
@@ -72,7 +73,8 @@ class Plugin : BaseUnityPlugin
             // 说起来这大概就是整个mod最古老的一行代码了 它从slugbase给的模板就已经存在于此 一直保留到如今。。
             On.RainWorld.OnModsInit += Extras.WrapInit(LoadResources);
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
-            
+            On.RainWorld.PostModsInit += RainWorld_PostModsInit;
+
 
 
             Content.Register(new OxygenMaskModules.OxygenMaskFisob());
@@ -81,6 +83,8 @@ class Plugin : BaseUnityPlugin
 
 
             On.RainWorldGame.Update += RainWorldGame_Update;
+            
+            On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
             On.World.GetNode += World_GetNode;
 
 
@@ -128,6 +132,17 @@ class Plugin : BaseUnityPlugin
     }
 
 
+
+    // 在onmodsinit上面读不到slugbase数据，只能写这儿了。这个应该可以保证，在这里加上去的所有函数都在slugbase方法之后执行，所以要是改那个The估计也可以在这改（？
+    private void RainWorld_PostModsInit(On.RainWorld.orig_PostModsInit orig, RainWorld self)
+    {
+        orig(self);
+        On.Menu.SlugcatSelectMenu.SetSlugcatColorOrder += SlugcatSelectMenu_SetSlugcatColorOrder;
+    }
+
+
+
+
     private void LoadResources(RainWorld rainWorld)
     {
         Futile.atlasManager.LoadAtlas("atlases/fp_tail_2");
@@ -147,6 +162,7 @@ class Plugin : BaseUnityPlugin
     // 不过能输出日志总归是好的……
     public static void Log(params object[] text)
     {
+        if (!ShowLogs) return;
         string log = "[syhnne.caterators] : ";
         foreach (object s in text)
         {
@@ -181,16 +197,61 @@ class Plugin : BaseUnityPlugin
 
 
 
+    // 防止选中剧情角色之后又在设置里面关掉devmode引发问题
+    private static void SlugcatSelectMenu_ctor(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
+    {
+
+        SlugcatStats.Name n = manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat;
+        if (!Options.DevMode.Value && n != null && Enums.IsCaterator(n))
+        {
+            manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat = SlugcatStats.Name.White;
+        }
+
+        orig(self, manager);
+
+    }
 
 
 
 
+    // 用来去掉剧情（
+
+    private static void SlugcatSelectMenu_SetSlugcatColorOrder(On.Menu.SlugcatSelectMenu.orig_SetSlugcatColorOrder orig, SlugcatSelectMenu self)
+    {
+        orig(self);
 
 
+        List<SlugcatStats.Name> newNames = new();
+        foreach (SlugcatStats.Name n in self.slugcatColorOrder)
+        {
+            if (!Enums.IsCaterator(n) && n != Enums.test) { newNames.Add(n); }
+            
+        }
+
+        // 只在开发者模式下解锁剧情
+        if (Options.DevMode.Value)
+        {
+            newNames.Add(Enums.FPname);
+            newNames.Add(Enums.SRSname);
+            newNames.Add(Enums.NSHname);
+            newNames.Add(Enums.Moonname);
+        }
+
+        self.slugcatColorOrder = newNames;
 
 
+        for (int i = 0; i < self.slugcatColorOrder.Count; i++)
+        {
+            if (self.slugcatColorOrder[i] == self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat)
+            {
+                self.slugcatPageIndex = i;
+                return;
+            }
+        }
 
 
+        
+    }
 
 
 

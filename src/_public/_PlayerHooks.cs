@@ -179,6 +179,7 @@ public class PlayerHooks
         // 好像按太快了就会出问题
         try
         {
+            Plugin.Log(self.SlugCatClass, "hypothermia:", self.Hypothermia);
             // 谨记，挂在playermodule里面的东西，一律在playermodule那里进行update
             // 由于我刚搬运代码的时候乱写，我两周了才发现gravityController每帧update两次
             bool getModule = Plugin.playerModules.TryGetValue(self, out var module);
@@ -192,6 +193,8 @@ public class PlayerHooks
 
             if (self.SlugCatClass == Enums.FPname) { fp.PlayerHooks.Player_Update(self, eu, module.IsMyStory); }
             else if (self.SlugCatClass == Enums.SRSname) { srs.PlayerHooks.Player_Update(self, eu); }
+
+            
         }
         catch (Exception e)
         {

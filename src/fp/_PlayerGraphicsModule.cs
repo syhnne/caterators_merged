@@ -15,6 +15,36 @@ public class PlayerGraphicsModule
     private static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, 5, 6, 7, 8, 9, };
     private const string tailAtlasName = "fp_tail_2";
 
+
+
+
+
+    public static void PlayerGraphics_ctor(PlayerGraphics self, PhysicalObject ow)
+    {
+        // 这个数据回头再改（
+        if (self.player.playerState.isPup)
+        {
+            self.tail[0] = new TailSegment(self, 6f, 2f, null, 0.85f, 1f, 1f, true);
+            self.tail[1] = new TailSegment(self, 4f, 3.5f, self.tail[0], 0.85f, 1f, 0.5f, true);
+            self.tail[2] = new TailSegment(self, 2.5f, 3.5f, self.tail[1], 0.85f, 1f, 0.5f, true);
+            self.tail[3] = new TailSegment(self, 1f, 3.5f, self.tail[2], 0.85f, 1f, 0.5f, true);
+        }
+        else
+        {
+            self.tail[0] = new TailSegment(self, 6f, 3f, null, 0.85f, 1f, 1f, true);
+            self.tail[1] = new TailSegment(self, 4f, 6f, self.tail[0], 0.85f, 1f, 0.5f, true);
+            self.tail[2] = new TailSegment(self, 2.5f, 5.5f, self.tail[1], 0.85f, 1f, 0.5f, true);
+            self.tail[3] = new TailSegment(self, 1f, 5f, self.tail[2], 0.85f, 1f, 0.5f, true);
+        }
+
+    }
+
+
+
+
+
+
+
     public static void InitiateSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
         sLeaser.RemoveAllSpritesFromContainer();
@@ -152,7 +182,7 @@ public class PlayerGraphicsModule
         {
             if (i == 13)
             {
-                rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[i]);
+                rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground").AddChild(sLeaser.sprites[i]);
             }
             else if (i == self.gownIndex)
             {
@@ -205,7 +235,11 @@ public class PlayerGraphicsModule
 
             }
         }
+        
 
+
+        // 尾巴是电量指示器（？
+        // 这个算法不够丝滑，有空的话还是改改
         sLeaser.sprites[13].alpha = Mathf.Lerp(sLeaser.sprites[13].alpha, 1 / (float)self.player.pyroJumpCounter, 0.05f);
         Vector2 vector = Vector2.Lerp(self.drawPositions[0, 1], self.drawPositions[0, 0], timeStacker);
         Vector2 vector2 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
@@ -236,6 +270,15 @@ public class PlayerGraphicsModule
             num4 = self.tail[i].StretchedRad;
             vector4 = vector5;
         }
+
+
+        // 体型比正常蛞蝓猫小一点（
+        float num = 0.5f + 0.5f * Mathf.Sin(Mathf.Lerp(self.lastBreath, self.breath, timeStacker) * 3.1415927f * 2f);
+        float num2 = Mathf.InverseLerp(0.3f, 0.5f, Mathf.Abs(Custom.DirVec(vector2, vector).y));
+        
+        // sLeaser.sprites[0].scaleX = 0.95f + Mathf.Lerp(Mathf.Lerp(Mathf.Lerp(-0.05f, -0.15f, self.malnourished), 0.05f, num) * num2, 0.15f, self.player.sleepCurlUp);
+        // sLeaser.sprites[1].scaleX = 0.9f + self.player.sleepCurlUp * 0.2f + 0.05f * num - 0.05f * self.malnourished;
+        sLeaser.sprites[3].scaleX *= 0.9f + 0.1f;
     }
 
 

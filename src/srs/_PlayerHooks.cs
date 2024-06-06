@@ -1,31 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using BepInEx;
-using UnityEngine;
-using SlugBase.Features;
-using static SlugBase.Features.FeatureTypes;
-using System.Drawing.Text;
-using RWCustom;
-using Noise;
-using MoreSlugcats;
-using BepInEx.Logging;
-using Smoke;
-using Random = UnityEngine.Random;
-using Mono.Cecil.Cil;
+﻿using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using Menu.Remix.MixedUI;
-using System.ComponentModel;
-using SlugBase.DataTypes;
-using MonoMod.RuntimeDetour;
-using System.Reflection;
-using SlugBase.SaveData;
-using SlugBase;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing.Imaging;
+using MoreSlugcats;
+using RWCustom;
+using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Caterators_by_syhnne.srs;
 
@@ -82,19 +61,21 @@ public static class PlayerHooks
             }
         }
 
+        // 这玩意太升血压了
         if (!player.Malnourished && player.Submersion > 0.2f && player.room.abstractRoom.name != "SB_L01" && player.room.abstractRoom.name != "FR_FINAL")
         {
-            player.Hypothermia += 0.03f * player.Submersion;
-            if (player.room.roomSettings.DangerType != MoreSlugcatsEnums.RoomRainDangerType.Blizzard && player.Hypothermia > 1.9f)
+            player.Hypothermia += 0.05f * player.Submersion;
+            if (player.Hypothermia > 2f)
             {
-                Plugin.Log("waterdeath");
-                Vector2 vector = Vector2.Lerp(player.firstChunk.pos, player.firstChunk.lastPos, 0.35f);
-                room.InGameNoise(new InGameNoise(vector, 8000f, player, 1f));
-                player.Die();
+                player.Hypothermia += 0.05f;
             }
+            
         }
 
-
+        if (player.Hypothermia > 5f)
+        {
+            player.Blink(3);
+        }
         // 咋说，这玩意儿应该不能被放在肚子里，这很奇怪（
         // if (player.objectInStomach is OxygenMaskModules.OxygenMaskAbstract) { return; }
 
@@ -182,7 +163,6 @@ public static class PlayerHooks
     public static void Apply()
     {
         
-        
 
         On.Player.ClassMechanicsSpearmaster += Player_ClassMechanicsSpearmaster;
         On.Player.Grabability += Player_Grabability;
@@ -192,7 +172,62 @@ public static class PlayerHooks
         On.Spear.DrawSprites += Spear_DrawSprites;
         On.PlayerGraphics.TailSpeckles.setSpearProgress += TailSpeckles_setSpearProgress;
         On.BigSpiderAI.IUseARelationshipTracker_UpdateDynamicRelationship += IUseARelationshipTracker_UpdateDynamicRelationship;
+        IL.Creature.HypothermiaUpdate += IL_Creature_HypothermiaUpdate;
+        On.Creature.HypothermiaUpdate += Creature_HypothermiaUpdate;
     }
+
+
+    private static void Creature_HypothermiaUpdate(On.Creature.orig_HypothermiaUpdate orig, Creature self)
+    {
+        orig(self);
+        if ( !(self.room.blizzardGraphics != null && self.room.roomSettings.DangerType == MoreSlugcatsEnums.RoomRainDangerType.Blizzard && self.room.world.rainCycle.CycleProgression > 0f) && self is Player && (self as Player).SlugCatClass == Enums.SRSname)
+        {
+            if (self.Hypothermia >= 8f && self.Consious && self.room != null && !self.room.abstractRoom.shelter)
+            {
+                if (self.HypothermiaStunDelayCounter < 0)
+                {
+                    int st = (int)Mathf.Lerp(5f, 60f, Mathf.Pow(self.Hypothermia / 2f, 8f));
+                    self.HypothermiaStunDelayCounter = (int)Random.Range(300f - self.Hypothermia * 120f, 500f - self.Hypothermia * 100f);
+                    self.Stun(st);
+                }
+            }
+            if (self.Hypothermia >= 5f && (float)self.stun > 50f && !self.dead)
+            {
+                self.Die();
+                return;
+            }
+        }
+    }
+
+
+
+
+    // 真纳闷，他为啥闲的没事在这里卡个2f，除了给我添堵以外还有什么用吗
+    private static void IL_Creature_HypothermiaUpdate(ILContext il)
+    {
+        // 444 返回true强制跳过赋值
+        ILCursor c1 = new ILCursor(il);
+        if (c1.TryGotoNext(MoveType.After,
+            i => i.MatchLdarg(0),
+            i => i.Match(OpCodes.Callvirt),
+            i => i.MatchRet(),
+            i => i.MatchLdarg(0),
+            i => i.Match(OpCodes.Call)
+            ))
+        {
+            c1.Emit(OpCodes.Ldarg_0);
+            c1.EmitDelegate<Func<float, Creature, float>>((orig, creature) =>
+            {
+                if (creature is Player && (creature as Player).SlugCatClass == Enums.SRSname)
+                {
+                    orig = 0f;
+                }
+                return orig;
+            });
+        }
+    }
+
+
 
 
 

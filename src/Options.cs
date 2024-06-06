@@ -56,7 +56,7 @@ internal class Options : OptionInterface
             { description = inGameTranslator.Translate(desc) }
         );
 
-        desc = "Developer Mode (unlock all characters, enables gravity control, disables some functions that make the game harder, etc)";
+        desc = "Developer Mode (enables story mode(wip), enables gravity control, makes the game easier, etc. Use at your own risk.)";
         ypos += 50f;
         Tabs[0].AddItems(
             new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("DevMode"), false)
@@ -65,10 +65,13 @@ internal class Options : OptionInterface
             { description = inGameTranslator.Translate(desc) }
         );
 
-        ypos += 120f;
-        Tabs[0].AddItems(
-            new OpLabelLong(new Vector2(xposLabel, ymax - yspacing - ypos), new Vector2(xmax - 100, 100), "  DevMode keybinds:<LINE>Y - spawn a green swarmer<LINE>U - Pause rain timer<LINE>T - Spawn a swarmer for moon if possible<LINE>H - Log all swarmers position<LINE>J - Teleport all swarmers to player<LINE>")
-        );
+        if (Plugin.ShowLogs)
+        {
+            ypos += 120f;
+            Tabs[0].AddItems(
+                new OpLabelLong(new Vector2(xposLabel, ymax - yspacing - ypos), new Vector2(xmax - 100, 100), "  -beta-<LINE>  DevMode keybinds:<LINE>Y - spawn a green swarmer<LINE>U - Pause rain timer<LINE>T - Spawn a swarmer for moon if possible<LINE>H - Log all swarmers position<LINE>J - Teleport all swarmers to player<LINE>")
+            );
+        }
 
 
         desc = "(FP)The maximum number of subsequent explosion actions player can perform before dying";

@@ -30,14 +30,14 @@ public class PlayerGraphicsModule
     public static void PlayerGraphics_ctor(PlayerGraphics self, PhysicalObject ow)
     {
         self.tailSpecks = new PlayerGraphics.TailSpeckles(self, ModManager.MSC ? 13 : 12);
-
+        self.bodyPearl = new PlayerGraphics.CosmeticPearl(self, (ModManager.MSC? 13 : 12) + self.tailSpecks.numberOfSprites);
         // 这个数据回头再改（
         if (self.player.playerState.isPup)
         {
             self.tail[0] = new TailSegment(self, 7f, 2f, null, 0.85f, 1f, 1f, true);
-            self.tail[1] = new TailSegment(self, 5f, 3.5f, self.tail[0], 0.85f, 1f, 0.5f, true);
-            self.tail[2] = new TailSegment(self, 4f, 3.5f, self.tail[1], 0.85f, 1f, 0.5f, true);
-            self.tail[3] = new TailSegment(self, 2f, 3.5f, self.tail[2], 0.85f, 1f, 0.5f, true);
+            self.tail[1] = new TailSegment(self, 6f, 3.5f, self.tail[0], 0.85f, 1f, 0.5f, true);
+            self.tail[2] = new TailSegment(self, 4.5f, 3.5f, self.tail[1], 0.85f, 1f, 0.5f, true);
+            self.tail[3] = new TailSegment(self, 2.5f, 3.5f, self.tail[2], 0.85f, 1f, 0.5f, true);
         }
         else
         {
@@ -62,7 +62,7 @@ public class PlayerGraphicsModule
             self.AddToContainer(sLeaser, rCam, null);*/
 
         sLeaser.RemoveAllSpritesFromContainer();
-        sLeaser.sprites = new FSprite[13 + self.tailSpecks.numberOfSprites];
+        sLeaser.sprites = new FSprite[13 + self.tailSpecks.numberOfSprites + self.bodyPearl.numberOfSprites];
 
         sLeaser.sprites[0] = new FSprite("BodyA", true);
         sLeaser.sprites[0].anchorY = 0.7894737f;
@@ -144,6 +144,7 @@ public class PlayerGraphicsModule
 
         self.tailSpecks.InitiateSprites(sLeaser, rCam);
         self.gown.InitiateSprite(self.gownIndex, sLeaser, rCam);
+        self.bodyPearl.InitiateSprites(sLeaser, rCam);
 
         // 太烧脑了，我终于懂了，0-11是原版sprite，12是msc加的那个gown，13开始才是我需要的
 
@@ -165,14 +166,30 @@ public class PlayerGraphicsModule
         }*/
         // self.tailSpecks.AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("Midground"));
 
-        
+
         // Plugin.Log("srs_add to container");
-        
+
         sLeaser.RemoveAllSpritesFromContainer();
+
+        // 这基本上就是把RemoveAllSpritesFromContainer()重写一遍，只不过加了null检查
+        /*for (int i = 0; i < sLeaser.sprites.Length; i++)
+        {
+            sLeaser.sprites[i]?.RemoveFromContainer();
+        }
+
+        if (sLeaser.containers != null)
+        {
+            for (int j = 0; j < sLeaser.containers.Length; j++)
+            {
+                sLeaser.containers[j]?.RemoveFromContainer();
+            }
+        }*/
+
+
         newContatiner ??= rCam.ReturnFContainer("Midground");
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
-            if (i >= self.tailSpecks.startSprite && i < self.tailSpecks.startSprite + self.tailSpecks.numberOfSprites)
+            if (i >= self.tailSpecks.startSprite && i < self.tailSpecks.startSprite + self.tailSpecks.numberOfSprites + self.bodyPearl.numberOfSprites)
             {
                 // 可喜可贺，输出日志显示玩家在背上的时候这个函数每帧都被调用一次，那么问题就很好解决了
                 rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground").AddChild(sLeaser.sprites[i]);
@@ -181,6 +198,8 @@ public class PlayerGraphicsModule
             {
                 newContatiner = rCam.ReturnFContainer("Items");
                 newContatiner.AddChild(sLeaser.sprites[i]);
+                // 没看懂游戏自己的代码写2和3上面啥意思，是单纯地为了只添加一次吗
+                // self.bodyPearl.AddToContainer(sLeaser, rCam, rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground"));
             }
             else
             {
@@ -204,7 +223,11 @@ public class PlayerGraphicsModule
 
     public static void DrawSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
-        self.tailSpecks.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+        if (self.player.room != null)
+        {
+            self.tailSpecks.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            self.bodyPearl.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+        }
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             if (i == 2)
@@ -223,7 +246,7 @@ public class PlayerGraphicsModule
     // 如果能让贴图不按正片叠底混合，而是覆盖在原本的颜色之上，那我简直用不着动这个函数
     public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
     {
-
+        self.bodyPearl.ApplyPalette(sLeaser, rCam, palette);
     }
 
 
