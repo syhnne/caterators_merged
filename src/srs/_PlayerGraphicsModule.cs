@@ -12,7 +12,7 @@ namespace Caterators_by_syhnne.srs;
 
 public class PlayerGraphicsModule
 {
-
+    internal static readonly Color spearColorDark = new Color(0.7f, 0.1f, 0.05f);
     internal static readonly Color spearColor = new Color(1f, 0.2f, 0.1f);
     internal static readonly Color32 bodyColor = new Color32(255, 207, 88, 255);
     internal static readonly List<int> ColoredBodyParts = new List<int>() { 2, 3, };
@@ -247,6 +247,7 @@ public class PlayerGraphicsModule
     public static void ApplyPalette(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
     {
         self.bodyPearl.ApplyPalette(sLeaser, rCam, palette);
+        
     }
 
 
@@ -330,7 +331,7 @@ public class PlayerGraphicsModule
             {
                 for (int j = 0; j < self.lines; j++)
                 {
-                    sLeaser.sprites[self.startSprite + i * self.lines + j].color = spearColor;
+                    sLeaser.sprites[self.startSprite + i * self.lines + j].color = Color.Lerp(self.pGraphics.HypothermiaColorBlend(spearColor), spearColor, 0.8f);
                     sLeaser.sprites[self.startSprite + i * self.lines + j].alpha = 0.7f;
 
                     if (i == self.spearRow && j == self.spearLine)
@@ -345,7 +346,7 @@ public class PlayerGraphicsModule
                         }
                         else if (self.pGraphics.player.Malnourished)
                         {
-                            sLeaser.sprites[self.startSprite + self.lines * self.rows].color = Color.white;
+                            sLeaser.sprites[self.startSprite + self.lines * self.rows].color = spearColorDark;
                         }
                         else
                         {

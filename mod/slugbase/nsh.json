@@ -1,20 +1,26 @@
 {
     "id": "NSHslugcat",
     "name": "nsh",
-    "description": "this just makes no sense",
+    "description": "this doesnt make any sense",
     "features": {
         "color": "7fe66f",
         "custom_colors": [
-            { "name": "Body", "story": "7fe66f" },
-            { "name": "Eyes", "story": "010101" }
+            {
+                "name": "Body",
+                "story": "7fe66f"
+            },
+            {
+                "name": "Eyes",
+                "story": "010101"
+            }
         ],
         "select_menu_scene": "Slugcat_nsh",
         "select_menu_scene_ascended": "Ghost_nsh",
 
         "back_spear": false,
         "weight": [ 1.2, 1.1 ],
-        "walk_speed": 1.2,
-        "climb_speed": 1.2,
+        "walk_speed": 1.1,
+        "climb_speed": 1.1,
         "tunnel_speed": 1.2,
         "lung_capacity": 1.0,
         "auto_grab_batflies": false,
@@ -22,8 +28,7 @@
         "karma_cap": 9,
         "the_mark": true,
         "the_glow": true,
-        "throw_skill": [ 1.0, 0.9 ],
-        "crouch_stealth": [ 1.0, 1.1 ],
+        "throw_skill": 1,
         "food_min": 6,
         "food_max": 9,
 
@@ -32,7 +37,6 @@
         "world_state": [ "NSHslugcat", "Rivulet", "Yellow" ],
         "timeline_after": "Yellow",
         "cycle_length_min": 5,
-
         "diet": {
             "base": "Red",
             "plants": 0.25,

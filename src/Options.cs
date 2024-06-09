@@ -20,6 +20,7 @@ internal class Options : OptionInterface
     public Configurable<KeyCode> CraftKey;
     public static Configurable<bool> RetrieveSlugFix;
     public static Configurable<bool> DevMode;
+    public static Configurable<bool> EnableCampaign;
 
     public Options()
     {
@@ -29,6 +30,7 @@ internal class Options : OptionInterface
         InventoryKey = config.Bind<KeyCode>("InventoryKey", KeyCode.D);
         RetrieveSlugFix = config.Bind<bool>("RetrieveSlugFix", true);
         DevMode = config.Bind<bool>("DevMode", false);
+        EnableCampaign = config.Bind<bool>("EnableCampaign", false);
     }
 
     public override void Initialize()
@@ -56,7 +58,7 @@ internal class Options : OptionInterface
             { description = inGameTranslator.Translate(desc) }
         );
 
-        desc = "Developer Mode (enables story mode(wip), enables gravity control, makes the game easier, etc. Use at your own risk.)";
+        desc = "Developer Mode (unlock story characters, enables gravity control anywhere, makes the game easier, etc. Use at your own risk.)";
         ypos += 50f;
         Tabs[0].AddItems(
             new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("DevMode"), false)
@@ -72,6 +74,18 @@ internal class Options : OptionInterface
                 new OpLabelLong(new Vector2(xposLabel, ymax - yspacing - ypos), new Vector2(xmax - 100, 100), "  -beta-<LINE>  DevMode keybinds:<LINE>Y - spawn a green swarmer<LINE>U - Pause rain timer<LINE>T - Spawn a swarmer for moon if possible<LINE>H - Log all swarmers position<LINE>J - Teleport all swarmers to player<LINE>")
             );
         }
+
+        desc = "in case if you wonder what are those dependencies for";
+        ypos += 50f;
+        Tabs[0].AddItems(
+            new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("Enable story mode"), false)
+            { description = inGameTranslator.Translate(desc) },
+            new OpCheckBox(EnableCampaign, new Vector2(xposOpt, ymax - yspacing - ypos))
+            { description = inGameTranslator.Translate(desc) }
+        );
+
+
+
 
 
         desc = "(FP)The maximum number of subsequent explosion actions player can perform before dying";

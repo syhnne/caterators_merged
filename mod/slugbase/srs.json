@@ -15,11 +15,11 @@
 		"select_menu_scene": "Slugcat_srs",
 		"select_menu_scene_ascended": "Ghost_srs",
 
-		"walk_speed": 1.2,
-		"climb_speed": 1.2,
-		"tunnel_speed": 1.2,
+		"walk_speed": 1.1,
+		"climb_speed": 1.0,
+		"tunnel_speed": 1.0,
 		"weight": [ 0.8, 0.7 ],
-		"throw_skill": [ 0.9, 0.7 ],
+		"throw_skill": 0,
 		"auto_grab_batflies": false,
 		"karma": 9,
 		"karma_cap": 9,
@@ -27,12 +27,12 @@
 		"the_glow": true,
 		"food_min": 11,
 		"food_max": 14,
-		"crouch_stealth": [ 0.2, 0.5 ],
-		"loudness": [ 1.8, 1.5 ],
+		"crouch_stealth": 0.1,
+		"loudness": [ 2.3, 2.0 ],
 
 		"guide_overseer": 3,
 		"start_room": "OE_S04",
-		"world_state": [ "SRSslugcat", "White" ],
+		"world_state": [ "SRSslugcat", "Red", "White" ],
 		"timeline_after": "White",
 		"cycle_length_min": 15,
 
@@ -40,6 +40,7 @@
 			"base": "White",
 			"plants": 0.25,
 			"meat": 0.25,
+			"corpses": 0.25,
 			"overrides": {
 			}
 		},

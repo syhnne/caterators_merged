@@ -1,7 +1,7 @@
 {
     "id": "Moonslugcat",
     "name": "moon",
-    "description": "how am i going to explain all this stuff",
+    "description": "lol",
     "features": {
         "color": "3ab0b4",
         "custom_colors": [
@@ -27,8 +27,8 @@
         "karma_cap": 9,
         "the_mark": false,
         "the_glow": true,
-        "throw_skill": [ 1.0, 0.9 ],
-        "crouch_stealth": [ 1.0, 1.1 ],
+        "throw_skill": [ 1, 0 ],
+        "crouch_stealth": [ 0.5, 0.6 ],
         "food_min": 6,
         "food_max": 7,
 

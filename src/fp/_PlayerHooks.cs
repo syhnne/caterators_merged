@@ -143,7 +143,7 @@ internal class PlayerHooks
             On.Player.GraspsCanBeCrafted += Player_GraspsCanBeCrafted;
             // On.Player.SwallowObject += Player_SwallowObject;
             On.Player.SpitUpCraftedObject += Player_SpitUpCraftedObject;
-            On.Player.ThrownSpear += Player_ThrownSpear;
+            // On.Player.ThrownSpear += Player_ThrownSpear;
 
             // 其他
             On.RegionGate.customKarmaGateRequirements += RegionGate_customKarmaGateRequirements;
@@ -191,7 +191,8 @@ internal class PlayerHooks
 
 
     // 一矛超人，只要不使用二段跳，就是常驻2倍矛伤。使用二段跳会导致这个伤害发生衰减，最低不低于0.5。修改slugbase的基础矛伤可以使所有的值发生变化
-    private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
+    // 算了，我要把这个砍了
+    /*private static void Player_ThrownSpear(On.Player.orig_ThrownSpear orig, Player self, Spear spear)
     {
         orig(self, spear);
         if (self.SlugCatClass == Enums.FPname)
@@ -205,7 +206,7 @@ internal class PlayerHooks
             Plugin.Log("spearDmgBonus: " + (0.5f + spearDmgBonus) + "  result: " + spear.spearDamageBonus);
         }
 
-    }
+    }*/
 
 
 

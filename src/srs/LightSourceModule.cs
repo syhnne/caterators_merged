@@ -128,6 +128,7 @@ public class LightSourceModule
     {
         if (deletionCounter > 100)
         {
+            deletionCounter = 100;
             slatedForDeletion = true;
             Clear();
             return;
@@ -142,6 +143,7 @@ public class LightSourceModule
             if (player.dead) deletionCounter++;
             else
             {
+                deletionCounter = 0;
                 for (int i = 0; i < lightSources.Length; i++)
                 {
 

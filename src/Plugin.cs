@@ -19,14 +19,15 @@ using System.Net.Configuration;
 using static Caterators_by_syhnne.srs.OxygenMaskModules;
 using DevInterface;
 using Menu;
+using SlugBase;
+using JollyCoop;
+using JollyCoop.JollyMenu;
 
 // TODO: 阿西吧 我还得检查探险模式有没有bug 太难顶了
 // 这个mod的大部分工程量都在于防止有人在酒吧里点炒饭。。。（
 
 namespace Caterators_by_syhnne;
 
-
-// TODO: 解决一下食肉猫没法把队友尸体扛回家的问题
 
 
 
@@ -85,6 +86,10 @@ class Plugin : BaseUnityPlugin
             On.RainWorldGame.Update += RainWorldGame_Update;
             
             On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
+            On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
+            On.JollyCoop.JollyMenu.JollyPlayerSelector.Update += JollyPlayerSelector_Update;
+            On.Menu.SlugcatSelectMenu.RefreshJollySummary += SlugcatSelectMenu_RefreshJollySummary;
+
             On.World.GetNode += World_GetNode;
 
 
@@ -197,6 +202,44 @@ class Plugin : BaseUnityPlugin
 
 
 
+
+
+    private static bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
+    {
+        return orig(i) || i == Enums.test;
+    }
+
+
+
+    // 去掉The
+    private static void SlugcatSelectMenu_RefreshJollySummary(On.Menu.SlugcatSelectMenu.orig_RefreshJollySummary orig, SlugcatSelectMenu self)
+    {
+        orig(self);
+        for (int i = 0; i < self.playerSummaries.Count; i++)
+        {
+            SlugcatStats.Name name = JollyCustom.SlugClassMenu(i, self.colorFromIndex(self.slugcatPageIndex));
+            if (Enums.IsCaterator(name))
+            {
+                self.playerSummaries[i].text = self.Translate(SlugcatStats.getSlugcatName(name));
+            }
+        }
+    }
+
+
+    // 去掉The
+    private static void JollyPlayerSelector_Update(On.JollyCoop.JollyMenu.JollyPlayerSelector.orig_Update orig, JollyPlayerSelector self)
+    {
+        orig(self);
+        SlugcatStats.Name name = JollyCustom.SlugClassMenu(self.index, self.dialog.currentSlugcatPageName);
+        if (Enums.IsCaterator(name))
+        {
+            self.classButton.menuLabel.text = self.menu.Translate(SlugcatStats.getSlugcatName(name));
+        }
+    }
+
+
+
+
     // 防止选中剧情角色之后又在设置里面关掉devmode引发问题
     private static void SlugcatSelectMenu_ctor(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
     {
@@ -228,14 +271,14 @@ class Plugin : BaseUnityPlugin
             
         }
 
-        // 只在开发者模式下解锁剧情
-        if (Options.DevMode.Value)
+        if (Options.EnableCampaign.Value)
         {
             newNames.Add(Enums.FPname);
             newNames.Add(Enums.SRSname);
             newNames.Add(Enums.NSHname);
             newNames.Add(Enums.Moonname);
         }
+        
 
         self.slugcatColorOrder = newNames;
 
@@ -252,6 +295,25 @@ class Plugin : BaseUnityPlugin
 
         
     }
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -288,6 +350,7 @@ class Plugin : BaseUnityPlugin
             {
                 self.rivuletEpilogueRainPause = !self.rivuletEpilogueRainPause;
                 Plugin.Log("ZA WARUDO");
+                Plugin.Log("--rain cycle progression:", self.world.rainCycle.CycleProgression);
             }
 
             // 按T生成一个月姐的神经元 

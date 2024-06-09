@@ -197,7 +197,7 @@ public class SwarmerManager
             }
         }
 
-        bool idle = player != null && player.room != null && callBackSwarmers == null && player.onBack == null && player.touchedNoInputCounter > 100;
+        bool idle = player != null && player.room != null && callBackSwarmers == null && swarmers != null && player.onBack == null && player.touchedNoInputCounter > 160;
         foreach (AbstractCreature sw in swarmers)
         {
             if (!(sw.realizedCreature != null && (sw.realizedCreature as MoonSwarmer).inSameRoom))
@@ -210,7 +210,8 @@ public class SwarmerManager
         if (player.room.GetTile(co).Solid) idle = false;
         co.y--;
         if (player.room.GetTile(co).Solid) idle = false;*/
-        if (!player.room.aimap.IsFreeSpace(player.abstractCreature.pos.Tile, 3)) idle = false;
+        if (!player.room.aimap.IsFreeSpace(player.abstractCreature.pos.Tile, 4)) idle = false;
+        if (player.onBack != null || player.room == null || player.room.abstractRoom.shelter || player.room.abstractRoom.gate) { idle = false; }
         IdleAtPlayerPos(idle? HoverAnimation.Circle : HoverAnimation.None);
 
 
@@ -436,13 +437,25 @@ public class SwarmerManager
                 if (CallBack()) break;
             }*/
             tryingToCallBack = true;
+            return;
         }
         else if (lastPlayerRoom != playerRoom)
         {
             tryingToTeleport = true;
         }
+        foreach (AbstractCreature sw in swarmers)
+        {
+            if (sw.realizedCreature != null && player != null)
+            {
+                (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+            }
+            else if (sw.realizedCreature != null)
+            {
+                (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(sw.pos);
+            }
 
-        
+        }
+
 
     }
 
@@ -461,7 +474,7 @@ public class SwarmerManager
         if (callBackSwarmers != null || swarmers == null) { return; }
         for (int i = 0; i < swarmers.Count; i++)
         {
-            if ((swarmers[i].realizedCreature as MoonSwarmer).notInSameRoom) return;
+            if (swarmers[i].realizedCreature == null || (swarmers[i].realizedCreature as MoonSwarmer).notInSameRoom) return;
         }
         meditateTick++;
         for (int i = 0; i < swarmers.Count; i++)

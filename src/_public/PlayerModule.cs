@@ -10,6 +10,8 @@ namespace Caterators_by_syhnne._public;
 // 举个例子，nsh可以复活队友，但如果他复活的是srs，我得重新生成他的那个光效，如果他复活的是moon，那就更麻烦了，得写个神经元类型转换，要不然moon一活过来发现自己没有神经元又要去世了
 // 再比如说，由于这个神经元谁拿了都可以去复活队友，那么如果有人在别的档里拿开发者模式调了一个这玩意儿出来防止自己被fp杀死，他又会有什么反应
 // 呃啊。。光是想想就觉得要晕过去了
+
+// 绷不住了，我注释都写了复活srs需要重新加光效，结果到头来还是忘了写
 public class PlayerModule
 {
     public readonly WeakReference<Player> playerRef;

@@ -52,6 +52,8 @@ public class PlayerHooks
         On.Player.CanIPutDeadSlugOnBack += Player_CanIPutDeadSlugOnBack;
         On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.Update += JollyMeter_PlayerIcon_Update;
 
+        On.Player.AddFood += Player_AddFood;
+
 
         // nshInventory
         On.OverWorld.GateRequestsSwitchInitiation += OverWorld_GateRequestsSwitchInitiation;
@@ -101,6 +103,34 @@ public class PlayerHooks
 
 
 
+
+    // 检测多人模式下传给这个函数的参数是不是有问题
+    private static void Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
+    {
+        orig(self, add);
+        Plugin.Log("AddFood:", self.SlugCatClass, add);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     #region playerReviver
 
     private static void JollyMeter_PlayerIcon_Update(On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.orig_Update orig, JollyCoop.JollyHUD.JollyMeter.PlayerIcon self)
@@ -120,10 +150,12 @@ public class PlayerHooks
         }
     }
 
-    private static bool Player_CanEatMeat(On.Player.orig_CanEatMeat orig, Player self, Creature crit)
-    {
-        return orig(self, crit) && crit is not Player;
-    }
+
+
+
+
+
+
 
 
     private static bool Player_CanIPutDeadSlugOnBack(On.Player.orig_CanIPutDeadSlugOnBack orig, Player self, Player pickUpCandidate)
@@ -179,7 +211,6 @@ public class PlayerHooks
         // 好像按太快了就会出问题
         try
         {
-            Plugin.Log(self.SlugCatClass, "hypothermia:", self.Hypothermia);
             // 谨记，挂在playermodule里面的东西，一律在playermodule那里进行update
             // 由于我刚搬运代码的时候乱写，我两周了才发现gravityController每帧update两次
             bool getModule = Plugin.playerModules.TryGetValue(self, out var module);
@@ -191,8 +222,26 @@ public class PlayerHooks
 
             if (self.room == null || self.dead || !getModule || !Enums.IsCaterator(self.SlugCatClass)) return;
 
-            if (self.SlugCatClass == Enums.FPname) { fp.PlayerHooks.Player_Update(self, eu, module.IsMyStory); }
-            else if (self.SlugCatClass == Enums.SRSname) { srs.PlayerHooks.Player_Update(self, eu); }
+            // 防止食肉猫吃队友，只对本模组的4只猫生效
+            int grasp = 0;
+            if (ModManager.MMF && (self.grasps[0] == null || self.grasps[0].grabbed is not Creature) && self.grasps[1] != null && self.grasps[1].grabbed is Creature)
+            {
+                grasp = 1;
+            }
+            if (self.input[0].pckp && self.grasps[grasp] != null && self.grasps[grasp].grabbed is Player)
+            {
+                self.eatMeat = 0;
+                (self.grasps[grasp].grabbed as Player).Template.meatPoints = 0;
+            }
+
+            if (self.SlugCatClass == Enums.FPname) 
+            { 
+                fp.PlayerHooks.Player_Update(self, eu, module.IsMyStory); 
+            }
+            else if (self.SlugCatClass == Enums.SRSname) 
+            { 
+                srs.PlayerHooks.Player_Update(self, eu); 
+            }
 
             
         }
@@ -294,11 +343,11 @@ public class PlayerHooks
     private static void Player_Jump(On.Player.orig_Jump orig, Player self)
     {
         orig(self);
-        if (self.SlugCatClass == Enums.FPname || self.SlugCatClass == Enums.NSHname || self.SlugCatClass == Enums.test)
+        if (self.SlugCatClass == Enums.FPname || self.SlugCatClass == Enums.test)
         {
             self.jumpBoost *= 1.2f;
         }
-        else if (self.SlugCatClass == Enums.SRSname)
+        else if (self.SlugCatClass == Enums.NSHname)
         {
             self.jumpBoost *= 1.1f;
         }

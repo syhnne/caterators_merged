@@ -23,7 +23,7 @@
 		"tunnel_speed": 2.0,
 		"throw_skill": 0.8,
 		"crouch_stealth": 0.8,
-
+		"expedition_enabled": false,
 
 
 		"karma": 9,

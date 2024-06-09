@@ -4,7 +4,7 @@
 	"version": "0.1.0",
 	"authors": "syhnne",
 	"description": "摆了，准备不写剧情直接发布（",
-	"requirements": [ "slime-cubed.slugbase", "moreslugcats", "fisobs", "crs", "pom", "regionkit" ],
-	"requirements_names": [ "SlugBase", "More Slugcats Expansion", "Fisobs", "Custom Regions Support", "POM", "RegionKit" ],
+	"requirements": [ "slime-cubed.slugbase", "moreslugcats", "fisobs", "crs", "regionkit" ],
+	"requirements_names": [ "SlugBase", "More Slugcats Expansion", "Fisobs", "Custom Regions Support", "RegionKit" ],
 	"tags": [ "Custom Slugcat" ]
 }

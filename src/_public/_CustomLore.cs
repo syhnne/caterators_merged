@@ -45,7 +45,7 @@ public class CustomLore
         On.Menu.SlugcatSelectMenu.SlugcatPage.AddAltEndingImage += SlugcatPage_AddAltEndingImage;
         On.Menu.SlideShow.ctor += SlideShow_ctor;
 
-
+        // 由于我把剧情砍了，这个可以去掉了。。
         On.SlugcatStats.SlugcatUnlocked += SlugcatStats_SlugcatUnlocked;
 
         // OxygenMask
@@ -81,7 +81,11 @@ public class CustomLore
     // 但 这玩意儿刷新的及时吗
     private static bool SlugcatStats_SlugcatUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugcatStats.Name i, RainWorld rainWorld)
     {
-        if (Options.DevMode.Value)
+        if (!Enums.IsCaterator(i))
+        {
+            return orig(i, rainWorld);
+        }
+        else if (Options.DevMode.Value || !Options.EnableCampaign.Value)
         {
             return true;
         }
@@ -113,21 +117,6 @@ public class CustomLore
     }
 
 
-
-
-    private static void SlugcatSelectMenu_SetSlugcatColorOrder(On.Menu.SlugcatSelectMenu.orig_SetSlugcatColorOrder orig, SlugcatSelectMenu self)
-    {
-        orig(self);
-
-        string str = "--slugcatColorOrder:";
-        foreach (var name in self.slugcatColorOrder)
-        {
-            str += name.value + " ";
-        }
-        Plugin.Log(str);
-
-
-    }
 
 
 

@@ -5,8 +5,14 @@
 	"features": {
 		"color": "fe68ca",
 		"custom_colors": [
-			{ "name": "Body", "story": "fe68ca" },
-			{ "name": "Eyes", "story": "ffffff" }
+			{
+				"name": "Body",
+				"story": "fe68ca"
+			},
+			{
+				"name": "Eyes",
+				"story": "ffffff"
+			}
 		],
 		"expedition_description": "别打探险模式，我不知道这里面藏着多少bug",
 
@@ -21,9 +27,10 @@
 		"lung_capacity": [ 0.5, 0.3 ],
 		"walk_speed": 1.4,
 		"climb_speed": 1.4,
-		"tunnel_speed": 1.5,
-		"throw_skill": [ 1.0, 0.7 ],
-		"crouch_stealth": [ 1.0, 0.7 ],
+		"tunnel_speed": 1.4,
+		"throw_skill": [ 2, 1 ],
+		"can_maul": true,
+		"maul_damage": 0.8,
 
 
 
@@ -46,12 +53,12 @@
 			}
 		},
 		"alignments": {
-			"Scavengers": { "like": -0.5 },
-			"Lizards": { "like": -0.5 },
-			"Cicadas": { "like": -0.5 },
-			"Deer": { "like": -0.5 },
-			"GarbageWorms": { "like": -0.5 },
-			"JetFish": { "like": -0.5 }
+			"Scavengers": { "like": -0.95 },
+			"Lizards": { "like": -0.95 },
+			"Cicadas": { "like": -0.95 },
+			"Deer": { "like": -0.95 },
+			"GarbageWorms": { "like": -0.95 },
+			"JetFish": { "like": -0.95 }
 		}
 
 	}

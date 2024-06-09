@@ -25,8 +25,12 @@ public static class PlayerHooks
         // 这个跟肚子里有多少吃的有关，众所周知饿着肚子更容易冷
         if (self.room != null && self.room.blizzard)
         {
-            self.Hypothermia += Mathf.Lerp(Mathf.Lerp(self.Malnourished ? 1f : 2.5f, 0.2f, (self.FoodInStomach / self.MaxFoodInStomach)) * RainWorldGame.DefaultHeatSourceWarmth, 0.1f, self.HypothermiaExposure);
+            self.Hypothermia += self.HypothermiaExposure * RainWorldGame.DefaultHeatSourceWarmth * 2f * self.room.world.rainCycle.CycleProgression;
         }
+        /*if (self.room != null && self.room.blizzard)
+        {
+            self.Hypothermia += Mathf.Lerp(Mathf.Lerp(self.Malnourished ? 1f : 2.5f, 0.2f, (self.FoodInStomach / self.MaxFoodInStomach)) * RainWorldGame.DefaultHeatSourceWarmth, 0.1f, self.HypothermiaExposure);
+        }*/
     }
 
     
@@ -40,6 +44,11 @@ public static class PlayerHooks
     public static void WaterUpdate(Player player, Room room)
     {
         if (player.dead) { return; }
+
+        if (player.Hypothermia > 5f)
+        {
+            player.Blink(3);
+        }
 
         // Plugin.Log(player.Hypothermia, player.HypothermiaGain, player.HypothermiaExposure, Mathf.Lerp(1f, 0f, player.Hypothermia));
 
@@ -72,24 +81,15 @@ public static class PlayerHooks
             
         }
 
-        if (player.Hypothermia > 5f)
-        {
-            player.Blink(3);
-        }
-        // 咋说，这玩意儿应该不能被放在肚子里，这很奇怪（
-        // if (player.objectInStomach is OxygenMaskModules.OxygenMaskAbstract) { return; }
+        
 
 
-        /*Plugin.Log("waterdeath");
-        Vector2 vector = Vector2.Lerp(player.firstChunk.pos, player.firstChunk.lastPos, 0.35f);
-        room.PlaySound(SoundID.Firecracker_Burn, vector);
-        room.ScreenMovement(new Vector2?(vector), default(Vector2), 1.3f);
-        room.InGameNoise(new InGameNoise(vector, 8000f, player, 1f));
-        player.Die();*/
     }
 
-    /*public static void PercentageViolence(this Creature crit, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, float damage) => PercentageViolence(crit, source, directionAndMomentum, hitChunk, hitAppendage, Creature.DamageType.Stab, damage, 0.1f);
-*/
+
+
+
+
     public static void PercentageViolence(this Creature crit, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
     {
         if (source != null && source.owner is Creature)
@@ -155,6 +155,17 @@ public static class PlayerHooks
 
 
 
+    
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -174,15 +185,25 @@ public static class PlayerHooks
         On.BigSpiderAI.IUseARelationshipTracker_UpdateDynamicRelationship += IUseARelationshipTracker_UpdateDynamicRelationship;
         IL.Creature.HypothermiaUpdate += IL_Creature_HypothermiaUpdate;
         On.Creature.HypothermiaUpdate += Creature_HypothermiaUpdate;
+        IL.Spear.HitSomethingWithoutStopping += IL_Spear_HitSomethingWithoutStopping;
+
+
     }
+
+
+
+
+
+
 
 
     private static void Creature_HypothermiaUpdate(On.Creature.orig_HypothermiaUpdate orig, Creature self)
     {
         orig(self);
-        if ( !(self.room.blizzardGraphics != null && self.room.roomSettings.DangerType == MoreSlugcatsEnums.RoomRainDangerType.Blizzard && self.room.world.rainCycle.CycleProgression > 0f) && self is Player && (self as Player).SlugCatClass == Enums.SRSname)
+        if (self.room.roomSettings.DangerType != MoreSlugcatsEnums.RoomRainDangerType.Blizzard && self is Player && (self as Player).SlugCatClass == Enums.SRSname)
         {
-            if (self.Hypothermia >= 8f && self.Consious && self.room != null && !self.room.abstractRoom.shelter)
+            Plugin.Log("warm room hypothermia update");
+            if (self.Hypothermia >= 10f && self.Consious && self.room != null && !self.room.abstractRoom.shelter)
             {
                 if (self.HypothermiaStunDelayCounter < 0)
                 {
@@ -191,7 +212,7 @@ public static class PlayerHooks
                     self.Stun(st);
                 }
             }
-            if (self.Hypothermia >= 5f && (float)self.stun > 50f && !self.dead)
+            if (self.Hypothermia >= 10f && (float)self.stun > 50f && !self.dead)
             {
                 self.Die();
                 return;
@@ -259,9 +280,9 @@ public static class PlayerHooks
     // 借用speartype标记拔出的矛的类型。源代码这个数字不会超过3，而且使用的时候是取的他的余数，所以我可以随便往上加
     private static void TailSpeckles_setSpearProgress(On.PlayerGraphics.TailSpeckles.orig_setSpearProgress orig, PlayerGraphics.TailSpeckles self, float p)
     {
-        if (self.pGraphics.player.slugcatStats.name == Enums.SRSname && !self.pGraphics.player.Malnourished)
+        if (self.pGraphics.player.slugcatStats.name == Enums.SRSname)
         {
-            self.spearType = Random.Range(4, 7);
+            self.spearType = self.pGraphics.player.Malnourished? Random.Range(4, 7) : Random.Range(7, 10);
             self.spearProg = Mathf.Clamp(p, 0f, 1f);
         }
         else { orig(self, p); }
@@ -294,7 +315,7 @@ public static class PlayerHooks
             }
             else
             {
-                sLeaser.sprites[0].color = Color.Lerp(PlayerGraphicsModule.spearColor, self.color, 1f - num);
+                sLeaser.sprites[0].color = Color.Lerp(self.spearmasterNeedleType > 6? PlayerGraphicsModule.spearColor : PlayerGraphicsModule.spearColorDark, self.color, 1f - num);
             }
         }
     }
@@ -314,8 +335,7 @@ public static class PlayerHooks
 
 
 
-    // 使被击中的生物当场去世
-    // 经测试，这不包括利维坦，因为利维坦能抗下好几发这种99倍的伤害
+    // 嗯。。
     private static bool Spear_HitSomething(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
     {
 
@@ -323,7 +343,7 @@ public static class PlayerHooks
         float dmg = 0f;
         if (result.obj != null && result.obj is Creature && !(result.obj as Creature).dead
             && self.thrownBy is Player && (self.thrownBy as Player).slugcatStats.name == Enums.SRSname
-            && self.Spear_NeedleCanFeed() && self.spearmasterNeedleType > 3
+            && self.Spear_NeedleCanFeed() && self.spearmasterNeedleType > 6
             && (result.obj as Creature).State is HealthState
             && (result.obj as Creature).SpearStick(self, 0.1f, result.chunk, result.onAppendagePos, self.firstChunk.vel))
         {
@@ -346,11 +366,11 @@ public static class PlayerHooks
         {
             
             Plugin.Log("orig h:", dmg, "crit:", result.obj);
-            // 无论是什么生物，一矛都是投矛本身的基础伤害+30%血量的额外伤害
+            // 物理伤害+1f火伤+10%火伤（大雾
             // 没错 就是针对香菇设计的
-            (result.obj as Creature).PercentageViolence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 0.3f, 20f);
+            (result.obj as Creature).PercentageViolence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.None, 0.1f, 20f);
 
-            // (result.obj as Creature).Violence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 99f, 20f);
+            (result.obj as Creature).Violence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.None, 1.5f, 0f);
 
             /*(result.obj as Creature).Die();
             (result.obj as Creature).SetKillTag(self.thrownBy.abstractCreature);*/
@@ -358,6 +378,31 @@ public static class PlayerHooks
         return res;
 
 
+    }
+
+
+
+
+    private static void IL_Spear_HitSomethingWithoutStopping(ILContext il)
+    {
+        // 160 如果是srs的矛就返回false
+        ILCursor c1 = new ILCursor(il);
+        if (c1.TryGotoNext(MoveType.After,
+            i => i.Match(OpCodes.Blt),
+            i => i.MatchLdarg(1),
+            i => i.MatchCallvirt<UpdatableAndDeletable>("Destroy"),
+            i => i.MatchLdarg(1),
+            i => i.MatchIsinst<OracleSwarmer>()
+            ))
+        {
+            // TODO: 
+            /*c1.Emit(OpCodes.Ldarg_0);
+            c1.EmitDelegate<Func<bool, Spear, bool>>((orig, spear) =>
+            {
+                if (spear.spearmasterNeedleType > 3) return false;
+                return orig;
+            });*/
+        }
     }
 
 

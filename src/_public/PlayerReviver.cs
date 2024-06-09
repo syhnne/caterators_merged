@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Caterators_by_syhnne._public;
 
@@ -192,6 +193,9 @@ public class PlayerReviver
             {
                 activatedSwarmer.Use(true);
             }
+            
+            
+
             slugcat.playerState.permanentDamageTracking = 0f;
             slugcat.playerState.alive = true;
             slugcat.playerState.permaDead = false;
@@ -211,6 +215,13 @@ public class PlayerReviver
                 spark.lifeTime = 30;
                 slugcat.room.AddObject(spark);
             }
+
+            if (Plugin.playerModules.TryGetValue(slugcat, out var mod2) && slugcat.SlugCatClass == Enums.SRSname)
+            {
+                mod2.srsLightSource = new srs.LightSourceModule(slugcat);
+                mod2.srsLightSource.AddModules();
+            }
+
             return true;
         }
         catch (Exception e)
