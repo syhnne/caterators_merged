@@ -46,7 +46,7 @@ public class MoonSwarmerCritob : Critob
             {
                 Standard = new(0.9f, Allowed),
                 OpenDiagonal = new(0.5f, Allowed),
-                ShortCut = new(1.2f, Allowed),
+                ShortCut = new(1.2f, Unwanted),
                 NPCTransportation = new(1, Allowed),
                 OffScreenMovement = new(1, Allowed),
                 BetweenRooms = new(1, Allowed),

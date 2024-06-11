@@ -150,8 +150,12 @@ public class CustomLore
                 }
                 if (module.swarmerManager != null)
                 {
-                    self.GetDeathPersistent().MoonHasSwarmers = module.swarmerManager.CycleEndSave();
-                    Plugin.Log("moonswarmer save:", self.GetDeathPersistent().MoonHasSwarmers);
+                    int? sw = module.swarmerManager.CycleEndSave();
+                    if (sw != null)
+                    {
+                        self.GetDeathPersistent().MoonHasSwarmers = (int)sw;
+                        Plugin.Log("moonswarmer save:", self.GetDeathPersistent().MoonHasSwarmers);
+                    }
                 }
             }
         }

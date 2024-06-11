@@ -36,6 +36,7 @@ public class SwarmerManager
     public List<AbstractCreature> swarmers;
     public _public.DeathPreventer deathPreventer;
     public SwarmerHUD hud;
+    public bool saved = false;
 
     // 以下大概是根据剩余的神经元数量，分为三个档位（？
     public bool alive;
@@ -401,9 +402,20 @@ public class SwarmerManager
 
 
 
-    public int CycleEndSave()
+    public int? CycleEndSave()
     {
-        if (player == null || callBackSwarmers != null) { return callBackSwarmers!=null? (int)callBackSwarmers : maxSwarmer; }
+        if (saved)
+        {
+            return null;
+        }
+        if (player == null)
+        {
+            return maxSwarmer;
+        }
+        if (callBackSwarmers  != null)
+        {
+            return (int)callBackSwarmers;
+        }
         for (; ; )
         {
             if (CallBack()) break;
@@ -414,6 +426,7 @@ public class SwarmerManager
             callBackSwarmers = swarmers.Count;
         }
         int result = (int)callBackSwarmers;
+        saved = true;
         callBackSwarmers = null;
         return result;
     }
@@ -430,7 +443,7 @@ public class SwarmerManager
         {
             Respawn();
         }
-        else if (player.room.abstractRoom.gate)
+        else if (player.room.abstractRoom.gate || player.room.abstractRoom.shelter)
         {
             /*for (; ; )
             {

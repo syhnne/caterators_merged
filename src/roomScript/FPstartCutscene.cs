@@ -152,7 +152,7 @@ public class FPstartCutscene : UpdatableAndDeletable
 
         if (timer == 580)
         {
-            room.game.cameras[0].hud.textPrompt.AddMessage(room.game.rainWorld.inGameTranslator.Translate("Press G and up&down arrow keys to adjust the gravity in room."), 140, 500, true, true);
+            room.game.cameras[0].hud.textPrompt.AddMessage(room.game.rainWorld.inGameTranslator.Translate("Press G and up&down arrow keys to adjust the gravity in room."), 140, 300, true, true);
             Destroy();
             return;
             // Plugin.Log("total time: ", room.game.GetStorySession.saveState.totTime);
