@@ -124,14 +124,14 @@ public class DeathPreventHooks
                     (physicalObj as Player).Stun(200);
                     physicalObj.room.AddObject(new CreatureSpasmer(physicalObj as Player, false, (physicalObj as Player).stun));
                     (physicalObj as Player).LoseAllGrasps();
-                    if (Options.DevMode.Value)
+                    /*if (Options.DevMode.Value)
                     {
                         int maxfood = (physicalObj as Player).MaxFoodInStomach;
                         int food = (physicalObj as Player).FoodInStomach;
                         Plugin.Log("Zapcoil - food:" + food + " maxfood: " + maxfood);
                         fp.PlayerHooks.CustomAddFood(physicalObj as Player, maxfood - food);
                         (physicalObj as Player).AddFood(maxfood - food);
-                    }
+                    }*/
                     return null;
                 }
                 // (deathPreventer)

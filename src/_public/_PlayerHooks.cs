@@ -52,7 +52,9 @@ public class PlayerHooks
         On.Player.CanIPutDeadSlugOnBack += Player_CanIPutDeadSlugOnBack;
         On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.Update += JollyMeter_PlayerIcon_Update;
 
-        On.Player.AddFood += Player_AddFood;
+        // On.Player.AddFood += Player_AddFood;
+        // On.Player.EatMeatUpdate += Player_EatMeatUpdate;
+        On.Player.AddQuarterFood += Player_AddQuarterFood;
 
 
         // nshInventory
@@ -113,7 +115,34 @@ public class PlayerHooks
 
 
 
+    private static void Player_EatMeatUpdate(On.Player.orig_EatMeatUpdate orig, Player self, int graspIndex)
+    {
+        orig(self, graspIndex);
 
+        /*if (self.playerState.quarterFoodPoints >= 4)
+        {
+            self.playerState.quarterFoodPoints -= 4;
+        }*/
+
+        Plugin.Log("player_eatmeatUpdate -", self.abstractCreature.ID.number, "qFoodPips:", self.playerState.quarterFoodPoints, "foods:", self.playerState.foodInStomach);
+        Plugin.Log("-- player0 - qFoodPips:", (self.abstractCreature.world.game.Players[0].state as PlayerState).quarterFoodPoints, "foods:", (self.abstractCreature.world.game.Players[0].state as PlayerState).foodInStomach);
+    }
+
+
+    private static void Player_AddQuarterFood(On.Player.orig_AddQuarterFood orig, Player self)
+    {
+        
+        if (ModManager.CoopAvailable && self.abstractCreature.world.game.IsStorySession && self.abstractCreature.world.game.Players[0] != self.abstractCreature && !self.isNPC && self.abstractCreature.world.game.Players[0].realizedCreature != null)
+        {
+            (self.abstractCreature.world.game.Players[0].realizedCreature as Player).AddQuarterFood();
+            return;
+        }
+        else
+        {
+            orig(self);
+        }
+
+    }
 
 
 
@@ -308,13 +337,13 @@ public class PlayerHooks
 
 
         // logs
-        if (!Options.DevMode.Value || !newRoom.game.IsStorySession) { return; }
+        if (!Options.DevMode.Value || !newRoom.game.IsStorySession || self.abstractCreature.ID.number != 0) { return; }
 
         CustomSaveData.SaveDeathPersistent dp = newRoom.game.GetDeathPersistent();
         CustomSaveData.SaveMiscProgression mp = newRoom.game.GetMiscProgression();
 
 
-        Plugin.Log("--ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
+        Plugin.Log("  ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
 
         // Plugin.Log("--CustomSaveData: CyclesFromLastEnterSSAI", dp.CyclesFromLastEnterSSAI);
 

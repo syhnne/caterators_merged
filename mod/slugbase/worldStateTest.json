@@ -24,6 +24,8 @@
 		"throw_skill": 0.8,
 		"crouch_stealth": 0.8,
 		"expedition_enabled": false,
+		"food_min": 20,
+		"food_max": 30,
 
 
 		"karma": 9,

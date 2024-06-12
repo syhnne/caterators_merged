@@ -91,6 +91,7 @@ class Plugin : BaseUnityPlugin
             On.Menu.SlugcatSelectMenu.RefreshJollySummary += SlugcatSelectMenu_RefreshJollySummary;
 
             On.World.GetNode += World_GetNode;
+            On.RegionState.AdaptRegionStateToWorld += RegionState_AdaptRegionStateToWorld;
 
 
             _public.PlayerHooks.Apply();
@@ -277,6 +278,10 @@ class Plugin : BaseUnityPlugin
             newNames.Add(Enums.SRSname);
             newNames.Add(Enums.NSHname);
             newNames.Add(Enums.Moonname);
+            if (ShowLogs)
+            {
+                newNames.Add(Enums.test);
+            }
         }
         
 
@@ -428,6 +433,21 @@ class Plugin : BaseUnityPlugin
             return new AbstractRoomNode();
         }
         return orig(self, c);
+    }
+
+
+    // 无奈出此下策，不知道会不会引发其他问题
+    // 似乎没毛病，姑且当它修好了罢
+    private static void RegionState_AdaptRegionStateToWorld(On.RegionState.orig_AdaptRegionStateToWorld orig, RegionState self, int playerShelter, int activeGate)
+    {
+        try
+        {
+            orig(self, playerShelter, activeGate);
+        }
+        catch (Exception e)
+        {
+            Plugin.LogException(e);
+        }
     }
 
 

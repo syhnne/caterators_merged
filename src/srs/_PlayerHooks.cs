@@ -202,7 +202,7 @@ public static class PlayerHooks
         orig(self);
         if (self.room.roomSettings.DangerType != MoreSlugcatsEnums.RoomRainDangerType.Blizzard && self is Player && (self as Player).SlugCatClass == Enums.SRSname)
         {
-            Plugin.Log("warm room hypothermia update");
+            // Plugin.Log("warm room hypothermia update");
             if (self.Hypothermia >= 10f && self.Consious && self.room != null && !self.room.abstractRoom.shelter)
             {
                 if (self.HypothermiaStunDelayCounter < 0)
