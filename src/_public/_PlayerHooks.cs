@@ -31,6 +31,7 @@ using Caterators_by_syhnne.nsh;
 using Caterators_by_syhnne.moon.MoonSwarmer;
 using System.Drawing;
 using JollyCoop;
+using HUD;
 
 namespace Caterators_by_syhnne._public;
 
@@ -52,9 +53,9 @@ public class PlayerHooks
         On.Player.CanIPutDeadSlugOnBack += Player_CanIPutDeadSlugOnBack;
         On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.Update += JollyMeter_PlayerIcon_Update;
 
-        // On.Player.AddFood += Player_AddFood;
+        On.Player.AddFood += Player_AddFood;
         // On.Player.EatMeatUpdate += Player_EatMeatUpdate;
-        On.Player.AddQuarterFood += Player_AddQuarterFood;
+        // On.Player.AddQuarterFood += Player_AddQuarterFood;
 
 
         // nshInventory
@@ -131,7 +132,7 @@ public class PlayerHooks
 
     private static void Player_AddQuarterFood(On.Player.orig_AddQuarterFood orig, Player self)
     {
-        
+        Plugin.Log("player add quarter food:", self.abstractCreature.ID.number);
         if (ModManager.CoopAvailable && self.abstractCreature.world.game.IsStorySession && self.abstractCreature.world.game.Players[0] != self.abstractCreature && !self.isNPC && self.abstractCreature.world.game.Players[0].realizedCreature != null)
         {
             (self.abstractCreature.world.game.Players[0].realizedCreature as Player).AddQuarterFood();
@@ -595,43 +596,82 @@ public class PlayerHooks
 
 
 
+    private static void InitPlayerHud(HUD.HUD self, PlayerModule module)
+    {
+        if (module.gravityController != null)
+        {
+            self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
+        }
+        if (module.nshInventory != null)
+        {
+            InventoryHUD inventoryHUD = new InventoryHUD(self, self.fContainers[1], module.nshInventory);
+            self.AddPart(inventoryHUD);
+            module.nshInventory.hud = inventoryHUD;
+        }
+        if (module.deathPreventer != null)
+        {
+            self.AddPart(new DeathPreventHUD(self, self.fContainers[1], module.deathPreventer));
+        }
+        if (module.pearlReader != null)
+        {
+            self.AddPart(new fp.PearlReaderHUD(self, self.fContainers[1], module.pearlReader));
+        }
+        if (module.swarmerManager != null)
+        {
+            moon.MoonSwarmer.SwarmerHUD swarmerHUD = new moon.MoonSwarmer.SwarmerHUD(self, self.fContainers[1], module.swarmerManager);
+            self.AddPart(swarmerHUD);
+            module.swarmerManager.hud = swarmerHUD;
+            swarmerHUD.UpdateIcons();
+            if (Options.DevMode.Value)
+            {
+                self.AddPart(new moon.MoonSwarmer.DebugHUD(self, self.fContainers[1], module.swarmerManager));
+            }
+        }
+    }
+
+
+
+
     // 已经变成工业生产流程了
     private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
     {
         orig(self, cam);
-        if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module))
+        if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module1))
         {
-            Plugin.Log("HUD added");
-            if (module.gravityController != null)
+            Plugin.Log("HUD added for player", (self.owner as Player).abstractCreature.ID.number);
+            /*Plugin.Log("HUD - fContainers:", self.fContainers.Count());
+            for (int i = 0; i < self.fContainers.Count(); i++) 
             {
-                self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
-            }
-            if (module.nshInventory != null)
+                Plugin.Log("-- container:", i, self.fContainers[i].GetChildCount());
+            }*/
+            InitPlayerHud(self, module1);
+        }
+
+        if (ModManager.CoopAvailable && cam.room.game.session != null)
+        {
+            for (int i = 1; i < cam.room.game.session.Players.Count; i++)
             {
-                InventoryHUD inventoryHUD = new InventoryHUD(self, self.fContainers[1], module.nshInventory);
-                self.AddPart(inventoryHUD);
-                module.nshInventory.hud = inventoryHUD;
-            }
-            if (module.deathPreventer != null)
-            {
-                self.AddPart(new DeathPreventHUD(self, self.fContainers[1], module.deathPreventer));
-            }
-            if (module.pearlReader != null)
-            {
-                self.AddPart(new fp.PearlReaderHUD(self, self.fContainers[1], module.pearlReader));
-            }
-            if (module.swarmerManager != null)
-            {
-                moon.MoonSwarmer.SwarmerHUD swarmerHUD = new moon.MoonSwarmer.SwarmerHUD(self, self.fContainers[1], module.swarmerManager);
-                self.AddPart(swarmerHUD);
-                module.swarmerManager.hud = swarmerHUD;
-                swarmerHUD.UpdateIcons();
-                if (Options.DevMode.Value)
+                if (cam.room.game.session.Players[i].realizedCreature == null || cam.room.game.session.Players[i].realizedCreature is not Player) return;
+                Player player = cam.room.game.session.Players[i].realizedCreature as Player;
+                if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module2))
                 {
-                    self.AddPart(new moon.MoonSwarmer.DebugHUD(self, self.fContainers[1], module.swarmerManager));
+                    Plugin.Log("HUD added for player", i);
+                    InitPlayerHud(self, module2);
                 }
             }
         }
+
+        string str = "- HUDparts:";
+        foreach (HudPart hudPart in self.parts)
+        {
+            str += hudPart.ToString() + " ";
+        }
+        Plugin.Log(str);
+
+
+
+            
+        
 
     }
 

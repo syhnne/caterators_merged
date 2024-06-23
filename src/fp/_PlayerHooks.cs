@@ -430,6 +430,7 @@ internal class PlayerHooks
             {
                 for (int n = 0; n < self.room.physicalObjects[m].Count; n++)
                 {
+                    if (self.room.physicalObjects[m][n] is Player && (self.room.physicalObjects[m][n] as Player).AI != null) continue;
                     if (self.room.physicalObjects[m][n] is Weapon)
                     {
                         Weapon weapon = self.room.physicalObjects[m][n] as Weapon;

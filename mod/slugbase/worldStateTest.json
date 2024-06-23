@@ -1,7 +1,7 @@
 {
 	"id": "placeholder_syhnne",
-	"name": "placeholder",
-	"description": "a super fast slugcat i made just for testing",
+	"name": "speedrunner",
+	"description": "烟囱天棚跑了10分钟才见到fp是不是废了",
 	"features": {
 		"color": "ffffff",
 		"custom_colors": [
@@ -18,11 +18,11 @@
 		"back_spear": false,
 		"weight": [ 1.1, 0.9 ],
 		"lung_capacity": 2.0,
-		"walk_speed": 2.0,
-		"climb_speed": 2.0,
-		"tunnel_speed": 2.0,
-		"throw_skill": 0.8,
-		"crouch_stealth": 0.8,
+		"walk_speed": 2.2,
+		"climb_speed": 2.2,
+		"tunnel_speed": 2.2,
+		"throw_skill": 1,
+		"crouch_stealth": 0.6,
 		"expedition_enabled": false,
 		"food_min": 20,
 		"food_max": 30,
@@ -40,9 +40,7 @@
 		"world_state": [ "Spear" ],
 		"diet": {
 			"base": "Gourmand",
-			"meat": 0.5,
 			"corpses": 0.5,
-			"plants": 0.5,
 			"overrides": {
 			}
 		}
