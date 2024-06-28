@@ -346,7 +346,7 @@ public class SpearOnBack : ItemsOnBack
             {
                 flip = Custom.LerpAndTick(flip, (float)player.flipDirection * Mathf.Abs(chunkDir.x), 0.15f, 0.16666667f);
             }
-        if (player.input[0].x != 0 && player.standing && player.animation != Player.AnimationIndex.ClimbOnBeam)
+            if (player.input[0].x != 0 && player.standing && player.animation != Player.AnimationIndex.ClimbOnBeam)
             {
                 float num = 0f;
                 for (int j = 0; j < player.grasps.Length; j++)
@@ -357,7 +357,7 @@ public class SpearOnBack : ItemsOnBack
                         break;
                     }
                 }
-            spear.setRotation = new Vector2?(Custom.DegToVec(Custom.AimFromOneVectorToAnother(chunk1Pos, mainChunkPos) + Custom.LerpMap(1, 12f, 20f, 0f, 360f * num)));
+                spear.setRotation = new Vector2?(Custom.DegToVec(Custom.AimFromOneVectorToAnother(chunk1Pos, mainChunkPos) + Custom.LerpMap(1, 12f, 20f, 0f, 360f * num)));
             }
             else
             {
@@ -387,7 +387,7 @@ public class SpearOnBack : ItemsOnBack
 
 
 
-public class LanternOnBack : ItemsOnBack
+/*public class LanternOnBack : ItemsOnBack
 {
     public Lantern lantern;
 
@@ -478,7 +478,7 @@ public class LanternOnBack : ItemsOnBack
         Plugin.Log("is this method being called?? ChangeOverlap()", newOverlap, lantern.CollideWithObjects, lantern.CollideWithSlopes, lantern.CollideWithTerrain, lantern.canBeHitByWeapons);
     }
 
-}
+}*/
 
 
 

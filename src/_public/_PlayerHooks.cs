@@ -28,8 +28,6 @@ using static MonoMod.Cil.RuntimeILReferenceBag;
 using System.Security.Cryptography;
 using Caterators_by_syhnne.srs;
 using Caterators_by_syhnne.nsh;
-using Caterators_by_syhnne.moon.MoonSwarmer;
-using System.Drawing;
 using JollyCoop;
 using HUD;
 
@@ -53,7 +51,7 @@ public class PlayerHooks
         On.Player.CanIPutDeadSlugOnBack += Player_CanIPutDeadSlugOnBack;
         On.JollyCoop.JollyHUD.JollyMeter.PlayerIcon.Update += JollyMeter_PlayerIcon_Update;
 
-        On.Player.AddFood += Player_AddFood;
+        // On.Player.AddFood += Player_AddFood;
         // On.Player.EatMeatUpdate += Player_EatMeatUpdate;
         // On.Player.AddQuarterFood += Player_AddQuarterFood;
 
@@ -108,29 +106,29 @@ public class PlayerHooks
 
 
     // 检测多人模式下传给这个函数的参数是不是有问题
-    private static void Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
+    /*private static void Player_AddFood(On.Player.orig_AddFood orig, Player self, int add)
     {
         orig(self, add);
         Plugin.Log("AddFood:", self.SlugCatClass, add);
-    }
+    }*/
 
 
 
-    private static void Player_EatMeatUpdate(On.Player.orig_EatMeatUpdate orig, Player self, int graspIndex)
+    /*private static void Player_EatMeatUpdate(On.Player.orig_EatMeatUpdate orig, Player self, int graspIndex)
     {
         orig(self, graspIndex);
 
-        /*if (self.playerState.quarterFoodPoints >= 4)
+        *//*if (self.playerState.quarterFoodPoints >= 4)
         {
             self.playerState.quarterFoodPoints -= 4;
-        }*/
+        }*//*
 
         Plugin.Log("player_eatmeatUpdate -", self.abstractCreature.ID.number, "qFoodPips:", self.playerState.quarterFoodPoints, "foods:", self.playerState.foodInStomach);
         Plugin.Log("-- player0 - qFoodPips:", (self.abstractCreature.world.game.Players[0].state as PlayerState).quarterFoodPoints, "foods:", (self.abstractCreature.world.game.Players[0].state as PlayerState).foodInStomach);
-    }
+    }*/
 
 
-    private static void Player_AddQuarterFood(On.Player.orig_AddQuarterFood orig, Player self)
+    /*private static void Player_AddQuarterFood(On.Player.orig_AddQuarterFood orig, Player self)
     {
         Plugin.Log("player add quarter food:", self.abstractCreature.ID.number);
         if (ModManager.CoopAvailable && self.abstractCreature.world.game.IsStorySession && self.abstractCreature.world.game.Players[0] != self.abstractCreature && !self.isNPC && self.abstractCreature.world.game.Players[0].realizedCreature != null)
@@ -143,7 +141,7 @@ public class PlayerHooks
             orig(self);
         }
 
-    }
+    }*/
 
 
 
@@ -477,14 +475,14 @@ public class PlayerHooks
 
 
     // 只是为了避免写一些对话而已。实际上好像并不能避免，我防不住雨鹿请联机队友替自己吃神经元（
-    private static bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
+    /*private static bool Player_CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
     {
         if (self.slugcatStats.name == Enums.SRSname && obj is SLOracleSwarmer)
         {
             return false;
         }
         return orig(self, obj);
-    }
+    }*/
 
 
 
@@ -495,14 +493,14 @@ public class PlayerHooks
 
     #region PlayerModule
 
-    private static void Creature_SuckedIntoShortCut(On.Creature.orig_SuckedIntoShortCut orig, Creature self, IntVector2 entrancePos, bool carriedByOther)
+    /*private static void Creature_SuckedIntoShortCut(On.Creature.orig_SuckedIntoShortCut orig, Creature self, IntVector2 entrancePos, bool carriedByOther)
     {
         if (self is Player && Plugin.playerModules.TryGetValue((self as Player), out var mod) && mod.swarmerManager != null) 
         {
             mod.swarmerManager.ForceAllSwarmersIntoShortcut(entrancePos);
         }
         orig(self, entrancePos, carriedByOther);
-    }
+    }*/
 
 
 
@@ -549,17 +547,12 @@ public class PlayerHooks
 
 
     // 好家伙 我都写了这么多东西了
+    // 这应该能释放实例罢（思考）
     private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
     {
         if (Plugin.playerModules.TryGetValue(self, out var module))
         {
-            module.gravityController?.Destroy();
-            module.gravityController = null;
-            module.nshInventory = null;
-            module.deathPreventer = null;
-            module.srsLightSource = null;
-            module.nshScarf = null;
-            module.swarmerManager = null;
+            Plugin.playerModules.Remove(self);
         }
         orig(self);
     }
@@ -585,7 +578,11 @@ public class PlayerHooks
         if (getModule)
         {
             module.gravityController?.Die();
-            module.nshInventory?.RemoveAndRealizeAllObjects();
+            if (module.deathPreventer != null && !module.deathPreventer.dontRevive)
+            {
+                module.nshInventory?.RemoveAndRealizeAllObjects();
+                module.deathPreventer.dontRevive = false;
+            }
             if (module.swarmerManager != null && module.swarmerManager.LastAliveSwarmer != null)
             {
                 module.swarmerManager.KillSwarmer(module.swarmerManager.LastAliveSwarmer, false);

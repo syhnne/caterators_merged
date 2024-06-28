@@ -20,7 +20,8 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
 public class SwarmerManager
 {
-    // TODO: 坏了 这个地方应该用弱引用 但我前面写了那么多东西全都不是弱引用（（
+    // : 坏了 这个地方应该用弱引用 但我前面写了那么多东西全都不是弱引用（（
+    // 摆烂了，不改了，看起来对游戏性能没什么影响
     public WeakReference<Player> owner;
     public Player? player
     {

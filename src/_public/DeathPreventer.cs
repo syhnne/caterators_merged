@@ -37,24 +37,27 @@ namespace Caterators_by_syhnne._public;
 
 
 
-
+// : 这些东西生效吗？
+// 破案了，香菇那个没什么用，被香菇舌草抓了基本上死路一条，救也没用。其他的倒是挺好使的。
 public class DeathPreventHooks
 {
     public static void Apply()
     {
         // deathPreventer
         On.DaddyLongLegs.Eat += DaddyLongLegs_Eat;
-        IL.Creature.Update += IL_Creature_Update;
+        IL.Creature.Update += IL_Creature_Update; // hypothermia
         // IL.Player.ClassMechanicsSaint += IL_Player_ClassMechanicsSaint;
         IL.ZapCoil.Update += IL_ZapCoil_Update;
         IL.Centipede.Shock += IL_Centipede_Shock;
         On.Creature.Violence += Creature_Violence;
+        IL.DaddyCorruption.EatenCreature.Update += IL_DaddyCorruption_EatenCreature_Update;
+        IL.WormGrass.WormGrassPatch.InteractWithCreature += IL_WormGrass_WormGrassPatch_InteractWithCreature;
     }
 
     private static void IL_Creature_Update(ILContext il)
     {
         // 158
-        ILCursor c = new ILCursor(il);
+        /*ILCursor c = new ILCursor(il);
         if (c.TryGotoNext(MoveType.After,
             i => i.Match(OpCodes.Brtrue),
             i => i.Match(OpCodes.Ldarg_0),
@@ -71,6 +74,22 @@ public class DeathPreventHooks
                     return 0f;
                 }
                 return origSubmersion;
+            });
+        }*/
+        ILCursor c2 = new(il);
+        if (c2.TryGotoNext(MoveType.After,
+            i => i.Match(OpCodes.Isinst),
+            i => i.Match(OpCodes.Brfalse_S),
+            i => i.MatchLdarg(0),
+            i => i.MatchIsinst<Player>()))
+        {
+            c2.EmitDelegate<Func<Player, Player>>((player) =>
+            {
+                if (Plugin.playerModules.TryGetValue(player, out var mod) && mod.deathPreventer != null)
+                {
+                    mod.deathPreventer.dontRevive = true;
+                }
+                return player;
             });
         }
     }
@@ -124,22 +143,14 @@ public class DeathPreventHooks
                     (physicalObj as Player).Stun(200);
                     physicalObj.room.AddObject(new CreatureSpasmer(physicalObj as Player, false, (physicalObj as Player).stun));
                     (physicalObj as Player).LoseAllGrasps();
-                    /*if (Options.DevMode.Value)
-                    {
-                        int maxfood = (physicalObj as Player).MaxFoodInStomach;
-                        int food = (physicalObj as Player).FoodInStomach;
-                        Plugin.Log("Zapcoil - food:" + food + " maxfood: " + maxfood);
-                        fp.PlayerHooks.CustomAddFood(physicalObj as Player, maxfood - food);
-                        (physicalObj as Player).AddFood(maxfood - food);
-                    }*/
                     return null;
                 }
                 // (deathPreventer)
-                else if (physicalObj is Player && Plugin.playerModules.TryGetValue(physicalObj as Player, out var module) && module.deathPreventer != null)
+                /*else if (physicalObj is Player && Plugin.playerModules.TryGetValue(physicalObj as Player, out var module) && module.deathPreventer != null)
                 {
                     bool prevented = module.deathPreventer.TryPreventDeath(PlayerDeathReason.ZapCoil);
                     return prevented ? null : physicalObj;
-                }
+                }*/
                 else { return physicalObj; }
             });
         }
@@ -169,11 +180,11 @@ public class DeathPreventHooks
                     return 0;
                 }
                 // (deathPreventer)
-                else if (physicalObj is Player && Plugin.playerModules.TryGetValue(physicalObj as Player, out var module) && module.deathPreventer != null)
+                /*else if (physicalObj is Player && Plugin.playerModules.TryGetValue(physicalObj as Player, out var module) && module.deathPreventer != null)
                 {
                     bool prevented = module.deathPreventer.TryPreventDeath(PlayerDeathReason.DangerGrasp);
                     return prevented ? 0 : centipedeMass;
-                }
+                }*/
                 else { return centipedeMass; }
             });
         }
@@ -210,14 +221,63 @@ public class DeathPreventHooks
         {
             if (self.eatObjects[i].chunk.owner is Player && Plugin.playerModules.TryGetValue((self.eatObjects[i].chunk.owner as Player), out var module) && module.deathPreventer != null)
             {
-                if (module.deathPreventer.TryPreventDeath(PlayerDeathReason.InstanceDestroy) || module.deathPreventer.justPreventedCounter > 0)
+                /*if (module.deathPreventer.TryPreventDeath(PlayerDeathReason.Destroy) || module.deathPreventer.justPreventedCounter > 0)
                 {
                     self.eatObjects[i].progression = 0;
-                }
-                
+                }*/
+                module.deathPreventer.dontRevive = true;
             }
         }
         orig(self, eu);
+    }
+
+
+    private static void IL_DaddyCorruption_EatenCreature_Update(ILContext il)
+    {
+        // 142之后，不影响他原来的值，只是给deathpreventer传一个值
+        ILCursor c1 = new(il);
+        if (c1.TryGotoNext(
+            i => i.MatchLdfld<DaddyCorruption.EatenCreature>("progression"),
+            i => i.MatchLdcR4(1),
+            i => i.Match(OpCodes.Blt_Un_S)))
+        {
+            c1.Emit(OpCodes.Ldarg_0);
+            c1.EmitDelegate<Action<DaddyCorruption.EatenCreature>>((daddyCorruption) =>
+            {
+                if (daddyCorruption.creature is Player && Plugin.playerModules.TryGetValue(daddyCorruption.creature as Player, out var mod) && mod.deathPreventer != null)
+                {
+                    mod.deathPreventer.dontRevive = true;
+                }
+            });
+        }
+
+    }
+
+
+    // 妈的有没有人能告诉我这玩意儿为什么不管用
+    // byd竟然是打错字了 ldloca到底是什么东西为啥会多个a 为啥他自动tab会给我tab出这个 为啥我在这里输出的日志一律不管用。。。。
+    private static void IL_WormGrass_WormGrassPatch_InteractWithCreature(ILContext il)
+    {
+        // 176 他存了一个player实例变量，此处已经判定完毕player不为null。所以直接调用
+        ILCursor c1 = new(il);
+        if (c1.TryGotoNext(
+            i => i.Match(OpCodes.Isinst),
+            i => i.Match(OpCodes.Stloc_S),
+            i => i.Match(OpCodes.Ldloc_S),
+            i => i.Match(OpCodes.Brfalse_S),
+            i => i.Match(OpCodes.Ldloc_S)))
+        {
+            Plugin.Log("IL_WormGrass_WormGrassPatch_InteractWithCreature");
+            c1.EmitDelegate<Func<Player, Player>>((player) =>
+            {
+                if (Plugin.playerModules.TryGetValue(player, out var mod) && mod.deathPreventer != null)
+                {
+                    Plugin.Log("wormgrass dont revive");
+                    mod.deathPreventer.dontRevive = true;
+                }
+                return player;
+            });
+        }
     }
 
 
@@ -399,7 +459,15 @@ public class DeathPreventer
     // TODO: 修复玩家被蜥蜴叼走然后复活的时候，蜥蜴钻管道导致玩家图像消失的问题
     public bool TryPreventDeath(PlayerDeathReason deathReason)
     {
-        if (dontRevive || justPreventedCounter > 0) { return false; }
+        Plugin.Log("TryPreventDeath:", !dontRevive, justPreventedCounter <= 0, deathReason < PlayerDeathReason.DeathPit);
+        if (dontRevive)
+        {
+            // 好吧 不能在这改 因为还有别的函数要读这个 这个在player.Die()里改了
+            // dontRevive = false;
+            return false;
+        }
+        if (justPreventedCounter > 0) { return false; }
+        if (deathReason >= PlayerDeathReason.DeathPit) return false;
         object reviveSwarmer = DeathPreventObject;
         // Plugin.Log("Try prevent death for player", player.abstractCreature.ID.number, deathReason.ToString(), "forceRevive:", forceRevive, "nullObject:", reviveSwarmer == null, "nullRoom:", player.room == null);
         
@@ -523,6 +591,8 @@ public class DeathPreventer
         AbstractCreatureAI abstractAI = player.abstractCreature.abstractAI;
         abstractAI?.SetDestination(player.abstractCreature.pos);
 
+        // 不知道为啥，神经元用完之后还会粘在手上，我怀疑allgrasps那个函数就是坏的，调用它好几次没有一次成功的（擦汗
+        player.LoseAllGrasps();
 
         // 移除复活用的神经元
         if (reviveSwarmer  != null) RemoveSwarmer(reviveSwarmer);
@@ -542,6 +612,8 @@ public class DeathPreventer
     {
         
         if (justPreventedCounter > 0) { return; }
+
+        
 
         if (reviveSwarmer is int) 
         {
@@ -589,7 +661,7 @@ public class DeathPreventer
 // 唉 写这个的时候才发现 那些个死法我都没记全 白死那么多回了
 // 写这个是因为死了之后需要加一小段无敌时间
 // 啊 其实应该直接抄DevConsole的代码
-public enum PlayerDeathReason
+/*public enum PlayerDeathReason
 {
     Unknown,
     Drown,
@@ -615,6 +687,19 @@ public enum PlayerDeathReason
     // 挑战70被茅草裂片杀死这个我不管了……
     Spear, // 我以为这个是在Violence里面的，看来不是
 
+}*/
+
+public enum PlayerDeathReason
+{
+    Unknown,
+    LethalWater,
+    DangerGrasp,
+    Violence,
+    ZapCoil,
+    // 分界线
+    DeathPit,
+    Destroy,
+    // singularity是删模型吗 不是的话我不管了
 }
 
 

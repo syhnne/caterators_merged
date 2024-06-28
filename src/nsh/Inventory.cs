@@ -21,7 +21,7 @@ namespace Caterators_by_syhnne.nsh;
 #pragma warning disable CS0162 // 检测到无法访问的代码
 
 
-// TODO: 加一个背包装满的动画效果
+// TODO: 更好的背包装满动画效果
 // TODO: 修复背上的矛能被香菇吃掉的bug（？
 // 我比较好奇猎手有没有遇到过这个问题 呃 应该没有过罢 一般蛞蝓猫应该没有香菇都吃到自己背上来了还能生还的经历 要不就不修了
 public class Inventory
@@ -175,7 +175,7 @@ public class Inventory
             RemoveAndRealizeObjectFromTop(eu);
         }
 
-
+        // TODO:
         #region spear straight to back
         /*bool flag7 = true;
         if (player.animation == Player.AnimationIndex.DeepSwim)
@@ -336,11 +336,9 @@ public class Inventory
 
 
 
-    /// <summary>
-    /// without realizing it
-    /// </summary>
+    /// <summary>without realizing it</summary>
     /// <param name="obj"></param>
-    /// <returns></returns>
+    /// <returns>bool</returns>
     public bool RemoveSpecificObj(AbstractPhysicalObject obj)
     {
         if (Items.Contains(obj))
@@ -374,7 +372,23 @@ public class Inventory
             else
             {
                 obj.pos = player.abstractCreature.pos;
-                obj.Spawn();
+                // 所以这个为啥会bug
+                try
+                {
+                    if (obj is ReviveSwarmerModules.ReviveSwarmerAbstract)
+                    {
+                        (obj as ReviveSwarmerModules.ReviveSwarmerAbstract).RealizeInRoom();
+                    }
+                    else
+                    {
+                        obj.Spawn();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Plugin.LogException(e);
+                    Plugin.Log("failed to realize:", obj.GetType());
+                }
             }
             
         }
@@ -423,7 +437,7 @@ public class Inventory
         bool spear = true;
         if (obj is AbstractSpear)
         {
-            spear = (itemsOnBack.CanAddASpear() != null);
+            spear = itemsOnBack.CanAddASpear() != null;
         }
         return spear && (currCapacity + ItemVolumeFromAbstr(obj) <= capacity);
     }
