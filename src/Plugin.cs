@@ -187,6 +187,7 @@ class Plugin : BaseUnityPlugin
     public static void LogException(Exception ex)
     {
         if (!ShowLogs || Logger == null) return;
+        Plugin.Log("An exception has occured!");
         Plugin.Logger.LogError(ex);
     }
 

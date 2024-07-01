@@ -31,6 +31,7 @@
         "throw_skill": 1,
         "food_min": 6,
         "food_max": 9,
+        "loudness": [ 1.2, 1.0 ],
 
         "guide_overseer": 2,
         "start_room": "LF_S01",

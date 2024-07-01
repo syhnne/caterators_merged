@@ -46,7 +46,12 @@
 		},
 
 		"alignments": {
-
+			"Scavengers": { "like": -0.5 },
+			"Lizards": { "like": -0.5 },
+			"Cicadas": { "like": -0.5 },
+			"Deer": { "like": -0.5 },
+			"GarbageWorms": { "like": -0.5 },
+			"JetFish": { "like": -0.5 }
 		}
 	}
 }

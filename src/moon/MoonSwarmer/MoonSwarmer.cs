@@ -8,6 +8,7 @@ using UnityEngine;
 using RWCustom;
 using Random = UnityEngine.Random;
 using Noise;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
@@ -43,8 +44,8 @@ public class MoonSwarmer : Creature
     /// <summary>
     /// 反转了，不给他赋值的话，他无脑跟随玩家的时候是不会去思考路怎么走的，所以要用这个
     /// </summary>
-    internal Vector2 debugConnectionEnd;
-    internal Vector2 debugDest;
+    public Vector2 debugConnectionEnd;
+    public Vector2 debugDest;
 
     public float rotation;
     public float lastRotation;
@@ -55,7 +56,7 @@ public class MoonSwarmer : Creature
     public float revolveSpeed;
     public bool lastVisible;
     public Vector2 drift;
-    public Vector2? hoverAtPlayerPos;
+    public Vector2? forceHoverPos;
 
     public float moveSpeed;
 
@@ -97,7 +98,7 @@ public class MoonSwarmer : Creature
         this.lastRotation = this.rotation;
         moveSpeed = 1f;
 
-        affectedByGravity = 0f;
+        affectedByGravity = 1f;
 
         debugDest = Vector2.zero;
         debugConnectionEnd = Vector2.zero;
@@ -118,7 +119,7 @@ public class MoonSwarmer : Creature
 
 
 
-            firstChunk.vel.y = firstChunk.vel.y - this.room.gravity * this.affectedByGravity;
+            firstChunk.vel.y += this.room.gravity * this.affectedByGravity;
             this.lastDirection = this.direction;
             this.lastLazyDirection = this.lazyDirection;
             this.lazyDirection = Vector3.Slerp(this.lazyDirection, this.direction, 0.06f);
@@ -159,6 +160,15 @@ public class MoonSwarmer : Creature
             notInSameRoomCounter = 0;
         }
 
+        if (notInSameRoom || (inSameRoom && !room.VisualContact(firstChunk.pos, player.mainBodyChunk.pos)))
+        {
+            cantSeeCounter++;
+        }
+        else
+        {
+            cantSeeCounter = 0;
+        }
+
         if (justTeleported > 0)
         {
             justTeleported--;
@@ -176,45 +186,30 @@ public class MoonSwarmer : Creature
 
         try
         {
-            
-            affectedByGravity = 0f;
 
-            if (notInSameRoom || (inSameRoom && !room.VisualContact(firstChunk.pos, player.mainBodyChunk.pos)))
-            {
-                cantSeeCounter++;
-            }
-            else
-            {
-                cantSeeCounter = 0;
-            }
+
+
 
 
             // 如果和玩家在一个房间且能看见玩家，就直接移动
             // 否则按照pathfinder的路线行进
             // 其实这个移动逻辑差极了，全仰仗每个房间门口tp一次才能运行的
-            if (!dead)
+            if (reachable && AI != null && AI.pathFinder != null)
             {
-                if (reachable && AI != null && AI.pathFinder != null)
-                {
-                    FindDest();
-                }
+                FindDest();
+            }
 
-                if (hoverAtPlayerPos != null)
-                {
-                    firstChunk.setPos = (Vector2)hoverAtPlayerPos;
-                }
-                else if (inSameRoom && cantSeeCounter < 30
-                    && AI != null && AI.pathFinder != null && AI.pathFinder.CoordinateCost(player.abstractCreature.pos).legality < PathCost.Legality.Unwanted
-                    // && Custom.DistLess(firstChunk.pos, player.mainBodyChunk.pos, 700f)
-                    // && AI.VisualContact(player.abstractCreature.pos, 3f)
-                    )
-                {
-                    HoverAtPlayerPos();
-                }
-                else
-                {
-                    MoveToDest();
-                }
+            if (forceHoverPos != null)
+            {
+                firstChunk.setPos = (Vector2)forceHoverPos;
+            }
+            else if (inSameRoom && cantSeeCounter < 30)
+            {
+                HoverAtPlayerPos();
+            }
+            else
+            {
+                QuickMoveToPos(debugConnectionEnd);
             }
 
 
@@ -235,65 +230,69 @@ public class MoonSwarmer : Creature
     // 即便能看见玩家，也要先找路，不然一旦看不见玩家，他们就要懵逼了，之前发生过好几次神经元看不见玩家然后回上一个房间找人的高血压事件
     public void FindDest()
     {
-        try
+        MovementConnection connection = new();
+        if (AI != null && AI.pathFinder != null && AI.pathFinder.destination != null)
         {
-            if (AI != null && AI.pathFinder != null && AI.pathFinder.destination != null && AI.pathFinder.DoneMappingAccessibility)
+            connection = (AI.pathFinder as StandardPather).FollowPath(abstractCreature.pos, false);
+            if (connection != currentConnection)
             {
-                MovementConnection connection = (AI.pathFinder as StandardPather).FollowPath(abstractCreature.pos, true);
                 currentConnection = connection;
-                if (connection != null && connection.type == MovementConnection.MovementType.ShortCut)
-                {
-                    if (room != null && room.GetTile(connection.StartTile).Terrain == Room.Tile.TerrainType.ShortcutEntrance)
-                    {
-                        enteringShortCut = new IntVector2?(connection.StartTile);
-                    }
-                }
-                else if (connection != null && room != null && !room.GetTile(connection.DestTile).Solid)
-                {
-                    debugConnectionEnd = room.MiddleOfTile(connection.DestTile);
-                    debugDest = room.MiddleOfTile(AI.pathFinder.destination);
-                    // MoveToDest(room.MiddleOfTile(connection.DestTile), room.MiddleOfTile(AI.pathFinder.destination));
-                }
             }
         }
-        catch (Exception ex)
+        if (currentConnection == null || connection == default)
         {
-            Plugin.LogException(ex);
+            if (inSameRoom)
+            {
+                debugConnectionEnd = player.mainBodyChunk.pos;
+                debugDest = player.mainBodyChunk.pos;
+            }
+            return;
         }
-
+        if (this.shortcutDelay < 1 && currentConnection.type == MovementConnection.MovementType.ShortCut)
+        {
+            enteringShortCut = new IntVector2?(currentConnection.StartTile);
+            return;
+        }
+        if (!room.GetTile(currentConnection.destinationCoord).IsSolid())
+        {
+            debugConnectionEnd = room.MiddleOfTile(currentConnection.destinationCoord);
+        }
+        debugDest = room.MiddleOfTile(AI.pathFinder.destination);
     }
 
 
 
-
-
-    public void MoveToDest()
+    public void MoveToPos(WorldCoordinate coord, int vel)
     {
-        // Plugin.Log("swarmer movetowards:", destSprite.x, destSprite.y);
+        if (room == null || coord.room != abstractCreature.pos.room) return;
+        MoveToPos(room.MiddleOfTile(coord), vel);
+    }
 
-        // 如果距离小于21f就不移动
-        // 21f是因为我发现一个很有意思的事情 首先他的dest是middleoftile 也就是一块地形的正中央
-        // room里面内置了一个函数叫visualcontact 看代码，他的原理是找到两点间距离的线段，每隔20f检测一下当前位置tile是否是实体，如果有实体就返回false
-        // 这是否说明，一个tile的宽度就是20f（
-        // 鉴于各路编程语言的float都不甚准确，写成21f以保证靠谱罢（
-        if (Custom.DistLess(firstChunk.pos, debugDest, 21f))
-        {
-            return;
-        }
+    public void MoveToPos(Vector2 destPos, int vel)
+    {
+        // TODO: 给每个神经元修改一下移动速度的参数，让他们的路径稍微有一点不同。
+        // 可以取神经元id的最后一位数
+        Vector2 dir = (destPos - base.firstChunk.pos) / 100f;
+        this.drift = (this.drift + Custom.RNV() * Random.value * 0.22f + dir * 0.03f).normalized;
+        base.firstChunk.vel += this.drift * 0.05f;
+        base.firstChunk.vel += dir * 0.01f;
+        base.firstChunk.vel += dir.normalized * 0.05f;
+        base.firstChunk.vel += Custom.DirVec(base.firstChunk.pos, destPos) * Mathf.InverseLerp(25f, 550f * vel, Vector2.Distance(base.firstChunk.pos, destPos));
+        base.firstChunk.vel *= Custom.LerpMap(base.firstChunk.vel.magnitude, 0.2f, 3f, 1f, 0.9f);
+    }
 
-        if (AI.pathFinder.destination == null || Vector2.Distance(firstChunk.pos, debugDest) <= 35f)
-        {
-            bodyChunks[0].vel = Vector2.Lerp(bodyChunks[0].vel, Vector2.zero, 0.05f);
-        }
-        else
-        {
-            Vector2 dir1 = Custom.DirVec(firstChunk.pos, debugConnectionEnd);
-            // Vector2 dir2 = Custom.DirVec(firstChunk.pos, destSprite);
-            float vel = Mathf.Lerp(moveSpeed, 5f, Custom.Dist(firstChunk.pos, debugConnectionEnd) * 0.05f);
-            bodyChunks[0].vel = dir1 * vel;
-            bodyChunks[0].vel = Vector2.Lerp(bodyChunks[0].vel, dir1 * vel, 0.02f);
-        }
+    // TODO: 这个规划路径的东西是打一棒子动一下，所以路上这个神经元必须跑得足够快才能逼着它再次计算。
+    // 那么怎么让神经元跑的快一点，还能看起来比较丝滑
+    // 最好用和玩家的距离来计算速度，而不是和connectionEnd的距离
+    public void QuickMoveToPos(Vector2 destPos)
+    {
+        if (room == null) return;
+        int r = abstractCreature.ID.number % 10;
 
+        Vector2 dir = (destPos - base.firstChunk.pos);
+        // Plugin.Log("dist:", Custom.BetweenRoomsDistance(room.world, abstractCreature.pos, player.abstractCreature.pos));
+        firstChunk.vel += dir.normalized * Custom.BetweenRoomsDistance(room.world, abstractCreature.pos, player.abstractCreature.pos) * r * 0.01f;
+        base.firstChunk.vel *= Custom.LerpMap(base.firstChunk.vel.magnitude, 0.2f, 40f, 1.0f, (15-r) * 0.03f);
     }
 
 
@@ -308,15 +307,7 @@ public class MoonSwarmer : Creature
             atPlayerTop += new Vector2(0f, 70f);
         }
 
-        Vector2 vector = (player.mainBodyChunk.pos - base.firstChunk.pos) / 100f;
-        this.drift = (this.drift + Custom.RNV() * Random.value * 0.22f + vector * 0.03f).normalized;
-        base.firstChunk.vel += this.drift * 0.05f;
-        base.firstChunk.vel += vector * 0.025f;
-        base.firstChunk.vel += vector.normalized * 0.05f;
-        base.firstChunk.vel += Custom.DirVec(base.firstChunk.pos, player.firstChunk.pos + atPlayerTop) * Mathf.InverseLerp(25f, 550f, Vector2.Distance(base.firstChunk.pos, player.firstChunk.pos + atPlayerTop));
-        base.firstChunk.vel *= Custom.LerpMap(base.firstChunk.vel.magnitude, 0.2f, 3f, 1f, 0.9f);
-
-        firstChunk.vel.y += room.gravity;
+        MoveToPos(player.mainBodyChunk.pos + atPlayerTop, 1);
     }
 
 
@@ -363,18 +354,7 @@ public class MoonSwarmer : Creature
     public override void Die()
     {
         // 懒得给o+8键写ilhook，于是想了这个招，只要我不执行这个函数不就好了吗（
-        // 说实话我不知道下面的代码会不会有bug
-        // 反转了，会有bug，这下o+8按不了了
         // 不过经实测，神经元就算意外掉虚空死了也能被传送回来，合理怀疑虚空底下是个实体的底，没被调用die()的都活下来了
-        /*if (!reachable) return;
-        if (manager.callBackSwarmers != null)
-        {
-            manager.callBackSwarmers++;
-        }
-        else
-        {
-            manager.callBackSwarmers = 1;
-        }*/
     }
 
 

@@ -46,15 +46,11 @@ public class MoonSwarmerCritob : Critob
             {
                 Standard = new(0.9f, Allowed),
                 OpenDiagonal = new(0.5f, Allowed),
-                ShortCut = new(1.2f, Unwanted),
+                ShortCut = new(1.2f, Allowed),
                 NPCTransportation = new(1, Allowed),
                 OffScreenMovement = new(1, Allowed),
                 BetweenRooms = new(1, Allowed),
                 DropToWater = new(1, Allowed),
-                ReachDown = new(1, Allowed),
-                ReachOverGap = new(1, Allowed),
-                ReachUp = new(1, Allowed),
-                LizardTurn = new(1, Allowed),
             },
             DamageResistances = new()
             {

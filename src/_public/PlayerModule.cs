@@ -105,7 +105,7 @@ public class PlayerModule
         pearlReader?.Update(eu);
         deathPreventer?.Update();
         playerReviver?.Update(eu);
-        swarmerManager?.Update();
+        swarmerManager?.Update(eu);
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
         srsLightSource?.Update();
         if (player.room == null || player.dead) return;
