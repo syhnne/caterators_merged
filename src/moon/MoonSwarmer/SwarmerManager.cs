@@ -17,7 +17,7 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
 
 
-// TODO: 每次钻管道的时候存储一下管道所处的房间和编号。如果神经元不在其中任何一个房间里，且两个管道不在同一个房间，那就全都传送到倒数第二个管道处
+
 public class SwarmerManager
 {
     // : 坏了 这个地方应该用弱引用 但我前面写了那么多东西全都不是弱引用（（
@@ -50,7 +50,7 @@ public class SwarmerManager
     public int? callBackSwarmers;
 
     public bool tryingToTeleport = false;
-    public float tpDistance = 80f;
+    public float tpDistance = 70f;
     private bool tryingToCallBack = false;
     private int teleportRetryCounter = 0;
     private int callBackRetryCounter = 0;
@@ -97,25 +97,6 @@ public class SwarmerManager
         }
     }
 
-    public AbstractCreature? FurthestSwarmer
-    {
-        get
-        {
-            if (swarmers == null || player.room == null) return null;
-            float dist = 0f;
-            int index = 0;
-            for (int i = 0; i < swarmers.Count; i++)
-            {
-                float d = Custom.BetweenRoomsDistance(player.room.world, swarmers[i].pos, player.abstractCreature.pos);
-                if (d > dist)
-                {
-                    dist = d;
-                    index = i; 
-                }
-            }
-            return swarmers[index];
-        }
-    }
 
 
 
@@ -219,6 +200,7 @@ public class SwarmerManager
                 if (sw.realizedCreature != null && player != null)
                 {
                     (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+                    sw.abstractAI.SetDestination(player.abstractCreature.pos);
                 }
                 else if (sw.realizedCreature != null)
                 {
@@ -475,11 +457,9 @@ public class SwarmerManager
         {
             if (sw.realizedCreature != null && player != null)
             {
-                (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
-            }
-            else if (sw.realizedCreature != null)
-            {
-                (sw.realizedCreature as MoonSwarmer).AI?.SetDestination(sw.pos);
+                (sw.realizedCreature as MoonSwarmer).AI.SetDestination(player.abstractCreature.pos);
+                sw.abstractAI.SetDestination(player.abstractCreature.pos);
+                (sw.realizedCreature as MoonSwarmer).AI.pathFinder.nextDestination = player.abstractCreature.pos;
             }
 
         }
@@ -634,6 +614,7 @@ public class SwarmerManager
             (swarmer.realizedCreature as MoonSwarmer).justTeleported = 60;
             // (swarmer.realizedCreature as MoonSwarmer).AI?.SwitchBehavior(MoonSwarmerAI.Behavior.FollowPlayer);
             (swarmer.realizedCreature as MoonSwarmer).AI?.SetDestination(player.abstractCreature.pos);
+            swarmer.abstractAI.SetDestination(player.abstractCreature.pos);
             swarmer.realizedCreature.firstChunk.pos = player.mainBodyChunk.pos;
             swarmer.realizedCreature.firstChunk.vel = player.mainBodyChunk.vel;
             return true;

@@ -381,7 +381,7 @@ public class PlayerHooks
         }
         else if (self.SlugCatClass == Enums.Moonname && Plugin.playerModules.TryGetValue(self, out var mod) && mod.swarmerManager != null)
         {
-            self.jumpBoost *= mod.swarmerManager.weakMode ? 0.9f : 1.2f;
+            self.jumpBoost *= mod.swarmerManager.weakMode ? 0.9f : (mod.swarmerManager.hasSwarmers + 7) / 10f;
         }
 
 

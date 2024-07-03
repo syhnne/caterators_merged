@@ -25,7 +25,9 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
     奶奶的。。这玩意儿真的难写。。*/
 
-// TODO: 让这玩意儿学会下台阶，他现在动不动就卡在平台上
+// : 让这玩意儿学会下台阶，他现在动不动就卡在平台上
+// 噢 原来这么简单
+
 
 public class MoonSwarmer : Creature
 {
@@ -46,6 +48,7 @@ public class MoonSwarmer : Creature
     /// </summary>
     public Vector2 debugConnectionEnd;
     public Vector2 debugDest;
+    public Vector2 lastConnectionEnd;
 
     public float rotation;
     public float lastRotation;
@@ -96,12 +99,14 @@ public class MoonSwarmer : Creature
         base.buoyancy = 1.1f;
         this.rotation = 0.25f;
         this.lastRotation = this.rotation;
+        base.GoThroughFloors = true;
         moveSpeed = 1f;
 
         affectedByGravity = 1f;
 
         debugDest = Vector2.zero;
         debugConnectionEnd = Vector2.zero;
+        lastConnectionEnd = Vector2.zero;
     }
 
     
@@ -207,7 +212,7 @@ public class MoonSwarmer : Creature
             {
                 HoverAtPlayerPos();
             }
-            else
+            else if (AI.pathFinder.destination.room == player.abstractCreature.pos.room)
             {
                 QuickMoveToPos(debugConnectionEnd);
             }
@@ -230,6 +235,7 @@ public class MoonSwarmer : Creature
     // 即便能看见玩家，也要先找路，不然一旦看不见玩家，他们就要懵逼了，之前发生过好几次神经元看不见玩家然后回上一个房间找人的高血压事件
     public void FindDest()
     {
+        lastConnectionEnd = debugConnectionEnd;
         MovementConnection connection = new();
         if (AI != null && AI.pathFinder != null && AI.pathFinder.destination != null)
         {
@@ -255,7 +261,11 @@ public class MoonSwarmer : Creature
         }
         if (!room.GetTile(currentConnection.destinationCoord).IsSolid())
         {
-            debugConnectionEnd = room.MiddleOfTile(currentConnection.destinationCoord);
+            Vector2 e = room.MiddleOfTile(currentConnection.destinationCoord);
+            if (e != lastConnectionEnd)
+            {
+                debugConnectionEnd = e;
+            }
         }
         debugDest = room.MiddleOfTile(AI.pathFinder.destination);
     }

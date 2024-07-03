@@ -382,7 +382,7 @@ public class DeathPreventer
         }
         if (g) dangerGraspCounter++; else dangerGraspCounter = 0;
 
-        if (dangerGraspCounter > 58)
+        if (dangerGraspCounter > 58 && player.dangerGrasp.grabber is not Centipede)
         {
             TryPreventDeath(PlayerDeathReason.DangerGrasp);
         }

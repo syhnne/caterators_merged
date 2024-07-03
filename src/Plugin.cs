@@ -39,8 +39,8 @@ class Plugin : BaseUnityPlugin
 {
 
     public const string MOD_ID = "syhnne.caterators";
-    public const string MOD_NAME = "Caterators-alpha";
-    public const string MOD_VERSION = "0.1.0";
+    public const string MOD_NAME = "Caterators_alpha";
+    public const string MOD_VERSION = "0.1.1";
 
     public static new ManualLogSource Logger { get; internal set; }
     public static ConditionalWeakTable<Player, _public.PlayerModule> playerModules = new ConditionalWeakTable<Player, _public.PlayerModule>();
@@ -113,6 +113,10 @@ class Plugin : BaseUnityPlugin
             throw;
         }
     }
+
+
+
+
     
 
 
