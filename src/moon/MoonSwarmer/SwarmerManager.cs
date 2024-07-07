@@ -246,6 +246,14 @@ public class SwarmerManager
         if (swarmers.Count == 0 && callBackSwarmers != null) return true;
         try
         {
+            /*for (int i = 0; i < 2; i++)
+            {
+                if (player.grasps.Count() > 0 && player.grasps[i].grabbed is MoonSwarmer)
+                {
+                    player.ReleaseGrasp(i); break;
+                }
+            }*/
+
             callBackSwarmers ??= 0;
             deathPreventer.forceRevive = true;
             Plugin.Log("CallBack() before:", swarmers.Count);

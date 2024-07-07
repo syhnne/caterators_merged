@@ -50,6 +50,7 @@ internal class CustomLore
                 self.AddObject(new roomScript.FPaltEndingCutscene(self));
             }
         }
+        
     }
 
 

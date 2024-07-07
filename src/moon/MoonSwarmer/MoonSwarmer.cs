@@ -9,6 +9,7 @@ using RWCustom;
 using Random = UnityEngine.Random;
 using Noise;
 using System.Runtime.InteropServices.WindowsRuntime;
+using MoreSlugcats;
 
 namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
@@ -29,7 +30,7 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 // 噢 原来这么简单
 
 
-public class MoonSwarmer : Creature
+public class MoonSwarmer : Creature, IPlayerEdible
 {
     // 好好好 这个manager被引用了14次 我特么测了三天才发现自己从来没给它赋过值
     public SwarmerManager manager = null;
@@ -77,8 +78,18 @@ public class MoonSwarmer : Creature
     public bool inSameRoom => room != null && reachable && manager.player.room != null && room.abstractRoom.index == manager.player.room.abstractRoom.index;
     public bool notInSameRoom => room != null && reachable && manager.player.room != null && room.abstractRoom.index != manager.player.room.abstractRoom.index;
     public bool reachable => manager != null && manager.player != null;
+
+    
+
     public float affectedByGravity = 1f;
     public MovementConnection currentConnection;
+
+
+
+
+
+
+    public int bites = 3;
 
     public MoonSwarmer(AbstractCreature abstr) : base(abstr, abstr.world)
     {
@@ -191,8 +202,11 @@ public class MoonSwarmer : Creature
 
         try
         {
-
-
+            // 目前来说，被玩家抓住了，那就是要吃了
+            if (grabbedBy.Count > 0 && grabbedBy[0].grabber is Player)
+            {
+                manager.hud.visibleCounter = 20;
+            }
 
 
 
@@ -373,6 +387,7 @@ public class MoonSwarmer : Creature
     public bool Kill(bool explode)
     {
         // if (abstractCreature == null) return false;
+        AllGraspsLetGoOfThisObject(true);
         if (explode && room != null)
         {
             room.AddObject(new Explosion.ExplosionLight(firstChunk.pos, 200f, 3f, 4, Color.white));
@@ -430,5 +445,41 @@ public class MoonSwarmer : Creature
     }
 
 
+    int IPlayerEdible.BitesLeft => bites;
 
+    int IPlayerEdible.FoodPoints => 1;
+
+    bool IPlayerEdible.Edible => manager.hasSwarmers > 1;
+
+    bool IPlayerEdible.AutomaticPickUp => false;
+
+    void IPlayerEdible.BitByPlayer(Grasp grasp, bool eu)
+    {
+        this.bites--;
+        this.room.PlaySound((this.bites == 0) ? SoundID.Slugcat_Eat_Swarmer : SoundID.Slugcat_Bite_Swarmer, base.firstChunk.pos);
+        base.firstChunk.MoveFromOutsideMyUpdate(eu, grasp.grabber.mainBodyChunk.pos);
+        if (this.bites < 1)
+        {
+            (grasp.grabber as Player).ObjectEaten(this);
+            if (!ModManager.MSC || !(grasp.grabber as Player).isNPC)
+            {
+                if (this.room.game.session is StoryGameSession)
+                {
+                    (this.room.game.session as StoryGameSession).saveState.theGlow = true;
+                }
+            }
+            else
+            {
+                ((grasp.grabber as Player).State as PlayerNPCState).Glowing = true;
+            }
+            (grasp.grabber as Player).glowing = true;
+            grasp.Release();
+            manager.KillSwarmer(this, false);
+        }
+    }
+
+    void IPlayerEdible.ThrowByPlayer()
+    {
+        // 不是，这个接口有什么用吗，我翻遍了代码没见任何一个可食用物品用过这个接口
+    }
 }

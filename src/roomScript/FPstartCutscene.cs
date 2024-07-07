@@ -38,7 +38,11 @@ public class FPstartCutscene : UpdatableAndDeletable
                 player = room.game.Players[0].realizedCreature as Player;
             }
         }
-        else if (!player.stillInStartShelter) { return; }
+        else if (!player.stillInStartShelter)
+        {
+            Destroy();
+            return;
+        }
 
 
 

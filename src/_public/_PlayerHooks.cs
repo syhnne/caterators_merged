@@ -726,7 +726,7 @@ public class PlayerHooks
 
 
 
-    // 修改神经元的可食用性和合成判定
+    // 好了，现在只有fp不能吃神经元了（。
     private static void IL_Player_GrabUpdate(ILContext il)
     {
         ILCursor c = new ILCursor(il);
@@ -744,7 +744,7 @@ public class PlayerHooks
             c.Emit(OpCodes.Ldloc, 13);
             c.EmitDelegate<Func<bool, Player, int, bool>>((edible, self, grasp) =>
             {
-                if (Enums.IsCaterator(self.slugcatStats.name))
+                if (self.SlugCatClass == Enums.FPname)
                 {
                     bool isNotOracleSwarmer = !(self.grasps[grasp].grabbed is OracleSwarmer);
                     return edible && isNotOracleSwarmer;
@@ -801,7 +801,7 @@ public class PlayerHooks
 
     private static void Player_BiteEdibleObject(On.Player.orig_BiteEdibleObject orig, Player self, bool eu)
     {
-        if (Enums.IsCaterator(self.slugcatStats.name) && self.grasps[0] != null && self.grasps[1] != null
+        if (self.SlugCatClass == Enums.FPname && self.grasps[0] != null && self.grasps[1] != null
             && (self.grasps[0].grabbed is SSOracleSwarmer || self.grasps[0].grabbed is SLOracleSwarmer) && self.grasps[1].grabbed is IPlayerEdible)
         {
             if ((self.grasps[1].grabbed as IPlayerEdible).BitesLeft == 1 && self.SessionRecord != null)
@@ -830,7 +830,7 @@ public class PlayerHooks
     private static bool Player_ObjectCountsAsFood(On.Player.orig_ObjectCountsAsFood orig, Player self, PhysicalObject obj)
     {
         bool result = orig(self, obj);
-        if (Enums.IsCaterator(self.slugcatStats.name))
+        if (self.SlugCatClass == Enums.FPname)
         {
             result = result && !(obj is OracleSwarmer);
         }
@@ -843,7 +843,7 @@ public class PlayerHooks
     private static bool SLOracleSwarmer_Edible(orig_SLOracleSwarmerEdible orig, SLOracleSwarmer self)
     {
         var result = orig(self);
-        if (self.grabbedBy.Count > 0 && self.grabbedBy[0] != null && self.grabbedBy[0].grabber is Player && Enums.IsCaterator((self.grabbedBy[0].grabber as Player).slugcatStats.name))
+        if (self.grabbedBy.Count > 0 && self.grabbedBy[0] != null && self.grabbedBy[0].grabber is Player && (self.grabbedBy[0].grabber as Player).SlugCatClass == Enums.FPname)
         {
             result = false;
         }
@@ -856,7 +856,7 @@ public class PlayerHooks
     private static bool SSOracleSwarmer_Edible(orig_SSOracleSwarmerEdible orig, SSOracleSwarmer self)
     {
         var result = orig(self);
-        if (self.grabbedBy.Count > 0 && self.grabbedBy[0] != null && self.grabbedBy[0].grabber is Player && Enums.IsCaterator((self.grabbedBy[0].grabber as Player).slugcatStats.name))
+        if (self.grabbedBy.Count > 0 && self.grabbedBy[0] != null && self.grabbedBy[0].grabber is Player && (self.grabbedBy[0].grabber as Player).SlugCatClass == Enums.FPname)
         {
             result = false;
         }
@@ -873,7 +873,7 @@ public class PlayerHooks
 
     private static bool Player_CanBeSwallowed(On.Player.orig_CanBeSwallowed orig, Player self, PhysicalObject testObj)
     {
-        if (Enums.IsCaterator(self.slugcatStats.name))
+        if (self.SlugCatClass == Enums.FPname)
         {
             return (testObj is Rock || testObj is DataPearl || testObj is FlareBomb || testObj is Lantern || testObj is FirecrackerPlant || testObj is VultureGrub && !(testObj as VultureGrub).dead || testObj is Hazer && !(testObj as Hazer).dead && !(testObj as Hazer).hasSprayed || testObj is FlyLure || testObj is ScavengerBomb || testObj is PuffBall || testObj is SporePlant || testObj is BubbleGrass || testObj is OracleSwarmer || testObj is NSHSwarmer || testObj is OverseerCarcass || ModManager.MSC && testObj is FireEgg && self.FoodInStomach >= self.MaxFoodInStomach || ModManager.MSC && testObj is SingularityBomb && !(testObj as SingularityBomb).activateSingularity && !(testObj as SingularityBomb).activateSucktion || testObj is nsh.ReviveSwarmerModules.ReviveSwarmer);
         }

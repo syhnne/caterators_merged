@@ -103,6 +103,7 @@ class Plugin : BaseUnityPlugin
             CustomSaveData.Apply();
             fp.ShelterSS_AI.Apply();
 
+
             // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
             _public.SSOracleHooks.Apply();
 

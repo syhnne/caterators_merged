@@ -10,6 +10,17 @@ namespace Caterators_by_syhnne.moon;
 public class CustomLore
 {
 
+    public static void Room_Loaded(Room self)
+    {
+        // 不是。咋不干活啊。给我动换啊。
+        // 反了你了，怎么连日志都没得
+        if (self.abstractRoom.name == "SL_AI")
+        {
+            self.AddObject(new roomScript.MoonStartCutscene(self));
+        }
+    }
+
+
 
 
 

@@ -33,7 +33,7 @@
         "food_max": 7,
 
         "guide_overseer": 1,
-        "start_room": "SU_A02",
+        "start_room": "SL_AI",
         "world_state": [ "Moonslugcat", "Saint", "Yellow" ],
         "timeline_after": "Rivulet",
         "cycle_length_min": 5,

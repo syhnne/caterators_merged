@@ -14,6 +14,8 @@ public class SLOracleHooks
     {
         On.SLOracleBehaviorHasMark.InitateConversation += SLOracleBehaviorHasMark_InitateConversation;
         On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += MoonConversation_AddEvents;
+
+        moon.SLOracleHooks.Apply();
     }
 
 

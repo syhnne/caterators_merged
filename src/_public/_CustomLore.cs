@@ -71,6 +71,11 @@ public class CustomLore
         {
             self.GetStorySession.saveState.hasRobo = true;
         }
+        // 这不会影响别的存档罢（心虚）会的话我就删了
+        else if (self.IsStorySession && self.StoryCharacter == Enums.Moonname)
+        {
+            self.GetStorySession.saveState.deathPersistentSaveData.ripMoon = true;
+        }
     }
 
 
@@ -233,6 +238,10 @@ public class CustomLore
             else if (self.game.StoryCharacter == Enums.NSHname)
             {
                 nsh.CustomLore.Room_Loaded(self);
+            }
+            else if (self.game.StoryCharacter == Enums.Moonname)
+            {
+                moon.CustomLore.Room_Loaded(self);
             }
         }
 
