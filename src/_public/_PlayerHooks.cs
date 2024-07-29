@@ -563,16 +563,19 @@ public class PlayerHooks
     // 防止你那倒霉的联机队友在你死了之后顶着3倍重力艰难行走。我知道队友有可能也会控制重力，但是我懒得加判断
     private static void Player_Die(On.Player.orig_Die orig, Player self)
     {
+        bool skipDeath = false;
         bool getModule = Plugin.playerModules.TryGetValue(self, out var module);
         if (getModule && module.deathPreventer != null)
         {
-            if (module.deathPreventer.TryPreventDeath(PlayerDeathReason.Unknown))
-            {
-                return;
-            }
-            else if (module.deathPreventer.justPreventedCounter > 0)
-            { return; }
+            if (module.deathPreventer.justPreventedCounter > 0) { skipDeath = true; }
+            else if (module.deathPreventer.TryPreventDeath(PlayerDeathReason.Unknown)) { skipDeath = true; }
         }
+        if (skipDeath)
+        {
+            self.dead = false;
+            return;
+        }
+
         orig(self);
         
         if (getModule)
@@ -633,29 +636,30 @@ public class PlayerHooks
     private static void HUD_InitSinglePlayerHud(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
     {
         orig(self, cam);
-        if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module1))
+        
+
+        if (ModManager.CoopAvailable && cam.room.game.session != null && (self.owner as Player).abstractCreature.ID.number == 0)
         {
-            Plugin.Log("HUD added for player", (self.owner as Player).abstractCreature.ID.number);
+            for (int i = 0; i < cam.room.game.session.Players.Count; i++)
+            {
+                if (cam.room.game.session.Players[i].realizedCreature == null || cam.room.game.session.Players[i].realizedCreature is not Player) return;
+                Player player = cam.room.game.session.Players[i].realizedCreature as Player;
+                if (Plugin.playerModules.TryGetValue(player, out var module2))
+                {
+                    Plugin.Log("coop - HUD added for player", i);
+                    InitPlayerHud(self, module2);
+                }
+            }
+        }
+        else if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module1))
+        {
+            Plugin.Log("single player - HUD added for player", (self.owner as Player).abstractCreature.ID.number);
             /*Plugin.Log("HUD - fContainers:", self.fContainers.Count());
             for (int i = 0; i < self.fContainers.Count(); i++) 
             {
                 Plugin.Log("-- container:", i, self.fContainers[i].GetChildCount());
             }*/
             InitPlayerHud(self, module1);
-        }
-
-        if (ModManager.CoopAvailable && cam.room.game.session != null)
-        {
-            for (int i = 1; i < cam.room.game.session.Players.Count; i++)
-            {
-                if (cam.room.game.session.Players[i].realizedCreature == null || cam.room.game.session.Players[i].realizedCreature is not Player) return;
-                Player player = cam.room.game.session.Players[i].realizedCreature as Player;
-                if (Plugin.playerModules.TryGetValue(self.owner as Player, out var module2))
-                {
-                    Plugin.Log("HUD added for player", i);
-                    InitPlayerHud(self, module2);
-                }
-            }
         }
 
         string str = "- HUDparts:";

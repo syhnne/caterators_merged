@@ -35,6 +35,8 @@ public class PlayerModule
 
     public PlayerModule(Player player, AbstractCreature abstractCreature, World world)
     {
+        // Plugin.Log("quickdeath:", player.Template.quickDeath);
+
         playerRef = new WeakReference<Player>(player);
         playerName = player.slugcatStats.name;
         if (Enums.IsCaterator(playerName))
@@ -52,10 +54,6 @@ public class PlayerModule
 
         deathPreventer = new DeathPreventer(player);
         playerReviver = new PlayerReviver(player);
-        if (isCaterator && storyName != null)
-        {
-            gravityController = new GravityController(player);
-        }
         if (playerName == Enums.NSHname)
         {
             nshInventory = new nsh.Inventory(player);
@@ -73,7 +71,6 @@ public class PlayerModule
                 deathPreventer.swarmerManager = swarmerManager;
                 swarmerManager.deathPreventer = deathPreventer;
                 int sw = world.game.GetDeathPersistent().MoonHasSwarmers;
-                // TODO: 算了，拉倒吧，生成神经元这个工作交给开场动画
                 swarmerManager.callBackSwarmers = (sw > moon.MoonSwarmer.SwarmerManager.maxSwarmer ? sw : Math.Min(sw + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer));
                 Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers, "last cycle swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
                 // gills = new PlayerGraphics.AxolotlGills(player.graphicsModule as PlayerGraphics, 13);
@@ -83,6 +80,7 @@ public class PlayerModule
         else if (playerName == Enums.FPname)
         {
             pearlReader = new fp.PearlReader(player);
+            gravityController = new(player);
         }
         else if (playerName == Enums.test)
         {

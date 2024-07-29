@@ -203,9 +203,14 @@ public class MoonSwarmer : Creature, IPlayerEdible
         try
         {
             // 目前来说，被玩家抓住了，那就是要吃了
-            if (grabbedBy.Count > 0 && grabbedBy[0].grabber is Player)
+            if (manager != null && grabbedBy.Count > 0 && grabbedBy[0].grabber is Player)
             {
                 manager.hud.visibleCounter = 20;
+                manager.hud.blinkRed = true;
+            }
+            else if (manager != null)
+            {
+                manager.hud.blinkRed = false;
             }
 
 
@@ -218,7 +223,7 @@ public class MoonSwarmer : Creature, IPlayerEdible
                 FindDest();
             }
 
-            if (forceHoverPos != null)
+            if (inSameRoom && forceHoverPos != null)
             {
                 firstChunk.setPos = (Vector2)forceHoverPos;
             }
@@ -226,7 +231,7 @@ public class MoonSwarmer : Creature, IPlayerEdible
             {
                 HoverAtPlayerPos();
             }
-            else if (AI.pathFinder.destination.room == player.abstractCreature.pos.room)
+            else if (AI != null && AI.pathFinder != null && AI.pathFinder.destination.room == player.abstractCreature.pos.room)
             {
                 QuickMoveToPos(debugConnectionEnd);
             }

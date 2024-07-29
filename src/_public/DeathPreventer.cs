@@ -50,32 +50,13 @@ public class DeathPreventHooks
         IL.ZapCoil.Update += IL_ZapCoil_Update;
         IL.Centipede.Shock += IL_Centipede_Shock;
         On.Creature.Violence += Creature_Violence;
+        // IL.Creature.Violence += IL_Creature_Violence;
         IL.DaddyCorruption.EatenCreature.Update += IL_DaddyCorruption_EatenCreature_Update;
         IL.WormGrass.WormGrassPatch.InteractWithCreature += IL_WormGrass_WormGrassPatch_InteractWithCreature;
     }
 
     private static void IL_Creature_Update(ILContext il)
     {
-        // 158
-        /*ILCursor c = new ILCursor(il);
-        if (c.TryGotoNext(MoveType.After,
-            i => i.Match(OpCodes.Brtrue),
-            i => i.Match(OpCodes.Ldarg_0),
-            i => i.MatchCall<PhysicalObject>("get_Submersion"),
-            i => i.Match(OpCodes.Ldc_R4)
-            ))
-        {
-            c.Emit(OpCodes.Ldarg_0);
-            c.EmitDelegate<Func<float, Creature, float>>((origSubmersion, creature) =>
-            {
-                if (creature is Player && Plugin.playerModules.TryGetValue(creature as Player, out var module) && module.deathPreventer != null)
-                {
-                    module.deathPreventer.TryPreventDeath(PlayerDeathReason.LethalWater);
-                    return 0f;
-                }
-                return origSubmersion;
-            });
-        }*/
         ILCursor c2 = new(il);
         if (c2.TryGotoNext(MoveType.After,
             i => i.Match(OpCodes.Isinst),
@@ -94,30 +75,7 @@ public class DeathPreventHooks
         }
     }
 
-    // 奶奶的 不管了
-    /*private static void IL_Player_ClassMechanicsSaint(ILContext il)
-    {
-        // 1223
-        ILCursor c = new ILCursor(il);
-        if (c.TryGotoNext(MoveType.After,
-            i => i.Match(OpCodes.Call),
-            i => i.Match(OpCodes.Stfld),
-            i => i.Match(OpCodes.Ldloca_S),
-            i => i.MatchIsinst<Creature>()
-            ))
-        {
-            c.Emit(OpCodes.Ldloc, 18);
-            c.EmitDelegate<Func<bool, PhysicalObject, bool>>((isCreature, obj) => 
-            { 
-                if (obj is Player && Plugin.playerModules.TryGetValue(obj as Player, out var module) && module.deathPreventer != null)
-                {
-                    module.deathPreventer.TryPreventDeath(PlayerDeathReason.SaintAscention);
-                    return false;
-                }
-                return isCreature;
-            });
-        }
-    }*/
+
 
 
     private static void IL_ZapCoil_Update(ILContext il)
@@ -202,15 +160,69 @@ public class DeathPreventHooks
                 stunBonus = Mathf.Lerp(1f, 0.1f, self.room.world.rainCycle.RainApproaching) * stunBonus;
             }
         }
-        /*else if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var module) && module.deathPreventer != null)
+        /*else if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var module) && module.deathPreventer != null && )
         {
             if (self.room.world.rainCycle.RainApproaching > 0f && module.deathPreventer.TryPreventDeath(PlayerDeathReason.Violence))
             {
                 { return; }
             }
-            
         }*/
         orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+
+        if (self.State is HealthState)
+        {
+            Plugin.Log("creature:", self, "health:", (self.State as HealthState).health);
+        }
+    }
+
+
+
+    private static void IL_Creature_Violence(ILContext il)
+    {
+        /*ILCursor c1 = new(il);
+        if (c1.TryGotoNext(
+            i => i.MatchIsinst<HealthState>(),
+            i => i.MatchDup(),
+            i => i.MatchCallvirt<HealthState>("get_health"),
+            i => i.MatchLdloc(0)))
+        {
+            Plugin.Log("ilcursor found");
+            c1.Emit(OpCodes.Ldarg_0);
+            c1.EmitDelegate<Func<float, Creature, float>>((minus, self) =>
+            {
+                if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var module) && module.deathPreventer != null && module.deathPreventer.TryPreventDeath(PlayerDeathReason.Violence))
+                {
+                    minus = 0f;
+                }
+                return minus;
+            });
+        }*/
+
+        /*ILCursor c2 = new(il);
+        if (c2.TryGotoNext(
+            i => i.Match(OpCodes.Ldsfld),
+            i => i.MatchStfld<Creature>("stunDamageType"),
+            i => i.MatchLdarg(0),
+            i => i.MatchCall<Creature>("get_State"),
+            i => i.MatchIsinst<HealthState>()))
+        {
+            c2.Emit(OpCodes.Ldarg_0);
+            c2.Emit(OpCodes.Ldloc_0);
+            c2.EmitDelegate<Func<bool, Creature, float, bool>>((orig, creature, minus) =>
+            {
+                return orig;
+            });
+        }*/
+
+        ILCursor c3 = new(il);
+        if (c3.TryGotoNext(
+            i => i.Match(OpCodes.Call),
+            i => i.MatchLdcR4(0.33f),
+            i => i.Match(OpCodes.Bge_Un_S),
+            i => i.MatchLdarg(0)))
+        {
+
+        }
     }
 
 
@@ -512,7 +524,7 @@ public class DeathPreventer
             {
                 player.room.AddObject(new ElectricDeath.SparkFlash(pos2, 10f));
             }
-            player.room.PlaySound(SoundID.Centipede_Shock, pos2, 1f, 1f + 0.25f * Random.value);
+            // player.room.PlaySound(SoundID.Centipede_Shock, pos2, 1f, 1f + 0.25f * Random.value);
             player.room.InGameNoise(new InGameNoise(pos2, 8000f, player, 1f));
             if (player.room.Darkness(pos2) > 0f)
             {
@@ -592,7 +604,11 @@ public class DeathPreventer
         abstractAI?.SetDestination(player.abstractCreature.pos);
 
         // 不知道为啥，神经元用完之后还会粘在手上，我怀疑allgrasps那个函数就是坏的，调用它好几次没有一次成功的（擦汗
-        player.LoseAllGrasps();
+        // player.LoseAllGrasps();
+        if (reviveSwarmer is AbstractPhysicalObject)
+        {
+            (reviveSwarmer as AbstractPhysicalObject).realizedObject?.AllGraspsLetGoOfThisObject(true);
+        }
 
         // 移除复活用的神经元
         if (reviveSwarmer  != null) RemoveSwarmer(reviveSwarmer);

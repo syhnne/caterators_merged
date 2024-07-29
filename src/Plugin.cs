@@ -93,6 +93,8 @@ class Plugin : BaseUnityPlugin
             On.World.GetNode += World_GetNode;
             On.RegionState.AdaptRegionStateToWorld += RegionState_AdaptRegionStateToWorld;
 
+            On.MoreSlugcats.SlugNPCAI.WantsToEatThis += SlugNPCAI_WantsToEatThis;
+
 
             _public.PlayerHooks.Apply();
             _public.PlayerGraphicsModule.Apply();
@@ -174,14 +176,16 @@ class Plugin : BaseUnityPlugin
     public static void Log(params object[] text)
     {
         if (!ShowLogs) return;
-        string log = "[syhnne.caterators] : ";
+        string prefix = "[syhnne.caterators] : ";
+        string log = "";
         foreach (object s in text)
         {
             log += s.ToString();
             log += " ";
         }
-        Debug.Log(log);
-        JollyCoop.JollyCustom.Log(log);
+        Debug.Log(prefix + log);
+        JollyCoop.JollyCustom.Log(prefix + log);
+        Logger.LogMessage(log);
     }
 
 
@@ -208,7 +212,10 @@ class Plugin : BaseUnityPlugin
 
 
 
-
+    private static bool SlugNPCAI_WantsToEatThis(On.MoreSlugcats.SlugNPCAI.orig_WantsToEatThis orig, SlugNPCAI self, PhysicalObject obj)
+    {
+        return orig(self, obj) && obj is not moon.MoonSwarmer.MoonSwarmer;
+    }
 
 
     private static bool SlugcatStats_HiddenOrUnplayableSlugcat(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugcatStats.Name i)
@@ -278,18 +285,15 @@ class Plugin : BaseUnityPlugin
             
         }
 
-        if (Options.EnableCampaign.Value)
+        newNames.Add(Enums.FPname);
+        newNames.Add(Enums.SRSname);
+        newNames.Add(Enums.NSHname);
+        newNames.Add(Enums.Moonname);
+        if (ShowLogs)
         {
-            newNames.Add(Enums.FPname);
-            newNames.Add(Enums.SRSname);
-            newNames.Add(Enums.NSHname);
-            newNames.Add(Enums.Moonname);
-            if (ShowLogs)
-            {
-                newNames.Add(Enums.test);
-            }
+            newNames.Add(Enums.test);
         }
-        
+
 
         self.slugcatColorOrder = newNames;
 

@@ -36,7 +36,7 @@
 
 		"karma": 0,
 		"karma_cap": 4,
-		"the_mark": true,
+		"the_mark": false,
 		"the_glow": true,
 		"cycle_length_min": 9,
 

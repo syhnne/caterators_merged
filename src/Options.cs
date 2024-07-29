@@ -75,14 +75,14 @@ internal class Options : OptionInterface
             );
         }
 
-        desc = "in case if you wonder what are those dependencies for";
+        /*desc = "in case if you wonder what are those dependencies for";
         ypos += 50f;
         Tabs[0].AddItems(
             new OpLabel(xposLabel, ymax - yspacing - ypos, inGameTranslator.Translate("Enable story mode"), false)
             { description = inGameTranslator.Translate(desc) },
             new OpCheckBox(EnableCampaign, new Vector2(xposOpt, ymax - yspacing - ypos))
             { description = inGameTranslator.Translate(desc) }
-        );
+        );*/
 
 
 

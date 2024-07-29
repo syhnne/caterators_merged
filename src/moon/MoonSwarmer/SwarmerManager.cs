@@ -700,6 +700,7 @@ public class SwarmerHUD : HudPart
     public int showCountDelay;
     public int visibleCounter;
     public float downInCorner;
+    public bool blinkRed;
 
     private static float xSpacing = 20f;
 
@@ -721,6 +722,8 @@ public class SwarmerHUD : HudPart
         showCount = 0;
         showCountDelay = 0; 
         visibleCounter = 0;
+        blinkRed = false;
+
 
         icons = new List<FSprite>();
         for (int i = 0; i < SwarmerManager.maxSwarmer; i++)
@@ -871,11 +874,17 @@ public class SwarmerHUD : HudPart
         {
             icons[i].alpha = fade;
             icons[i].SetPosition(DrawPos(timeStacker, i));
+            if (blinkRed)
+            {
+                icons[i].color = Color.Lerp(Color.white, Color.red, Mathf.Sin(showCount * 0.1f));
+            }
         }
         lineSprite.alpha = fade;
         Vector2 linePos = DrawPos(timeStacker, SwarmerManager.maxSwarmer);
         linePos.x -= 0.5f * xSpacing; 
         lineSprite.SetPosition(linePos);
+
+
 
     }
 

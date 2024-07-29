@@ -368,7 +368,7 @@ public static class PlayerHooks
             Plugin.Log("orig h:", dmg, "crit:", result.obj);
             // 物理伤害+2f火伤+10%火伤（大雾
             // 没错 就是针对香菇设计的
-            (result.obj as Creature).PercentageViolence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.None, 0.1f, 20f);
+            (result.obj as Creature).PercentageViolence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.None, 0.4f, 20f);
 
             (result.obj as Creature).Violence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.None, 2f, 0f);
 
