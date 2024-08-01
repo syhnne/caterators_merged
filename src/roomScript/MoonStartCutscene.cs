@@ -69,7 +69,6 @@ public class MoonStartCutscene : UpdatableAndDeletable
                 }
 
             }
-            Plugin.Log("player pos:", pl.firstChunk.pos);
 
         }
 

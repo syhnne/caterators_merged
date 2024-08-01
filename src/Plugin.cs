@@ -22,6 +22,7 @@ using Menu;
 using SlugBase;
 using JollyCoop;
 using JollyCoop.JollyMenu;
+using Caterators_by_syhnne.fp;
 
 // TODO: 阿西吧 我还得检查探险模式有没有bug 太难顶了
 // 这个mod的大部分工程量都在于防止有人在酒吧里点炒饭。。。（
@@ -151,6 +152,7 @@ class Plugin : BaseUnityPlugin
     {
         orig(self);
         On.Menu.SlugcatSelectMenu.SetSlugcatColorOrder += SlugcatSelectMenu_SetSlugcatColorOrder;
+        _public.CustomMenu.Apply();
     }
 
 

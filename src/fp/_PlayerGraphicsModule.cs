@@ -22,7 +22,7 @@ public class PlayerGraphicsModule
     public static void PlayerGraphics_ctor(PlayerGraphics self, PhysicalObject ow)
     {
         // 这个数据回头再改（
-        if (self.player.playerState.isPup)
+        /*if (self.player.playerState.isPup)
         {
             self.tail[0] = new TailSegment(self, 6f, 2f, null, 0.85f, 1f, 1f, true);
             self.tail[1] = new TailSegment(self, 4f, 3.5f, self.tail[0], 0.85f, 1f, 0.5f, true);
@@ -35,7 +35,7 @@ public class PlayerGraphicsModule
             self.tail[1] = new TailSegment(self, 4f, 6f, self.tail[0], 0.85f, 1f, 0.5f, true);
             self.tail[2] = new TailSegment(self, 2.5f, 5.5f, self.tail[1], 0.85f, 1f, 0.5f, true);
             self.tail[3] = new TailSegment(self, 1f, 5f, self.tail[2], 0.85f, 1f, 0.5f, true);
-        }
+        }*/
 
     }
 

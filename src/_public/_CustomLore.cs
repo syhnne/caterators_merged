@@ -42,8 +42,7 @@ public class CustomLore
         On.Room.Loaded += Room_Loaded;
 
 
-        On.Menu.SlugcatSelectMenu.SlugcatPage.AddAltEndingImage += SlugcatPage_AddAltEndingImage;
-        On.Menu.SlideShow.ctor += SlideShow_ctor;
+        
 
         // 由于我把剧情砍了，这个可以去掉了。。
         On.SlugcatStats.SlugcatUnlocked += SlugcatStats_SlugcatUnlocked;
@@ -51,7 +50,7 @@ public class CustomLore
         // OxygenMask
         On.AbstractPhysicalObject.UsesAPersistantTracker += AbstractPhysicalObject_UsesAPersistantTracker;
 
-        fp.CustomLore.Apply();
+        
         srs.CustomLore.Apply();
         moon.CustomLore.Apply();
     }
@@ -158,7 +157,9 @@ public class CustomLore
                     int? sw = module.swarmerManager.CycleEndSave();
                     if (sw != null)
                     {
+                        sw = sw > moon.MoonSwarmer.SwarmerManager.maxSwarmer ? sw : Math.Min((int)sw + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer);
                         self.GetDeathPersistent().MoonHasSwarmers = (int)sw;
+                        self.GetMiscProgression().MoonSwarmers = (int)sw;
                         Plugin.Log("moonswarmer save:", self.GetDeathPersistent().MoonHasSwarmers);
                     }
                 }
@@ -202,21 +203,10 @@ public class CustomLore
 
 
 
-    private static void SlugcatPage_AddAltEndingImage(On.Menu.SlugcatSelectMenu.SlugcatPage.orig_AddAltEndingImage orig, SlugcatSelectMenu.SlugcatPage self)
-    {
-        if (self.slugcatNumber == Enums.FPname)
-        {
-            fp.CustomLore.SlugcatPage_AddAltEndingImage(self);
-        }
-        else { orig(self); }
-    }
+    
 
 
-    private static void SlideShow_ctor(On.Menu.SlideShow.orig_ctor orig, SlideShow self, ProcessManager manager, SlideShow.SlideShowID slideShowID)
-    {
-        orig(self, manager, slideShowID);
-        fp.CustomLore.SlideShow_ctor(self, manager, slideShowID);
-    }
+    
 
 
     /// <summary>

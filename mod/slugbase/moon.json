@@ -1,20 +1,19 @@
 {
     "id": "Moonslugcat",
     "name": "moon",
-    "description": "lol",
+    "description": "took me 2hrs to export these pictures",
     "features": {
-        "color": "3ab0b4",
+        "color": "2aa0a4",
         "custom_colors": [
             {
                 "name": "Body",
-                "story": "3ab0b4"
+                "story": "2aa0a4"
             },
             {
                 "name": "Eyes",
                 "story": "010101"
             }
         ],
-        "select_menu_scene": "Slugcat_moon",
         "select_menu_scene_ascended": "Ghost_moon",
 
         "back_spear": false,

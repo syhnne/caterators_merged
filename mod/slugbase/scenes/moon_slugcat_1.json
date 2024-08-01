@@ -1,0 +1,21 @@
+{
+	"id": "Slugcat_moon_1",
+	"scene_folder": "scenes/lttm/slugcat",
+	"images": [
+		{ "name": "back4", "pos": [0, 0], "depth": 4.0, "shader": "Basic" },
+		{ "name": "back3", "pos": [0, 0], "depth": 4.0, "shader": "Basic" },
+		{ "name": "back2", "pos": [0, 0], "depth": 3.8, "shader": "Basic" },
+		{ "name": "back1", "pos": [0, 0], "depth": 3.6, "shader": "Basic" },
+		{ "name": "mid3", "pos": [0, 0], "depth": 3.2, "shader": "Basic" },
+		{ "name": "mid2", "pos": [0, 0], "depth": 2.8, "shader": "Basic" },
+		{ "name": "mid1", "pos": [0, 0], "depth": 2.7, "shader": "Basic" },
+		{ "name": "Slugcat",    "pos": [0, 0], "depth": 2.5, "shader": "Basic" },
+		{ "name": "front1",    "pos": [0, 0], "depth": 1.8, "shader": "Basic" },
+		{ "name": "neu5",    "pos": [0, 0], "depth": 2.3, "shader": "Basic" }
+	],
+	"idle_depths": [ 2.5 ],
+	"glow_pos": [688, 484],
+	"mark_pos": [689, 583],
+	"select_menu_pos": [463, 235],
+	"slugcat_depth": 2.5
+}

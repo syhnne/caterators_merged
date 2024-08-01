@@ -97,6 +97,7 @@ public static class CustomSaveData
         public bool alt2ending_nsh { get; set; }
         public bool beaten_moon {  get; set; }
         public bool alt2ending_moon { get; set; }
+        public int MoonSwarmers {  get; set; }
 
     }
 

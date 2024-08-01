@@ -69,6 +69,8 @@ public class PlayerHooks
         On.Player.Update += Player_Update;
         On.Player.LungUpdate += Player_LungUpdate;
         On.Player.NewRoom += Player_NewRoom;
+        // On.Creature.SuckedIntoShortCut += Creature_SuckedIntoShortCut;
+        On.UpdatableAndDeletable.RemoveFromRoom += UpdatableAndDeletable_RemoveFromRoom;
 
 
         // PlayerModule
@@ -292,7 +294,7 @@ public class PlayerHooks
 
         if (Plugin.playerModules.TryGetValue(self, out var module) && !self.dead)
         {
-            module.gravityController?.NewRoom(module.IsMyStory);
+            module.gravityController?.NewRoom(newRoom);
         }
 
         if (!newRoom.game.IsStorySession) { return; }
@@ -344,6 +346,8 @@ public class PlayerHooks
 
         Plugin.Log("  ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
 
+        Plugin.Log("hasRobo:", newRoom.game.GetStorySession.saveState.hasRobo);
+
         // Plugin.Log("--CustomSaveData: CyclesFromLastEnterSSAI", dp.CyclesFromLastEnterSSAI);
 
         // Plugin.Log("--CustomSaveData:", mp.beaten_fp, mp.beaten_srs, mp.beaten_nsh, mp.beaten_moon);
@@ -355,6 +359,27 @@ public class PlayerHooks
         }
         Plugin.Log(warmth);*/
 
+    }
+
+
+    /*private static void Creature_SuckedIntoShortCut(On.Creature.orig_SuckedIntoShortCut orig, Creature self, IntVector2 entrancePos, bool carriedByOther)
+    {
+        Room oldRoom = self.room;
+        orig(self, entrancePos, carriedByOther);
+        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod) && mod.gravityController != null)
+        {
+            mod.gravityController.LeaveRoom(oldRoom);
+        }
+    }*/
+
+    // 经检验，玩家离开房间时终究会调用到这个代码，估计warp之类模组也是一样，所以写在这
+    private static void UpdatableAndDeletable_RemoveFromRoom(On.UpdatableAndDeletable.orig_RemoveFromRoom orig, UpdatableAndDeletable self)
+    {
+        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod) && mod.gravityController != null)
+        {
+            mod.gravityController.LeaveRoom(self.room);
+        }
+        orig(self);
     }
 
 
@@ -530,7 +555,7 @@ public class PlayerHooks
     {
         if (Plugin.playerModules.TryGetValue(self, out var module))
         {
-            if (module.gravityController != null && module.gravityController.isAbleToUse)
+            if (module.gravityController != null && module.gravityController.KeyPressed)
             {
                 module.gravityController.inputY = self.input[0].y;
                 self.input[0].y = 0;
@@ -580,7 +605,7 @@ public class PlayerHooks
         
         if (getModule)
         {
-            module.gravityController?.Die();
+            if (self.room != null) module.gravityController?.LeaveRoom(self.room);
             if (module.deathPreventer != null && !module.deathPreventer.dontRevive)
             {
                 module.nshInventory?.RemoveAndRealizeAllObjects();
@@ -600,7 +625,7 @@ public class PlayerHooks
     {
         if (module.gravityController != null)
         {
-            self.AddPart(new GravityMeter(self, self.fContainers[1], module.gravityController));
+            self.AddPart(new fp.GravityMeter_v2(self, self.fContainers[1], module.gravityController));
         }
         if (module.nshInventory != null)
         {

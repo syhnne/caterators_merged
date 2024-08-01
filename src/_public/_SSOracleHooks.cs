@@ -41,7 +41,7 @@ public class SSOracleHooks
     private static bool Oracle_Consious(orig_Consious orig, Oracle self)
     {
         var result = orig(self);
-        if (self.room.game.IsStorySession && self.ID == Oracle.OracleID.SS && self.room.game.GetStorySession.saveState.IsCaterator() && (self.room.game.GetStorySession.saveState.deathPersistentSaveData.altEnding != true || self.room.game.StoryCharacter != Enums.FPname))
+        if (self.room.game.IsStorySession && self.ID == Oracle.OracleID.SS && self.room.game.GetStorySession.saveState.IsCaterator())
         {
             result = false;
         }
@@ -106,9 +106,9 @@ public class SSOracleHooks
                 self.oracle.room.gravity = 1f;
                 return;
             }
-            if (self.player != null && Plugin.playerModules.TryGetValue(self.player, out var module) && module.isCaterator && module.gravityController != null && module.gravityController.enabled)
+            if (self.player != null && Plugin.playerModules.TryGetValue(self.player, out var module) && module.gravityController != null && module.gravityController.IsActive)
             {
-                self.oracle.room.gravity = module.gravityController.gravityBonus * 0.1f;
+                self.oracle.room.gravity = module.gravityController.gravity * 0.1f;
             }
 
 
@@ -274,7 +274,7 @@ public class SSOracleSubBehavior : SSOracleBehavior.ConversationBehavior
         {
             if (PlayerModule != null && PlayerModule.gravityController != null)
             {
-                return PlayerModule.gravityController.gravityBonus * 0.1f;
+                return PlayerModule.gravityController.gravity * 0.1f;
             }
             return -1f;
         }

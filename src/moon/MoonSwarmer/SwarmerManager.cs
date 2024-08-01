@@ -640,7 +640,7 @@ public class SwarmerManager
     public void LogAllSwarmersData()
     {
         Plugin.Log();
-        Plugin.Log(" ~ swarmers ~ playerPos: ", player.abstractCreature.pos);
+        Plugin.Log(" ~ swarmers ~ | playerPos: ", player.abstractCreature.pos, "| roomPos:", player.mainBodyChunk.pos);
         if (player == null)
         {
             Plugin.Log(" ~ DISCONNECTED");

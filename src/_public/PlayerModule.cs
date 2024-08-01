@@ -1,4 +1,5 @@
 ﻿using System;
+using Caterators_by_syhnne.fp;
 using UnityEngine;
 
 
@@ -20,7 +21,7 @@ public class PlayerModule
     public readonly bool IsMyStory;
     public readonly bool isCaterator;
 
-    public _public.GravityController gravityController;
+    public GravityController_v2 gravityController;
     public nsh.Scarf nshScarf;
     public nsh.Inventory nshInventory;
     public srs.LightSourceModule srsLightSource;
@@ -70,8 +71,7 @@ public class PlayerModule
                 swarmerManager = new moon.MoonSwarmer.SwarmerManager(player);
                 deathPreventer.swarmerManager = swarmerManager;
                 swarmerManager.deathPreventer = deathPreventer;
-                int sw = world.game.GetDeathPersistent().MoonHasSwarmers;
-                swarmerManager.callBackSwarmers = (sw > moon.MoonSwarmer.SwarmerManager.maxSwarmer ? sw : Math.Min(sw + 1, moon.MoonSwarmer.SwarmerManager.maxSwarmer));
+                swarmerManager.callBackSwarmers = world.game.GetDeathPersistent().MoonHasSwarmers;
                 Plugin.Log("new game! moon has swarmers:", swarmerManager.callBackSwarmers, "last cycle swarmers:", world.game.GetDeathPersistent().MoonHasSwarmers);
                 // gills = new PlayerGraphics.AxolotlGills(player.graphicsModule as PlayerGraphics, 13);
             }
@@ -108,7 +108,7 @@ public class PlayerModule
         srsLightSource?.Update();
         if (player.room == null || player.dead) return;
         nshInventory?.Update(eu);
-        gravityController?.Update(eu, storyName == playerName);
+        gravityController?.Update(eu);
 
 
 
