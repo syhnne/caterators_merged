@@ -102,7 +102,7 @@ public class GravityController_v2
 
     public void LeaveRoom(Room oldRoom)
     {
-        oldRoom.gravity = oldRoom.abstractRoom.name.StartsWith("SS")? 0f : 1f;
+        oldRoom.gravity = (player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.ZeroG) != null || player.room.roomSettings.GetEffect(RoomSettings.RoomEffect.Type.BrokenZeroG) != null) ? 0f : 1f;
         if (antiG != null && antiG.TryGetTarget(out var g))
         {
             g.active = true;

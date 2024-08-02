@@ -47,8 +47,12 @@ public class PlayerGraphicsModule
 
     public static void InitiateSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
     {
+        if (!Plugin.playerModules.TryGetValue(self.player, out var mod)) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
-        sLeaser.sprites = new FSprite[14];
+
+        mod.daddy.startSprite = 14;
+        sLeaser.sprites = new FSprite[mod.daddy.startSprite + mod.daddy.numberOfSprites];
+        
 
         sLeaser.sprites[0] = new FSprite("BodyA", true);
         sLeaser.sprites[0].anchorY = 0.7894737f;
@@ -155,7 +159,7 @@ public class PlayerGraphicsModule
         sLeaser.sprites[13].isVisible = true;
 
 
-
+        mod.daddy.InitiateSprites(sLeaser, rCam);
 
         self.gown.InitiateSprite(self.gownIndex, sLeaser, rCam);
 
@@ -175,14 +179,19 @@ public class PlayerGraphicsModule
 
     public static void AddToContainer(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
     {
-
+        if (!Plugin.playerModules.TryGetValue(self.player, out var mod)) { return; }
         sLeaser.RemoveAllSpritesFromContainer();
         newContatiner ??= rCam.ReturnFContainer("Midground");
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             if (i == 13)
             {
+                // 这句话就是解决联机穿模问题的终极方案
                 rCam.ReturnFContainer(self.player.onBack != null ? "Background" : "Midground").AddChild(sLeaser.sprites[i]);
+            }
+            else if (i >= mod.daddy.startSprite)
+            {
+                rCam.ReturnFContainer("Background").AddChild(sLeaser.sprites[i]);
             }
             else if (i == self.gownIndex)
             {
@@ -218,6 +227,7 @@ public class PlayerGraphicsModule
 
     public static void DrawSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
     {
+        if (!Plugin.playerModules.TryGetValue(self.player, out var mod)) { return; }
         for (int i = 0; i < sLeaser.sprites.Length; i++)
         {
             if (i == 13)
@@ -279,6 +289,8 @@ public class PlayerGraphicsModule
         // sLeaser.sprites[0].scaleX = 0.95f + Mathf.Lerp(Mathf.Lerp(Mathf.Lerp(-0.05f, -0.15f, self.malnourished), 0.05f, num) * num2, 0.15f, self.player.sleepCurlUp);
         // sLeaser.sprites[1].scaleX = 0.9f + self.player.sleepCurlUp * 0.2f + 0.05f * num - 0.05f * self.malnourished;
         sLeaser.sprites[3].scaleX *= 0.9f + 0.1f;
+
+        mod.daddy.DrawSprites(sLeaser, rCam, timeStacker, camPos);
     }
 
 

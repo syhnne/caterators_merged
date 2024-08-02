@@ -169,10 +169,10 @@ public class DeathPreventHooks
         }*/
         orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
 
-        if (self.State is HealthState)
+        /*if (self.State is HealthState)
         {
             Plugin.Log("creature:", self, "health:", (self.State as HealthState).health);
-        }
+        }*/
     }
 
 
@@ -471,7 +471,7 @@ public class DeathPreventer
     // TODO: 修复玩家被蜥蜴叼走然后复活的时候，蜥蜴钻管道导致玩家图像消失的问题
     public bool TryPreventDeath(PlayerDeathReason deathReason)
     {
-        Plugin.Log("TryPreventDeath:", !dontRevive, justPreventedCounter <= 0, deathReason < PlayerDeathReason.DeathPit);
+        // Plugin.Log("TryPreventDeath:", !dontRevive, justPreventedCounter <= 0, deathReason < PlayerDeathReason.DeathPit);
         if (dontRevive)
         {
             // 好吧 不能在这改 因为还有别的函数要读这个 这个在player.Die()里改了

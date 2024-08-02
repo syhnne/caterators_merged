@@ -29,6 +29,7 @@ public class PlayerModule
     public moon.MoonSwarmer.SwarmerManager swarmerManager;
     public int spearExhaustCounter;
     public fp.PearlReader pearlReader;
+    public fp.DaddyModule daddy;
     public _public.PlayerReviver playerReviver;
     public PlayerGraphics.AxolotlGills gills;
     public bool isMoon = false;
@@ -81,6 +82,7 @@ public class PlayerModule
         {
             pearlReader = new fp.PearlReader(player);
             gravityController = new(player);
+            daddy = new(player, 80f);
         }
         else if (playerName == Enums.test)
         {
@@ -109,6 +111,7 @@ public class PlayerModule
         if (player.room == null || player.dead) return;
         nshInventory?.Update(eu);
         gravityController?.Update(eu);
+        daddy?.Update();
 
 
 

@@ -295,6 +295,7 @@ public class PlayerHooks
         if (Plugin.playerModules.TryGetValue(self, out var module) && !self.dead)
         {
             module.gravityController?.NewRoom(newRoom);
+            module.daddy?.NewRoom(newRoom);
         }
 
         if (!newRoom.game.IsStorySession) { return; }
