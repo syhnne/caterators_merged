@@ -48,7 +48,7 @@ public class TentacleRopeGraphics : RopeGraphic
         }
     }
 
-    // 好吧，我猜现在他扯成一长条多半是这个函数没被调用导致的，但我也不知道为啥没人调用它
+
     public override void MoveSegment(int segment, Vector2 goalPos, Vector2 smoothedGoalPos)
     {
         this.segments[segment].vel *= 0f;

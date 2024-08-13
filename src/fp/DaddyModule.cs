@@ -48,8 +48,6 @@ public class DaddyModule : IDrawable
             t.limp = !player.Consious;
             
         }
-        
-        // 好吧，数据告诉我这个触手穿过了地板，正在玩家下方做单摆运动
     }
 
     public void NewRoom(Room room)
@@ -58,7 +56,15 @@ public class DaddyModule : IDrawable
         {
             t.NewRoom(room);
         }
-            
+    }
+
+
+    public void LeaveRoom(Room oldRoom)
+    {
+        foreach (var t in tentacles) 
+        { 
+            t.LeaveRoom(oldRoom); 
+        }
     }
 
 

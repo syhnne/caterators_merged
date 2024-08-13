@@ -376,9 +376,10 @@ public class PlayerHooks
     // 经检验，玩家离开房间时终究会调用到这个代码，估计warp之类模组也是一样，所以写在这
     private static void UpdatableAndDeletable_RemoveFromRoom(On.UpdatableAndDeletable.orig_RemoveFromRoom orig, UpdatableAndDeletable self)
     {
-        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod) && mod.gravityController != null)
+        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod))
         {
-            mod.gravityController.LeaveRoom(self.room);
+            mod.gravityController?.LeaveRoom(self.room);
+            mod.daddy?.LeaveRoom(self.room);
         }
         orig(self);
     }

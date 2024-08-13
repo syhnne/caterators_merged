@@ -173,6 +173,8 @@ internal class PlayerHooks
                 SaveState_SlowFadeIn
                 );*/
 
+
+            // TODO: public bool WormGrassGooduckyImmune（读dll的数据看有没有
         }
         catch (Exception ex)
         {

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using RWCustom;
+using MoreSlugcats;
 
 namespace Caterators_by_syhnne.fp.Daddy;
 
@@ -29,7 +30,8 @@ public class CustomDaddyTentacle : Tentacle
     public Tentacle.TentacleChunk lastChunk => tChunks[tChunks.Count() - 1];
 
     // DLL features
-    public BodyChunk grabChunk;
+    public Creature.Grasp[] grasps;
+    // public BodyChunk grabChunk;
     public AbstractCreature huntCreature;
     public int stun = 0;
     public Task task = Task.Locomotion;
@@ -58,6 +60,7 @@ public class CustomDaddyTentacle : Tentacle
         
         this.graphics = new(this);
         this.graphics.Reset(this.firstChunk.pos);
+        this.grasps = new Creature.Grasp[1];
     }
 
     
@@ -126,11 +129,11 @@ public class CustomDaddyTentacle : Tentacle
             }
             return;
         }
-        
 
 
 
 
+        this.awayFromBodyRotation = 0f;
         if (!this.neededForLocomotion)
         {
             if (this.task != Task.Grabbing)
@@ -142,9 +145,7 @@ public class CustomDaddyTentacle : Tentacle
         {
             this.SwitchTask(Task.Locomotion);
         }
-        this.awayFromBodyRotation = 0f;
-
-
+        
         if (this.task == Task.Hunt && (this.huntCreature == null || this.huntCreature.slatedForDeletion))
         {
             this.SwitchTask(Task.Locomotion);
@@ -153,6 +154,8 @@ public class CustomDaddyTentacle : Tentacle
         {
             this.huntCreature = null;
         }
+
+        // 准备改一下这里，抓住别的东西不松手的时候会直接把对方拽进管道
         if (this.task == Task.Grabbing && (this.grabChunk == null || this.grabChunk.owner.room != this.room || (ModManager.MMF && !this.daddy.player.Consious)))
         {
             this.SwitchTask(Task.Locomotion);
@@ -175,13 +178,16 @@ public class CustomDaddyTentacle : Tentacle
         {
             this.ExamineSound(ref this.scratchPath);
         }*/
+
+        // TODO: 写闲置状态
         switch (task)
         {
+            // 真神奇，我没见任何一个地方给scratchPath 赋值，这玩意是个private不存在其他东西给他赋值的可能性，但它还能跑，还不卡bug
             case Task.Locomotion:
+                Climb(ref scratchPath);
                 break;
             case Task.Hunt:
-                List<IntVector2> path = new();
-                Hunt(ref path);
+                Hunt(ref scratchPath);
                 break;
             case Task.Grabbing:
                 base.MoveGrabDest(connectedChunk.pos + Custom.DirVec(connectedChunk.pos, this.grabChunk.pos) * 20f, ref this.scratchPath);
@@ -209,6 +215,11 @@ public class CustomDaddyTentacle : Tentacle
                         break;
                     }
                 }
+                // 这块建议重写，因为这个代码是给香菇用的，考虑到香菇的质量，其他物体对香菇的作用力可以忽略
+                // 但玩家是蛞蝓猫，再怎么变香菇了这个问题也是要考虑的
+                // 而且我严重怀疑他有bug
+                // 还得额外写一行代码来判断要不要松手，松手条件是离得足够远，或者玩家空手按了投掷键
+                // 然后……我就不管了……多少行代码了已经……差不多够了吧……
                 if (this.task == Task.Grabbing)
                 {
                     Vector2 vec = Vector3.Slerp(Custom.DirVec(this.grabChunk.pos, p), Custom.DirVec(base.Tip.pos, this.tChunks[this.tChunks.Length - 2].pos) , 0.5f) * Custom.LerpMap((float)this.grabPath.Count, 3f, 18f, 0.65f, 0.25f) * 0.45f / this.grabChunk.mass;
@@ -235,7 +246,9 @@ public class CustomDaddyTentacle : Tentacle
 
         for (int i = 0; i < creatures.Count; i++)
         {
-            if (creatures[i].realizedCreature == null || creatures[i].realizedCreature.inShortcut || creatures[i].realizedCreature == this.daddy.player || creatures[i].tentacleImmune) continue;
+            // 能抓玩家这个事情有点难绷，主要是会引发别的问题，所以暂且禁用
+            // 按理说不能联机的，有空稍微修一修，应该出避难所之前就把队友全吃了
+            if (creatures[i].realizedCreature == null || creatures[i].realizedCreature.inShortcut || creatures[i].realizedCreature is Player || creatures[i].tentacleImmune) continue;
 
             Creature realizedCreature = creatures[i].realizedCreature;
             for (int j = 0; j < this.tChunks.Length; j++)
@@ -254,7 +267,7 @@ public class CustomDaddyTentacle : Tentacle
                             realizedCreature.abstractCreature.abstractAI.RealAI.tracker.SeeCreature(this.daddy.player.abstractCreature);
                         }
                         this.CollideWithCreature(j, realizedCreature.bodyChunks[k]);
-                        if (!neededForLocomotion && task != Task.Grabbing && realizedCreature.newToRoomInvinsibility < 1 && this.grabChunk == null && j == this.tChunks.Length - 1 && (this.task == Task.Hunt || !this.IsCreatureCaughtEnough(realizedCreature.abstractCreature)))
+                        if (!neededForLocomotion && task != Task.Grabbing && realizedCreature.newToRoomInvinsibility < 1 && this.grasps[0] == null && j == this.tChunks.Length - 1 && (this.task == Task.Hunt || !this.IsCreatureCaughtEnough(realizedCreature.abstractCreature)))
                         {
                             flag = true;
                             if (Vector2.Distance(this.tChunks[j].vel, realizedCreature.bodyChunks[k].vel) >= Mathf.Lerp(1f, 8f, this.sticky))
@@ -275,10 +288,11 @@ public class CustomDaddyTentacle : Tentacle
                                 }
                                 num++;
                             }
-                            if (flag3)
+                            // 呃，数值我瞎填的，这下估计很难抓住东西了罢
+                            if (flag3 && Grab(realizedCreature, 0, k, Creature.Grasp.Shareability.CanNotShare, 0.6f, true, false))
                             {
                                 Plugin.Log("tentacle grab creature:", realizedCreature);
-                                this.grabChunk = realizedCreature.bodyChunks[k];
+                                // this.grabChunk = realizedCreature.bodyChunks[k];
                                 this.room.PlaySound(SoundID.Daddy_And_Bro_Tentacle_Grab_Creature, this.tChunks[j].pos, 1f, 1f);
                                 this.SwitchTask(Task.Grabbing);
                                 return;
@@ -420,7 +434,7 @@ public class CustomDaddyTentacle : Tentacle
         {
             for (int i = 0; i < this.daddy.tentacles.Length; i++)
             {
-                if (this.daddy.tentacles[i].grabChunk != null && this.daddy.tentacles[i].grabChunk.owner is Creature && (this.daddy.tentacles[i].grabChunk.owner as Creature).abstractCreature == crit)
+                if (this.daddy.tentacles[i].grasps[0] != null && this.daddy.tentacles[i].grasps[0].grabbed is Creature && (this.daddy.tentacles[i].grasps[0].grabbed as Creature).abstractCreature == crit)
                 {
                     num++;
                 }
@@ -499,12 +513,132 @@ public class CustomDaddyTentacle : Tentacle
     }
 
 
+    private void Climb(ref List<IntVector2> path)
+    {
+        // TODO
+    }
+
+
 
     public override void NewRoom(Room room)
     {
         base.NewRoom(room);
         graphics.Reset(connectedChunk.pos);
+        if (this.grasps != null)
+        {
+            foreach (Creature.Grasp grasp in this.grasps)
+            {
+                if (grasp != null)
+                {
+                    room.AddObject(grasp.grabbed);
+                    for (int j = 0; j < grasp.grabbed.bodyChunks.Length; j++)
+                    {
+                        grasp.grabbed.bodyChunks[j].pos = this.connectedChunk.pos;
+                        grasp.grabbed.bodyChunks[j].lastPos = this.connectedChunk.pos;
+                        grasp.grabbed.bodyChunks[j].lastLastPos = this.connectedChunk.pos;
+                        grasp.grabbed.bodyChunks[j].setPos = null;
+                        grasp.grabbed.bodyChunks[j].vel *= 0f;
+                    }
+                }
+            }
+        }
     }
+
+
+
+    public void LeaveRoom(Room oldRoom)
+    {
+        if (this.grasps != null)
+        {
+            foreach (Creature.Grasp grasp in this.grasps)
+            {
+                if (grasp != null)
+                {
+                    if (grasp.grabbed is Creature)
+                    {
+                        (grasp.grabbed as Creature).FlyAwayFromRoom(true);?
+                    }
+                    else if (this.room != null)
+                    {
+                        this.room.RemoveObject(grasp.grabbed);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    public void LoseAllGrasps()
+    {
+        if (this.grasps.Count() > 0)
+        {
+            for (int i = 0; i < this.grasps.Length; i++)
+            {
+                this.ReleaseGrasp(i);
+            }
+        }
+    }
+
+
+    public virtual void ReleaseGrasp(int grasp)
+    {
+        if (grasp - 1 > this.grasps.Length)
+        {
+            Plugin.Log("tentacle ReleaseGrasp(): index out of range");
+            return;
+        }
+        // 哈哈，坏了菜了，这个grabber必须是一个creature，因为要调用这个creature的grasps
+        // 造成的效果就是玩家会松手
+        // 好了我要回档了，这些东西留着我哪天吃饱了撑的真准备用Creature.Grasp的时候再写吧
+        this.grasps[grasp]?.Release();
+    }
+
+
+
+    public bool Grab(PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
+    {
+        if (this.grasps == null || graspUsed < 0 || graspUsed > this.grasps.Length)
+        {
+            return false;
+        }
+        if (obj.slatedForDeletetion || (obj is Creature && !(obj as Creature).CanBeGrabbed(daddy.player)))
+        {
+            return false;
+        }
+        if (this.grasps[graspUsed] != null && this.grasps[graspUsed].grabbed == obj)
+        {
+            this.ReleaseGrasp(graspUsed);
+            this.grasps[graspUsed] = new Creature.Grasp(this.daddy.player, obj, graspUsed, chunkGrabbed, shareability, dominance, true);
+            obj.Grabbed(this.grasps[graspUsed]);
+            new AbstractPhysicalObject.CreatureGripStick(this.daddy.player.abstractCreature, obj.abstractPhysicalObject, graspUsed, pacifying || obj.TotalMass < this.daddy.player.TotalMass);
+            // TODO: 香菇会影响玩家自身的质量，要改这个totalmass
+            return true;
+        }
+        foreach (Creature.Grasp grasp in obj.grabbedBy)
+        {
+            if (grasp.grabber == daddy.player || (grasp.ShareabilityConflict(shareability) && ((overrideEquallyDominant && grasp.dominance == dominance) || grasp.dominance > dominance)))
+            {
+                return false;
+            }
+        }
+        for (int i = obj.grabbedBy.Count - 1; i >= 0; i--)
+        {
+            if (obj.grabbedBy[i].ShareabilityConflict(shareability))
+            {
+                obj.grabbedBy[i].Release();
+            }
+        }
+        if (this.grasps[graspUsed] != null)
+        {
+            this.ReleaseGrasp(graspUsed);
+        }
+        this.grasps[graspUsed] = new Creature.Grasp(daddy.player, obj, graspUsed, chunkGrabbed, shareability, dominance, pacifying);
+        obj.Grabbed(this.grasps[graspUsed]);
+        new AbstractPhysicalObject.CreatureGripStick(daddy.player.abstractCreature, obj.abstractPhysicalObject, graspUsed, pacifying || obj.TotalMass < daddy.player.TotalMass);
+        return true;
+    }
+
 
 
     public override IntVector2 GravityDirection()
@@ -529,10 +663,10 @@ public class CustomDaddyTentacle : Tentacle
 
     public void SwitchTask(Task newTask)
     {
-        if (newTask != Task.Grabbing && this.grabChunk != null)
+        if (newTask != Task.Grabbing && this.grasps[0] != null)
         {
-            this.room.PlaySound(SoundID.Daddy_And_Bro_Tentacle_Release_Creature, this.grabChunk.pos);
-            this.grabChunk = null;
+            this.room.PlaySound(SoundID.Daddy_And_Bro_Tentacle_Release_Creature, this.grasps[0].grabbedChunk.pos);
+            grasps[0].Release();
         }
         if (task != newTask)
         {
@@ -545,6 +679,7 @@ public class CustomDaddyTentacle : Tentacle
 
     public enum Task
     {
+        Idle,
         Locomotion,
         Hunt,
         Grabbing,
@@ -554,5 +689,19 @@ public class CustomDaddyTentacle : Tentacle
 
 
 
+
+
+
+
+    public void ReleaseDoorForbiddenCreatures(bool enteringShortcut, bool enteringDen)
+    {
+        if ((ModManager.MMF && MMF.cfgVanillaExploits.Value) || (!enteringShortcut && !enteringDen))
+        {
+            return;
+        }
+        // TODO
+    }
+
+    
 
 }
