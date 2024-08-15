@@ -29,16 +29,19 @@ public class DaddyModule : IDrawable
     public DaddyModule(Player player, float tentacleLength)
     {
         this.owner = new(player);
-        tentacles = new CustomDaddyTentacle[2]
+        tentacles = new CustomDaddyTentacle[1]
         {
             new(this, player.bodyChunks[1], tentacleLength),
-            new(this, player.bodyChunks[1], tentacleLength * 0.7f),
+            // new(this, player.bodyChunks[1], tentacleLength * 0.7f),
         };
         foreach (var t in tentacles)
         {
             numberOfSprites += t.graphics.numberOfSprites;
         }
     }
+
+
+
 
     public void Update()
     {
@@ -49,7 +52,6 @@ public class DaddyModule : IDrawable
             
         }
         
-        // 好吧，数据告诉我这个触手穿过了地板，正在玩家下方做单摆运动
     }
 
     public void NewRoom(Room room)
@@ -59,6 +61,14 @@ public class DaddyModule : IDrawable
             t.NewRoom(room);
         }
             
+    }
+
+    public void LeaveRoom(Room oldRoom)
+    {
+        foreach(var t in tentacles)
+        {
+            t.LeaveRoom(oldRoom);
+        }
     }
 
 

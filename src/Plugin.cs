@@ -52,6 +52,8 @@ class Plugin : BaseUnityPlugin
 
     private bool _inited;
 
+    public static uint TickCount = 0;
+
 
     #region 暂存区
     // 正常人基本不会在这种地方存数据，但我不是正常人，我是菜狗，让让我吧
@@ -179,7 +181,7 @@ class Plugin : BaseUnityPlugin
     {
         if (!ShowLogs) return;
         string prefix = "[syhnne.caterators] : ";
-        string log = "";
+        string log = TickCount.ToString() + " | ";
         foreach (object s in text)
         {
             log += s.ToString();
@@ -349,6 +351,12 @@ class Plugin : BaseUnityPlugin
             throw;
         }
 
+        if (!self.GamePaused)
+        {
+            Plugin.TickCount++;
+        }
+
+
         if (Options.DevMode.Value && self.devToolsActive)
         {
             // 按Y生成一个复活用的神经元
@@ -468,3 +476,28 @@ class Plugin : BaseUnityPlugin
 
 
 
+public static class sCustom
+{
+    public static bool IsGrabbedBy(this PhysicalObject obj, Creature crit)
+    {
+        if (obj.grabbedBy.Count <= 0) return false;
+        foreach (var g in obj.grabbedBy)
+        {
+            if (g.grabber != null && g.grabber == crit) return true;
+        }
+        return false;
+    }
+
+
+    public static bool IsGrabbingAnything(this Creature crit)
+    {
+        if (crit.grasps.Count() == 0) return false;
+        foreach (var g in crit.grasps)
+        {
+            if (g != null && g.grabbedChunk != null) return true;
+        }
+        return false;
+    }
+
+
+}

@@ -1,7 +1,7 @@
 {
 	"id": "FPslugcat",
 	"name": "fp",
-	"description": "yeah i removed their campaign",
+	"description": "",
 	"features": {
 		"color": "fe68ca",
 		"custom_colors": [
@@ -23,14 +23,14 @@
 
 		"auto_grab_batflies": false,
 		"back_spear": false,
-		"weight": [ 1.1, 0.9 ],
+		"weight": [ 1.2, 1.0 ],
 		"lung_capacity": [ 0.5, 0.3 ],
 		"walk_speed": 1.4,
 		"climb_speed": 1.4,
 		"tunnel_speed": 1.4,
 		"throw_skill": [ 2, 1 ],
 		"can_maul": true,
-		"maul_damage": 0.8,
+		"maul_damage": 1.0,
 
 
 
@@ -41,7 +41,7 @@
 		"cycle_length_min": 9,
 
 		"guide_overseer": 0,
-		"start_room": "SS_AI",
+		"start_room": "CC_A02",
 		"timeline_after": "Red",
 		"world_state": [ "FPslugcat", "Red" ],
 		"diet": {

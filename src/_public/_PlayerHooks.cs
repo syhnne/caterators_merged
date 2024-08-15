@@ -292,10 +292,9 @@ public class PlayerHooks
         orig(self, newRoom);
 
 
-        if (Plugin.playerModules.TryGetValue(self, out var module) && !self.dead)
+        if (Plugin.playerModules.TryGetValue(self, out var module))
         {
-            module.gravityController?.NewRoom(newRoom);
-            module.daddy?.NewRoom(newRoom);
+            module.NewRoom(newRoom);
         }
 
         if (!newRoom.game.IsStorySession) { return; }
@@ -347,7 +346,7 @@ public class PlayerHooks
 
         Plugin.Log("  ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
 
-        Plugin.Log("hasRobo:", newRoom.game.GetStorySession.saveState.hasRobo);
+        Plugin.Log("totalmass:", self.TotalMass);
 
         // Plugin.Log("--CustomSaveData: CyclesFromLastEnterSSAI", dp.CyclesFromLastEnterSSAI);
 
@@ -376,9 +375,9 @@ public class PlayerHooks
     // 经检验，玩家离开房间时终究会调用到这个代码，估计warp之类模组也是一样，所以写在这
     private static void UpdatableAndDeletable_RemoveFromRoom(On.UpdatableAndDeletable.orig_RemoveFromRoom orig, UpdatableAndDeletable self)
     {
-        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod) && mod.gravityController != null)
+        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod))
         {
-            mod.gravityController.LeaveRoom(self.room);
+            mod.LeaveRoom(self.room);
         }
         orig(self);
     }

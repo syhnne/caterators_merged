@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Caterators_by_syhnne.fp;
 using UnityEngine;
 
@@ -80,7 +81,7 @@ public class PlayerModule
         }
         else if (playerName == Enums.FPname)
         {
-            pearlReader = new fp.PearlReader(player);
+            // pearlReader = new fp.PearlReader(player);
             gravityController = new(player);
             daddy = new(player, 80f);
         }
@@ -97,6 +98,8 @@ public class PlayerModule
 
     public void Update(Player player, bool eu)
     {
+
+
         if (player.SlugCatClass == Enums.Moonname) { isMoon = player.isRivulet; }
         if (spearExhaustCounter > 0)
         {
@@ -108,10 +111,11 @@ public class PlayerModule
         swarmerManager?.Update(eu);
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
         srsLightSource?.Update();
-        if (player.room == null || player.dead) return;
+        daddy?.Update();
+        if (player.room == null || player.dead) return; // woc 这句话坑死我了
         nshInventory?.Update(eu);
         gravityController?.Update(eu);
-        daddy?.Update();
+        
 
 
 
@@ -182,6 +186,23 @@ public class PlayerModule
 
         }
 
+    }
+
+
+
+
+    public void NewRoom(Room newRoom)
+    {
+        gravityController?.NewRoom(newRoom);
+        daddy?.NewRoom(newRoom);
+    }
+
+
+
+    public void LeaveRoom(Room oldRoom)
+    {
+        gravityController?.LeaveRoom(oldRoom);
+        daddy?.LeaveRoom(oldRoom);
     }
 
 }
