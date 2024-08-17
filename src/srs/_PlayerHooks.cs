@@ -22,7 +22,6 @@ public static class PlayerHooks
         // 为了防止玩家发现虚空流体就是水这个事实（。
         WaterUpdate(self, self.room);
         // 体温高的话，热传递效率高，更容易被冻死，很合理吧（你
-        // 这个跟肚子里有多少吃的有关，众所周知饿着肚子更容易冷
         if (self.room != null && self.room.blizzard)
         {
             self.Hypothermia += self.HypothermiaExposure * RainWorldGame.DefaultHeatSourceWarmth * 2f * self.room.world.rainCycle.CycleProgression;
@@ -186,6 +185,7 @@ public static class PlayerHooks
         IL.Creature.HypothermiaUpdate += IL_Creature_HypothermiaUpdate;
         On.Creature.HypothermiaUpdate += Creature_HypothermiaUpdate;
         IL.Spear.HitSomethingWithoutStopping += IL_Spear_HitSomethingWithoutStopping;
+        On.Spider.ConsiderPrey += Spider_ConsiderPrey;
 
 
     }
@@ -194,6 +194,16 @@ public static class PlayerHooks
 
 
 
+
+
+    private static bool Spider_ConsiderPrey(On.Spider.orig_ConsiderPrey orig, Spider self, Creature crit)
+    {
+        if (crit is Player && Plugin.playerModules.TryGetValue(crit as Player, out var mod) && mod.srsLightSource != null && mod.srsLightSource.LightSourceRad(0) > 100f)
+        {
+            return false;
+        }
+        return orig(self, crit);
+    }
 
 
 
@@ -263,7 +273,8 @@ public static class PlayerHooks
             Player player = dRelation.trackerRep.representedCreature.realizedCreature as Player;
             if (player.glowing && player.SlugCatClass == Enums.SRSname)
             {
-                result = new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Afraid, player.Malnourished? 0.8f : 0.4f);
+                result = new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Afraid, player.Malnourished? 0.4f : 0.8f);
+                // 淦，我说他怎么不管用。。原来是写反了。。4个月后才发现。。
             }
 
             

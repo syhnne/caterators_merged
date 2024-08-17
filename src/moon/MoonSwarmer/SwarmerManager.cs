@@ -17,7 +17,8 @@ namespace Caterators_by_syhnne.moon.MoonSwarmer;
 
 
 
-
+// TODO: 不测不知道，一测才发现我得写点代码防止蓝香菇尝试吃神经元
+// 虽然在设定上这合情合理，但是我删了神经元的Die()函数防止玩家o+8的时候把自己整死，结果……结果又出这么个问题……我服了
 public class SwarmerManager
 {
     // : 坏了 这个地方应该用弱引用 但我前面写了那么多东西全都不是弱引用（（

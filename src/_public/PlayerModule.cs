@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Caterators_by_syhnne.fp;
+using RWCustom;
 using UnityEngine;
 
 
@@ -46,7 +47,7 @@ public class PlayerModule
         {
             isCaterator = true;
         }
-        if (player.room.game.session is StoryGameSession)
+        if (player.room.game.IsStorySession)
         {
             storyName = player.room.game.StoryCharacter;
         }
@@ -83,7 +84,7 @@ public class PlayerModule
         {
             // pearlReader = new fp.PearlReader(player);
             gravityController = new(player);
-            daddy = new(player, 80f);
+            if (IsMyStory) daddy = new(player, world.game.GetStorySession.saveState.cycleNumber);
         }
         else if (playerName == Enums.test)
         {
@@ -101,10 +102,7 @@ public class PlayerModule
 
 
         if (player.SlugCatClass == Enums.Moonname) { isMoon = player.isRivulet; }
-        if (spearExhaustCounter > 0)
-        {
-            spearExhaustCounter--;
-        }
+        if (spearExhaustCounter > 0) spearExhaustCounter--;
         pearlReader?.Update(eu);
         deathPreventer?.Update();
         playerReviver?.Update(eu);
@@ -115,7 +113,7 @@ public class PlayerModule
         if (player.room == null || player.dead) return; // woc 这句话坑死我了
         nshInventory?.Update(eu);
         gravityController?.Update(eu);
-        
+
 
 
 
@@ -203,6 +201,34 @@ public class PlayerModule
     {
         gravityController?.LeaveRoom(oldRoom);
         daddy?.LeaveRoom(oldRoom);
+    }
+
+
+    public IntVector2 PlayerInput(int x, int y)
+    {
+        if (gravityController != null && gravityController.KeyPressed)
+        {
+            gravityController.inputY = y;
+            y = 0;
+        }
+        if (nshInventory != null && nshInventory.IsActive)
+        {
+            nshInventory.inputY = y;
+            y = 0;
+        }
+        if (daddy != null && daddy.controlOfPlayer >= fp.DaddyModule.Control.CantWalk)
+        {
+            daddy.playerInput.x = x;
+            daddy.playerInput.y = y;
+            // 阴间小寄巧：每隔几帧就把input还给玩家一次，防止钻不进管道
+            // 算了，这下鬼畜了
+            /*if (Plugin.TickCount % 2 == 1)
+            {
+                x = 0;
+                y = 0;
+            }*/
+        }
+        return new(x, y);
     }
 
 }

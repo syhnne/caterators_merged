@@ -87,7 +87,9 @@ class Plugin : BaseUnityPlugin
 
 
             On.RainWorldGame.Update += RainWorldGame_Update;
-            
+            On.RainWorldGame.ctor += RainWorldGame_ctor;
+
+
             On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             On.JollyCoop.JollyMenu.JollyPlayerSelector.Update += JollyPlayerSelector_Update;
@@ -105,12 +107,11 @@ class Plugin : BaseUnityPlugin
             _public.SLOracleHooks.Apply();
             _public.SSRoomEffects.Apply();
             _public.DeathPreventHooks.Apply();
+            _public.SSOracleHooks.Apply();
             CustomSaveData.Apply();
             fp.ShelterSS_AI.Apply();
+            fp.Daddy.CreatureRelationship.Apply();
 
-
-            // 鉴于雨世界更新之后报错一声不吭，连日志都不输出了，现把这一项放在最后面充当报错警告。如果点进游戏发现fp复活了，说明前面的部分有问题。
-            _public.SSOracleHooks.Apply();
 
         }
         catch (Exception ex)
@@ -203,6 +204,11 @@ class Plugin : BaseUnityPlugin
         Plugin.Log("An exception has occured!");
         Plugin.Logger.LogError(ex);
     }
+
+
+
+
+
 
 
 
@@ -334,7 +340,11 @@ class Plugin : BaseUnityPlugin
 
 
 
-
+    private void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
+    {
+        orig(self, manager);
+        Plugin.TickCount = 0;
+    }
 
 
 
@@ -494,9 +504,22 @@ public static class sCustom
         if (crit.grasps.Count() == 0) return false;
         foreach (var g in crit.grasps)
         {
-            if (g != null && g.grabbedChunk != null) return true;
+            if (g != null && g.grabbed != null) return true;
         }
         return false;
+    }
+
+
+    // 这个函数应该是存在的罢，为什么我调用不到
+    // 那我只能瞎写了，我也不知道这对不对啊
+    public static Vector2 SlerpVec(Vector2 a, Vector2 b, float t)
+    {
+        return Custom.DegToVec(SlerpDeg(a, b, t));
+    }
+
+    public static float SlerpDeg(Vector2 a, Vector2 b, float t)
+    {
+        return Mathf.Lerp(Custom.VecToDeg(a), Custom.VecToDeg(b), Mathf.Clamp01(t));
     }
 
 

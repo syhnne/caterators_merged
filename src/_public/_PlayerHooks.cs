@@ -36,6 +36,7 @@ namespace Caterators_by_syhnne._public;
 public class PlayerHooks
 {
 
+    // 淦我还是觉得这个代码很答辩 又想重写了
     public static void Apply()
     {
         // playerReviver
@@ -79,7 +80,11 @@ public class PlayerHooks
         On.Player.Die += Player_Die;
         On.Player.Destroy += Player_Destroy;
         On.Player.MovementUpdate += Player_MovementUpdate;
-        // On.Creature.SuckedIntoShortCut += Creature_SuckedIntoShortCut;
+        /*new Hook(
+            typeof(PhysicalObject).GetProperty(nameof(PhysicalObject.TotalMass), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+            get_PhysicalObject_TotalMass
+            );*/
+        IL.Player.GraphicsModuleUpdated += Player_GraphicsModuleUpdated;
 
 
         // 不能吃神经元
@@ -209,6 +214,33 @@ public class PlayerHooks
 
 
     #region general
+
+    // 用来在香菇模式下（？）修改玩家体重（？）
+    // 这已经是我能想到的第二简单的写法了，最简单的那个会卡bug
+    private static void Player_GraphicsModuleUpdated(ILContext il)
+    {
+        // 300 修改读取到的mainBodyChunk.mass
+        ILCursor c1 = new(il);
+        if (c1.TryGotoNext(MoveType.After,
+            i => i.MatchLdfld<BodyChunk>("mass"),
+            i => i.Match(OpCodes.Ldarg_0),
+            i => i.Match(OpCodes.Call),
+            i => i.MatchLdfld<BodyChunk>("mass")
+            ))
+        {
+            c1.Emit(OpCodes.Ldarg_0);
+            c1.EmitDelegate<Func<float, Player, float>>((orig, player) =>
+            {
+                if (Plugin.playerModules.TryGetValue(player, out var mod) && mod.daddy != null)
+                {
+                    orig += mod.daddy.PlayerExtraMass;
+                }
+                return orig;
+            });
+        }
+    }
+
+
 
 
 
@@ -550,21 +582,14 @@ public class PlayerHooks
 
 
 
-    // 启用重力控制时阻止y轴输入
+    // 一帮模组在这轮番劫持玩家输入……要不还是给搬到playermodule里头去吧
     private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
     {
         if (Plugin.playerModules.TryGetValue(self, out var module))
         {
-            if (module.gravityController != null && module.gravityController.KeyPressed)
-            {
-                module.gravityController.inputY = self.input[0].y;
-                self.input[0].y = 0;
-            }
-            if (module.nshInventory != null && module.nshInventory.IsActive)
-            {
-                module.nshInventory.inputY = self.input[0].y;
-                self.input[0].y = 0;
-            }
+            var newinput = module.PlayerInput(self.input[0].x, self.input[0].y);
+            self.input[0].x = newinput.x;
+            self.input[0].y = newinput.y;
         }
         orig(self, eu);
     }
@@ -701,6 +726,19 @@ public class PlayerHooks
 
     }
 
+
+
+    // 行吧，不敢这么写了，玩家手上拿东西的时候游戏会直接闪退，没有任何报错信息
+    private delegate float orig_get_PhysicalObject_TotalMass(PhysicalObject self);
+    private static float get_PhysicalObject_TotalMass(orig_get_PhysicalObject_TotalMass orig, PhysicalObject self)
+    {
+        var result = orig(self);
+        if (self is Player && Plugin.playerModules.TryGetValue(self as Player, out var mod) && mod.daddy != null)
+        {
+            result += mod.daddy.PlayerExtraMass;
+        }
+        return result;
+    }
 
 
     #endregion

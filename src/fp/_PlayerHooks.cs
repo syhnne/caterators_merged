@@ -158,6 +158,8 @@ internal class PlayerHooks
             IL.Menu.SlugcatSelectMenu.SlugcatPageContinue.ctor += Menu_SlugcatSelectMenu_SlugcatPageContinue_ctor;
             IL.ProcessManager.CreateValidationLabel += ProcessManager_CreateValidationLabel;
 
+            
+
             // 这仨有问题，先不挂了，除了让游戏变难以外没影响
             // TODO: 
             /*new Hook(
