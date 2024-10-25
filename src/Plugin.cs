@@ -34,6 +34,7 @@ namespace Caterators_by_syhnne;
 
 
 // 天呐，好大的工作量啊（倒地不起）
+// 今天是2024年10月25号，我两个月没打开这玩意现在是一点也不记得自己写了啥了，跟tm读天书一样
 
 [BepInPlugin(MOD_ID, MOD_NAME, MOD_VERSION)]
 class Plugin : BaseUnityPlugin

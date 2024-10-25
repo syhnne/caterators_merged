@@ -566,7 +566,8 @@ public static class PlayerHooks
             // 加一些体力限制（
             if (tailSpecks.spearProg > 0.1f && tailSpecks.spearProg < 0.95f)
             {
-                self.AerobicIncrease(0.07f);
+                // 这个属实有点难受，降低一点点
+                self.AerobicIncrease(0.06f);
             }
 
             if (tailSpecks.spearProg == 1f)

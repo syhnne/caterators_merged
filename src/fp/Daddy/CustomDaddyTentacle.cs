@@ -70,7 +70,7 @@ public class CustomDaddyTentacle : Tentacle
         this.length = length;
         daddy = owner;
         limp = false;
-        neededForLocomotion = true;
+        // neededForLocomotion = true;
         tProps = new Tentacle.TentacleProps(true, true, false, 0.5f, 0.1f, 0f, 0f, 0f, 3.2f, 10f, 0.25f, 5f, 15, 60, 12, 20);
         scratchPath = new();
         tChunks = new Tentacle.TentacleChunk[Mathf.RoundToInt(length) / 20];

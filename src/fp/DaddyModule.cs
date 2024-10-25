@@ -33,6 +33,10 @@ public class DaddyModule : IDrawable
 
     public Vector2 playerInput = Vector2.zero;
 
+    // eat
+    private List<DaddyLongLegs.EatObject> eatObjects;
+    public int digestingCounter;
+
 
 
     public bool NeededForLocomotion => (player.grasps[0] != null && player.HeavyCarry(player.grasps[0].grabbed)) || (player.grasps[1] != null && player.HeavyCarry(player.grasps[1].grabbed));
@@ -97,7 +101,7 @@ public class DaddyModule : IDrawable
         controlOfPlayer = Control.NoControl;
 
         this.owner = new(player);
-
+        this.eatObjects = new List<DaddyLongLegs.EatObject>();
 
         if (controlOfPlayer == Control.NoTentacle) return; // 注意这句话，不要把关键事项放这个后面
         tentacles = new CustomDaddyTentacle[]
@@ -119,20 +123,23 @@ public class DaddyModule : IDrawable
 
 
 
-    public void Update()
+    public void Update(bool eu)
     {
         if (controlOfPlayer == Control.NoTentacle) return;
         bool neededForLocomotion = NeededForLocomotion;
+
         foreach (var t in tentacles)
         {
             // 加个数量判定
-            // t.neededForLocomotion = t.canGrabTerrain && neededForLocomotion;
+            t.neededForLocomotion = t.canGrabTerrain && (neededForLocomotion || controlOfPlayer >= Control.CantWalk);
 
             t.Update();
             t.limp = !player.Consious;
             t.playerInput = playerInput;
         }
-        
+
+
+
         switch (controlOfPlayer)
         {
             case Control.Throw:
@@ -140,12 +147,14 @@ public class DaddyModule : IDrawable
             case Control.Locomotion:
                 break;
             case Control.Stun:
+                Eat(eu);
                 break;
             case Control.CantWalk:
             case Control.NoControl:
+                Eat(eu);
+
                 // 好吧这个似乎不管用，我觉得下一步是劫持玩家的input让这个数只输入到这里，让玩家变成一只真正的香菇
                 // 不行，这样进不了管道，而且真的巨tm搞笑。。。卧槽。。
-                
                 foreach (BodyChunk bodyChunk in player.bodyChunks)
                 {
                     bodyChunk.vel.y += (player.gravity - player.buoyancy * bodyChunk.submersion) * 0.1f * TentaclesOnTerrain;
@@ -175,6 +184,134 @@ public class DaddyModule : IDrawable
         }
     }
 
+
+    public void Eat(bool eu)
+    {
+        // Vector2 middleOfBody = this.MiddleOfBody;
+        for (int i = this.eatObjects.Count - 1; i >= 0; i--)
+        {
+            var obj = this.eatObjects[i];
+            if (obj.progression > 1f)
+            {
+                if (obj.chunk.owner is Creature)
+                {
+                    this.digestingCounter = (int)Custom.LerpMap((obj.chunk.owner as Creature).Template.bodySize, 0.2f, 5f, 50f, 1100f);
+                    Player player = obj.chunk.owner as Player;
+                    player?.PermaDie();
+                }
+                obj.chunk.owner.Destroy();
+                this.eatObjects.RemoveAt(i);
+            }
+            else
+            {
+                if (obj.chunk.owner.collisionLayer != 0)
+                {
+                    obj.chunk.owner.ChangeCollisionLayer(0);
+                }
+                if (ModManager.MMF && obj.chunk.owner is Creature)
+                {
+                    (obj.chunk.owner as Creature).enteringShortCut = null;
+                }
+                float progression = obj.progression;
+                obj.progression += 0.0125f;
+                if (progression <= 0.5f && obj.progression > 0.5f)
+                {
+                    if (obj.chunk.owner is Creature)
+                    {
+                        (obj.chunk.owner as Creature).Die();
+                    }
+                    for (int j = 0; j < obj.chunk.owner.bodyChunkConnections.Length; j++)
+                    {
+                        obj.chunk.owner.bodyChunkConnections[j].type = PhysicalObject.BodyChunkConnection.Type.Pull;
+                    }
+                }
+                float num = obj.distance * (1f - obj.progression);
+                obj.chunk.vel *= 0f;
+                obj.chunk.MoveFromOutsideMyUpdate(eu, player.mainBodyChunk.pos + Custom.DirVec(player.mainBodyChunk.pos, obj.chunk.pos) * num);
+                for (int k = 0; k < obj.chunk.owner.bodyChunks.Length; k++)
+                {
+                    obj.chunk.owner.bodyChunks[k].vel *= 1f - obj.progression;
+                    obj.chunk.owner.bodyChunks[k].MoveFromOutsideMyUpdate(eu, Vector2.Lerp(obj.chunk.owner.bodyChunks[k].pos, player.mainBodyChunk.pos + Custom.DirVec(player.mainBodyChunk.pos, obj.chunk.owner.bodyChunks[k].pos) * num, obj.progression));
+                }
+                if (obj.chunk.owner.graphicsModule != null && obj.chunk.owner.graphicsModule.bodyParts != null)
+                {
+                    for (int l = 0; l < obj.chunk.owner.graphicsModule.bodyParts.Length; l++)
+                    {
+                        obj.chunk.owner.graphicsModule.bodyParts[l].vel *= 1f - obj.progression;
+                        obj.chunk.owner.graphicsModule.bodyParts[l].pos = Vector2.Lerp(obj.chunk.owner.graphicsModule.bodyParts[l].pos, player.mainBodyChunk.pos, obj.progression);
+                    }
+                }
+            }
+        }
+    }
+
+
+    public bool CheckDaddyConsumption(PhysicalObject otherObject)
+    {
+        bool result = false;
+        if (otherObject != null)
+        {
+            if (otherObject is DaddyLongLegs)
+            {
+                result = false;
+            }
+            else
+            {
+                result = (otherObject.TotalMass < 1.6f * player.TotalMass);
+            }
+        }
+        return result;
+    }
+
+
+
+    public void Collide(PhysicalObject otherObject, int myChunk, int otherChunk)
+    {
+        if (player.room == null) return;
+        if (CheckDaddyConsumption(otherObject))
+        {
+            bool grabbing = false;
+            if (this.digestingCounter > 0)
+            {
+                return;
+            }
+            int num = 0;
+            while (num < this.tentacles.Length && !grabbing)
+            {
+                if (this.tentacles[num].grabChunk != null && this.tentacles[num].grabChunk.owner == otherObject)
+                {
+                    grabbing = true;
+                }
+                num++;
+            }
+            int num2 = 0;
+            while (num2 < this.eatObjects.Count && grabbing)
+            {
+                if (this.eatObjects[num2].chunk.owner == otherObject)
+                {
+                    grabbing = false;
+                }
+                num2++;
+            }
+            // 如果有抓住生物后吃掉 的输入条件，写在下面这一行
+            if (grabbing)
+            {
+                if (player.graphicsModule != null)
+                {
+                    if (otherObject is IDrawable)
+                    {
+                        player.graphicsModule.AddObjectToInternalContainer(otherObject as IDrawable, 0);
+                    }
+                    else if (otherObject.graphicsModule != null)
+                    {
+                        player.graphicsModule.AddObjectToInternalContainer(otherObject.graphicsModule, 0);
+                    }
+                }
+                this.eatObjects.Add(new DaddyLongLegs.EatObject(otherObject.bodyChunks[otherChunk], Vector2.Distance(player.bodyChunks[myChunk].pos, otherObject.bodyChunks[otherChunk].pos)));
+                this.player.room.PlaySound(SoundID.Bro_Digestion_Init, player.bodyChunks[myChunk].pos);
+            }
+        }
+    }
 
 
 

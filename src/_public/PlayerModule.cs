@@ -109,7 +109,7 @@ public class PlayerModule
         swarmerManager?.Update(eu);
         if (srsLightSource != null && srsLightSource.slatedForDeletion) { srsLightSource = null; }
         srsLightSource?.Update();
-        daddy?.Update();
+        daddy?.Update(eu);
         if (player.room == null || player.dead) return; // woc 这句话坑死我了
         nshInventory?.Update(eu);
         gravityController?.Update(eu);

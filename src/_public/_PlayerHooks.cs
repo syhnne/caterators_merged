@@ -80,6 +80,7 @@ public class PlayerHooks
         On.Player.Die += Player_Die;
         On.Player.Destroy += Player_Destroy;
         On.Player.MovementUpdate += Player_MovementUpdate;
+        On.Player.Collide += Player_Collide;
         /*new Hook(
             typeof(PhysicalObject).GetProperty(nameof(PhysicalObject.TotalMass), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
             get_PhysicalObject_TotalMass
@@ -578,6 +579,16 @@ public class PlayerHooks
         }
     }
 
+
+
+    private static void Player_Collide(On.Player.orig_Collide orig, Player self, PhysicalObject otherObject, int myChunk, int otherChunk)
+    {
+        orig(self, otherObject, myChunk, otherChunk);
+        if (Plugin.playerModules.TryGetValue(self, out var mod) && mod.daddy != null)
+        {
+            mod.daddy.Collide(otherObject, myChunk, otherChunk);
+        }
+    }
 
 
 
