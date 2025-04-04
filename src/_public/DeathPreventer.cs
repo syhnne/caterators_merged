@@ -360,44 +360,52 @@ public class DeathPreventer
     // 检测一些常见的死法，比如被蜥蜴咬
     public void Update()
     {
-        
-        if (player.slatedForDeletetion || player.room == null) return;
-
-        // Plugin.Log(justPreventedCounter);
-        // 防止反复去世
-        if (justPreventedCounter > 0)
+        int ex = 0;
+        try
         {
-            justPreventedCounter--;
-            SetInvuln();
-        }
-        else { DisableInvuln(); }
+            if (player.slatedForDeletetion || player.room == null) return;
 
-        // 
-        /*if (player.grabbedBy != null)
-        {
-            foreach (var item in player.grabbedBy)
+            // Plugin.Log(justPreventedCounter);
+            // 防止反复去世
+            if (justPreventedCounter > 0)
             {
-                if (item.grabber is not Player)
+                justPreventedCounter--;
+                SetInvuln();
+            }
+            else { DisableInvuln(); }
+            ex = 1;
+            // 
+            /*if (player.grabbedBy != null)
+            {
+                foreach (var item in player.grabbedBy)
                 {
-                    TryPreventDeath(PlayerDeathReason.DangerGrasp);
+                    if (item.grabber is not Player)
+                    {
+                        TryPreventDeath(PlayerDeathReason.DangerGrasp);
+                    }
+                }
+            }*/
+            bool g = false;
+            if (player.grabbedBy != null)
+            {
+                for (int i = player.grabbedBy.Count - 1; i >= 0; i--)
+                {
+                    // 这我不好说嗷 不知道除了蛞蝓猫以外还有什么属于是危险生物
+                    if (player.grabbedBy[i].grabber is not Player)
+                    {
+                        g = true;
+                    }
                 }
             }
-        }*/
-        bool g = false;
-        for (int i = player.grabbedBy.Count - 1; i >= 0; i--)
-        {
-            // 这我不好说嗷 不知道除了蛞蝓猫以外还有什么属于是危险生物
-            if (player.grabbedBy[i].grabber is not Player)
+            ex = 2;
+            if (g) dangerGraspCounter++; else dangerGraspCounter = 0;
+            ex = 3;
+            if (dangerGraspCounter > 58 && player.dangerGrasp != null && player.dangerGrasp.grabber is not Centipede)
             {
-                g = true;
+                TryPreventDeath(PlayerDeathReason.DangerGrasp);
             }
         }
-        if (g) dangerGraspCounter++; else dangerGraspCounter = 0;
-
-        if (dangerGraspCounter > 58 && player.dangerGrasp.grabber is not Centipede)
-        {
-            TryPreventDeath(PlayerDeathReason.DangerGrasp);
-        }
+        catch (Exception e) { Plugin.LogException(e); Plugin.Log("exception:", ex); }
 
     }
 

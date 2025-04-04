@@ -380,6 +380,7 @@ public class PlayerHooks
         Plugin.Log("  ROOM: ", newRoom.abstractRoom.name, "STORY:", newRoom.game.StoryCharacter);
 
         Plugin.Log("totalmass:", self.TotalMass);
+        Plugin.Log("room danger type:", newRoom.roomSettings.DangerType.GetType());
 
         // Plugin.Log("--CustomSaveData: CyclesFromLastEnterSSAI", dp.CyclesFromLastEnterSSAI);
 

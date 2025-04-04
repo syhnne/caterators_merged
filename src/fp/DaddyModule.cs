@@ -19,6 +19,9 @@ namespace Caterators_by_syhnne.fp;
 // 我们的香菇终于初具猫形了
 // 受不了了，一出门就被蜥蜴群殴，我要先改生物捕食关系
 
+// 2024年10月25日，我不想写了！！摆烂！！我要摆烂！！
+// 你知道吗，我要改这个东西的话需要先花大量时间读懂这些天书
+
 public class DaddyModule : IDrawable
 {
     public WeakReference<Player> owner;

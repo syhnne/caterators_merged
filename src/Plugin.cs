@@ -33,8 +33,7 @@ namespace Caterators_by_syhnne;
 
 
 
-// 天呐，好大的工作量啊（倒地不起）
-// 今天是2024年10月25号，我两个月没打开这玩意现在是一点也不记得自己写了啥了，跟tm读天书一样
+// 今天是2025年2月6日，我已经半年没打开过这玩意了，本来只有我和上帝能看懂的代码，现在只有上帝能看懂了
 
 [BepInPlugin(MOD_ID, MOD_NAME, MOD_VERSION)]
 class Plugin : BaseUnityPlugin
@@ -91,7 +90,7 @@ class Plugin : BaseUnityPlugin
             On.RainWorldGame.ctor += RainWorldGame_ctor;
 
 
-            On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
+            // On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += SlugcatStats_HiddenOrUnplayableSlugcat;
             On.JollyCoop.JollyMenu.JollyPlayerSelector.Update += JollyPlayerSelector_Update;
             On.Menu.SlugcatSelectMenu.RefreshJollySummary += SlugcatSelectMenu_RefreshJollySummary;

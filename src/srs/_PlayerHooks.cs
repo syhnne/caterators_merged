@@ -210,7 +210,10 @@ public static class PlayerHooks
     private static void Creature_HypothermiaUpdate(On.Creature.orig_HypothermiaUpdate orig, Creature self)
     {
         orig(self);
-        if (self.room.roomSettings.DangerType != MoreSlugcatsEnums.RoomRainDangerType.Blizzard && self is Player && (self as Player).SlugCatClass == Enums.SRSname)
+        // 坏了 新dlc你把这个暴风雪给我放哪儿去了
+        // 我好像该出门了。。回头再跟你算账。。
+        return;
+        if (self.room.roomSettings.DangerType != RoomRain.DangerType.Blizzard && self is Player && (self as Player).SlugCatClass == Enums.SRSname)
         {
             // Plugin.Log("warm room hypothermia update");
             if (self.Hypothermia >= 10f && self.Consious && self.room != null && !self.room.abstractRoom.shelter)

@@ -274,7 +274,7 @@ public class CustomDaddyTentacle : Tentacle
                     if (this.tChunks[l].phase > -1f || (grabChunk.owner is not IPlayerEdible && this.room.GetTile(this.tChunks[l].pos).Solid))
                     {
                         //  || this.room.GetTile(this.tChunks[l].pos).Solid
-                        // 懂了，主要是注释这句话导致的松手，不然它基本上是不会松开的
+                        // 懂了，主要是上面这句话导致的松手，不然它基本上是不会松开的
                         Plugin.Log("too far release");
                         ReleaseGrasp(true);
                         break;

@@ -139,7 +139,7 @@ public class CustomLore
 
     // 防止玩家在循环耗尽的时候正常睡觉
     // 并且保存数据
-    private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
+    private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished, bool fromWarpPoint)
     {
         if (self.manager.upcomingProcess != null) return;
         foreach (AbstractCreature player in self.Players)
@@ -171,7 +171,7 @@ public class CustomLore
         {
             fp.CustomLore.RainWorldGame_Win(self, malnourished);
         }
-        orig(self, malnourished);
+        orig(self, malnourished, fromWarpPoint);
     }
 
 

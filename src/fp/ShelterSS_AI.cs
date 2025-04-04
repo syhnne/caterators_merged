@@ -383,7 +383,7 @@ public static class ShelterSS_AI
                         }
                     }
                 }
-                self.room.game.Win(foodInRoom < y);
+                self.room.game.Win(foodInRoom < y, false);
             }
             else
             {
@@ -402,7 +402,7 @@ public static class ShelterSS_AI
             if (winGame)
             {
                 Plugin.Log("single player win");
-                self.room.game.Win((self.room.game.Players[0].realizedCreature as Player).FoodInRoom(self.room, false) < (self.room.game.Players[0].realizedCreature as Player).slugcatStats.foodToHibernate);
+                self.room.game.Win((self.room.game.Players[0].realizedCreature as Player).FoodInRoom(self.room, false) < (self.room.game.Players[0].realizedCreature as Player).slugcatStats.foodToHibernate, false);
             }
             else
             {
